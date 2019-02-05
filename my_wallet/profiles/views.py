@@ -1,3 +1,6 @@
 from django.shortcuts import render
+from django.views import View
 
-# Create your views here.
+class MyProfileCreation(View):
+    def get(self, request):
+        return render(request, 'profiles/signup.html')
