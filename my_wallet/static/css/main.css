@@ -1,0 +1,53 @@
+body
+{
+    background: #ff00cc;  /* fallback for old browsers */
+    background: -webkit-linear-gradient(to left, #333399, #ff00cc);  /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to left, #333399, #ff00cc); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+}
+h1
+{
+    color: #ffffff;
+    font-weight: bold;
+}
+.wrapper
+{
+   font-size: 20px;
+   width: 90%;
+   border-bottom: 1px solid #b1b5bc;
+   margin: auto;
+}
+.navbar
+{
+   height: 100px;
+}
+
+.navbar .navbar-brand
+{
+    color: #000000;
+    margin-right: 30px;
+    font: 1px 'Great Vibes', Helvetica, sans-serif;
+    font-weight: bold;
+    text-shadow: 4px 4px 3px rgba(0,0,0,0.1);
+    font-size: 30px;
+}
+.navbar .navbar-nav > li > a
+{
+    color: #ffffff;
+    letter-spacing: 1px;
+    margin: auto 7px;
+}
+.navbar .navbar-nav > li > a:hover {
+      background-color: #546175;
+      color: #ffffff;
+      border-radius: 20px;
+ }
+
+
+footer
+{
+  background-color: #ffffff;
+  height: 100px;
+  position: fixed;
+  bottom: 0px;
+
+}

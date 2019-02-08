@@ -3,4 +3,4 @@ from django.contrib.auth.models import AbstractUser
 
 
 class Profile(AbstractUser):
-    pass
+    image = models.ImageField(upload_to='profile_pics/')

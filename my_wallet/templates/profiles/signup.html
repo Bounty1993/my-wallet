@@ -1,10 +1,42 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-    <h1>Hello World</h1>
-</body>
-</html>
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+    <div class="row">
+    <div class="col-sm-9">
+        <div class="bg-white mt-3 p-3" style="border-radius: 30px">
+        <h3 class="mb-5">Registration Form</h3>
+        <form method="post" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+                <ul class="alert alert-danger">
+                {% for error in form.non_field_errors %}
+                    <li><strong>{{error}}</strong></li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+            {% for field in form %}
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-sm-3"
+                            {{ field.label_tag }}
+                        </div>
+                        <div class="col-sm-5">
+                            {{ field }}
+                        </div>
+                    </div>
+                    {% for error in field.errors %}
+                        <div class="invalid-feedback">
+                            {{ error }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+            <button class="btn btn-primary" type="submit">Register</button>
+        </form>
+        </div>
+    </div>
+        <div class="col-sm-3">
+            <div class="bg-white mt-3">Dummy data</div>
+        </div>
+    </div>
+{% endblock content %}

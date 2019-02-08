@@ -29,10 +29,13 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'coverage',
+    'crispy_forms',
 
     'my_wallet.profiles',
+    'my_wallet.core',
 ]
 
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -120,7 +123,16 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
-STATIC_URL = '/static/'
+STATIC_URL = '/my_wallet/static/'
+
+STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'my_wallet/staticfiles')
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'my_wallet/static'),
+]
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 if DEBUG:
    INTERNAL_IPS = ('127.0.0.1', 'localhost',)
