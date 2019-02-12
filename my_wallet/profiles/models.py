@@ -1,6 +1,23 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from PIL import Image
+from django.urls import reverse
 
 
 class Profile(AbstractUser):
-    image = models.ImageField(upload_to='profile_pics/')
+
+    image = models.ImageField(upload_to='profile_pics/', default=None,
+                              blank=True)
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        img = Image.open(self.image.path)
+        output_size = (125, 125)
+        img.thumbnail(output_size)
+        img.save(self.image.path)
+
+    def get_absolute_url(self):
+        return reverse('profiles:profile')
+
+    def __str__(self):
+        return self.username

@@ -1,10 +1,20 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-    <h1>Hello User</h1>
-</body>
-</html>
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+<ul class="nav nav-tabs" role="tablist">
+    <li class="nav-item">
+        <a class="nav-link active" data-toggle="tab" href="#main">My Data</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" data-toggle="tab" href="#portfolio">Portfolio</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" data-toggle="tab" href="#password1">Password</a>
+    </li>
+</ul>
+<div class="tab-content" style="background-color: #ffffff">
+    <div class="tab-pane container active" id="main">{{form|crispy}}</div>
+    <div class="tab-pane container fade" id="portfolio">{{total_wealth}}</div>
+    <div class="tab-pane container fade" id="password1">Password</div>
+</div>
+{% endblock content %}

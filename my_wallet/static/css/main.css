@@ -41,7 +41,11 @@ h1
       color: #ffffff;
       border-radius: 20px;
  }
-
+.form_panel
+{
+    background-color: #f2f4f7;
+    margin: auto;
+}
 
 footer
 {

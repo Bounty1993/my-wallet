@@ -36,8 +36,12 @@
                 </li>
             </ul>
             <form class="form-inline ml-auto">
-                    <a class="btn btn-primary navbar-btn navbar-right mr-1" href="#">Sign Up</a>
-                    <a class="btn btn-success navbar-btn navbar-right mr-2" href="#">Login</a>
+                {% if user.is_authenticated %}
+                    <a class="btn btn-primary navbar-btn navbar-right mr-1" href="{% url 'profiles:logout' %}">Logout</a>
+                {% else %}
+                    <a class="btn btn-primary navbar-btn navbar-right mr-1" href="{% url 'profiles:signup' %}">Sign Up</a>
+                    <a class="btn btn-success navbar-btn navbar-right mr-2" href="{% url 'profiles:login' %}">Login</a>
+                {% endif %}
             </form>
             </div>
 
