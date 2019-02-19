@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+    <div class="container">
+        <form method="post">
+            {% csrf_token %}
+            {{ formset.management_form }}
+            {% for form in formset %}
+                {% for field in form %}
+                    {{ field.label_tag }} {{ field }}
+                {% endfor %}
+            {% endfor %}
+            <div>
+            <div class="col-4 offset-2">
+                <button type="submit" class="btn btn-block btn-primary">Create</button>
+            </div>
+        </div>
+    </form>
+
+    <form class="form" method="POST" action="">
+        {% csrf_token %}
+        {{ formset.management_form|crispy}}
+        {% for form in formset %}
+            <div class="row">
+            <h1 class="col-5 offset-1">Hello from here</h1>
+            <div class="col-5 offset-right-1">
+            {% crispy form %}
+            </div>
+            </div>
+        {% endfor %}
+        <div>
+            <div class="col-4 offset-2">
+                <button type="submit" class="btn btn-block btn-primary">Create</button>
+            </div>
+        </div>
+    </form>
+    </div>
+
+{% endblock content %}

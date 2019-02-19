@@ -7,7 +7,8 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('', include('my_wallet.core.urls', namespace='core')),
     path('admin/', admin.site.urls),
-    path('profile/', include('my_wallet.profiles.urls', namespace='profiles'))
+    path('profile/', include('my_wallet.profiles.urls', namespace='profiles')),
+    path('stocks/', include('my_wallet.stocks.urls', namespace='stocks'))
 ]
 
 if settings.DEBUG:

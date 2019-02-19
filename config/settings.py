@@ -30,9 +30,11 @@ INSTALLED_APPS = [
 
     'coverage',
     'crispy_forms',
+    'django_tables2',
 
     'my_wallet.profiles',
     'my_wallet.core',
+    'my_wallet.stocks',
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'

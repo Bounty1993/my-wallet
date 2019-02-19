@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block content %}
+{% load render_table from django_tables2 %}
+<div class="container">
+  <row>
+      <ul class="breadcrumb">
+          <li class="breadcrumb-item">
+              <a href="{% url 'core:home' %}">
+                  Home
+              </a>
+          </li>
+          <li class="breadcrumb-item">
+              <a href="{% url 'stocks:list' %}">
+                  Stocks
+              </a>
+          </li>
+          <li class="breadcrumb-item active">
+                  Details
+          </li>
+      </ul>
+  </row>
+  <div class="row">
+    <div class="col-sm-4">
+        <div class="card shadowing">
+          <div class="card-header">
+            <h3 style="font-weight:bold; text-align: center">{{stocks.name}}</h3>
+          </div>
+          <div class="card-body">
+            <p>Basic Informations:</p>
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item">
+                  Ticker: <span style="float:right">{{stocks.ticker}}</span>
+              </li>
+              <li class="list-group-item">
+                  Nominal change <span style="float:right">{{currency}}</span>
+              </li>
+              <li class="list-group-item">
+                  Percent change <span style="float:right">{{percent}}</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+    </div>
+    <div class="col-sm-8">
+        <div class="jumbotron shadowing">Hello from the other side</div>
+        {% render_table prices %}
+    </div>
+  </div>
+</div>
+{% endblock content %}

@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+  <row>
+      <ul class="breadcrumb">
+          <li class="breadcrumb-item">
+              <a href="{% url 'core:home' %}">
+                  Home
+              </a>
+          </li>
+          <li class="breadcrumb-item">
+              <a href="{% url 'stocks:list' %}">
+                  Stocks
+              </a>
+          </li>
+          <li class="breadcrumb-item active">
+                  News
+          </li>
+      </ul>
+  </row>
+  <div class="row">
+    <div class="col-sm-10 offset-sm-1">
+        <div class="articles shadowing">
+        <ul class="nav nav-pills nav-justified mb-3" id="pills-tab" role="tablist">
+          <li class="nav-item">
+            <a class="nav-link active" id="pills-google-tab" data-toggle="pill" href="#pills-google" role="tab" aria-controls="pills-google" aria-selected="true">Google</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" id="pills-yahoo-tab" data-toggle="pill" href="#pills-yahoo" role="tab" aria-controls="pills-yahoo" aria-selected="false">Yahoo</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" id="pills-contact-tab" data-toggle="pill" href="#pills-contact" role="tab" aria-controls="pills-contact" aria-selected="false">Bloomberg</a>
+          </li>
+        </ul>
+        <div class="tab-content" id="pills-tabContent">
+          <div class="tab-pane fade show active" id="pills-google" role="tabpanel" aria-labelledby="pills-google-tab">
+              <h2>Google Articles</h2>
+              <ul class="list-group">
+                  {% for key, article in google_news.items %}
+                  <li class="list-group-item">
+                    <p>{{article.title }}</p>
+                    <p>{{article.summary}}</p>
+                    <a class="btn btn-primary" href="{{article.link}}" target="_blank">
+                        See that at Google website
+                    </a>
+                  </li>
+                  {% endfor %}
+              </ul>
+          </div>
+          <div class="tab-pane fade" id="pills-yahoo" role="tabpanel" aria-labelledby="pills-yahoo-tab">
+              <h2>Yahoo Articles</h2>
+              <ul class="list-group">
+                  {% for key, article in yahoo_news.items %}
+                  <li class="list-group-item">
+                    <p>{{article.title }}</p>
+                    <p>{{article.summary}}</p>
+                    <a class="btn btn-primary" href="{{article.link}}" target="_blank">
+                        See that at Yahoo website
+                    </a>
+                  </li>
+                  {% endfor %}
+              </ul>
+          </div>
+          <div class="tab-pane fade" id="pills-contact" role="tabpanel" aria-labelledby="pills-contact-tab">...</div>
+        </div>
+        </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
