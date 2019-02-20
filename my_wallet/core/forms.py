@@ -19,5 +19,3 @@ class AssetCreationForm(forms.ModelForm):
         }
 
 
-AssetCreationFormset = modelformset_factory(
-    Asset, form=AssetCreationForm)

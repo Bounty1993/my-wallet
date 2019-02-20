@@ -14,7 +14,6 @@ class MyProfileCreationView(CreateView):
 
     def form_valid(self, form):
         profile = form.save()
-        Portfolio.objects.create(profile=profile)
         return redirect(profile)
 
 

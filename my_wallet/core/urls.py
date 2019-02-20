@@ -1,9 +1,9 @@
 from django.urls import path, include
-from .views import HomeView, create_asset
+from .views import HomeView, AssetCreateView
 
 app_name = 'core'
 urlpatterns = [
     path('', HomeView.as_view(), name='home'),
-    path('new/', create_asset, name='new'),
+    path('new/', AssetCreateView.as_view(), name='new'),
 ]
 

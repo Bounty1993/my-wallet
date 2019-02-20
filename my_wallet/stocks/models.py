@@ -24,6 +24,10 @@ class Stocks(models.Model):
     def __str__(self):
         return self.name
 
+    @staticmethod
+    def get_current_price(ticker):
+        return quotes_IEX()['latestPrice']
+
     def get_past_data(self):
         # returns past prices of a Stocks' instance (last 5 years)
         url = 'https://api.iextrading.com/1.0/stock/{}/chart/5y'.format(self.ticker)
@@ -70,10 +74,8 @@ class Stocks(models.Model):
         quotes = quotes_IEX(ticker)
 
         data = {'name': quotes['companyName'],
-                'ticker': quotes['symbol'],
-                'current_price': quotes['latestPrice'],
-                'date_price': datetime.date.today()}
-
+                'ticker': quotes['symbol']
+                }
         stock = cls.objects.create(name=data['name'],
                                    ticker=data['ticker'])
         stock.get_past_data()

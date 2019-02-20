@@ -6,7 +6,7 @@ from django.urls import reverse
 
 class Profile(AbstractUser):
 
-    image = models.ImageField(upload_to='profile_pics/', default=None,
+    image = models.ImageField(upload_to='profile_pics/', default='default.png',
                               blank=True)
 
     def save(self, *args, **kwargs):
