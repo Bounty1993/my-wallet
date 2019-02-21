@@ -26,7 +26,7 @@ class Stocks(models.Model):
 
     @staticmethod
     def get_current_price(ticker):
-        return quotes_IEX()['latestPrice']
+        return quotes_IEX(ticker)['latestPrice']
 
     def get_past_data(self):
         # returns past prices of a Stocks' instance (last 5 years)

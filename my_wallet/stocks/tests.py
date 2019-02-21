@@ -4,7 +4,7 @@ from .models import Stocks, Prices
 
 class StocksModels(TestCase):
     def setUp(self):
-        Stocks.get_current_data(ticker='AAPL')
+        Stocks.get_stocks_with_data('AAPL')
         self.apple = Stocks.objects.get(ticker='AAPL')
 
     def test_creation_stocks(self):
