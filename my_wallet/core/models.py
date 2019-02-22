@@ -13,7 +13,7 @@ class Portfolio(models.Model):
     profile = models.ForeignKey(Profile, related_name='portfolio',
                                 on_delete=models.CASCADE)
     beginning_cash = models.DecimalField(max_digits=11, decimal_places=2)
-    current_cash = models.DecimalField(max_digits=11, decimal_places=2)
+    cash = models.DecimalField(max_digits=11, decimal_places=2)
     created_at = models.DateTimeField(auto_now_add=True)
     description = models.CharField(max_length=250, blank=True)
     is_visible = models.BooleanField(default=True)
@@ -27,43 +27,51 @@ class Portfolio(models.Model):
     def __str__(self):
         return self.name
 
-    def get_total_wealth(self):
-        # returns Profile's wealth (all Assets * number of shares
-        total_wealth = 0
-        for asset in self.assets:
-            current_value = asset.get_current_value()
-            total_wealth += current_value
-        return total_wealth
+    @property
+    def value(self):
+        total_value = 0
+        for asset in self.asset:
+            total_value += asset.value
+        return total_value
 
-    def create_transaction(self, ticker, number, price):
+
+    def create_transaction(self, ticker, number, price, kind):
         stocks = Stocks.objects.get(ticker=ticker)
         transaction = Transaction.objects.create(
             portfolio=self,
             stocks=stocks,
             number=number,
             price=price,
-            kind='B',
+            kind=kind,
             date=timezone.now()
         )
         return transaction
 
-    def buy_asset(self, ticker, number):
+    def buy_transaction(self, ticker, number):
         price = Stocks.get_current_price(ticker)
-        self.current_cash -= price * number
-        self.save()
+        value = price * number
+        if self.cash < value:
+            print ("Not enough money")
+        self.cash -= price * number
+        self.save()  # add method to change data
         transaction = self.create_transaction(
-            ticker, number, price
+            ticker, number, price, kind='B'
         )
-        transaction.buy_update()
+        transaction.buy()
 
-    def sell_asset(self, ticker, number):
-        pass
-
-    def make_transaction(self, ticker, number, kind):
-        if kind == 'B':
-            self.buy_asset(ticker, number)
+    def sell_transaction(self, ticker, number):
+        try:
+            asset = self.asset.get(ticker=ticker)
+        except Asset.DoesNotExist:
+            print('You have no asset')
         else:
-            self.sell_asset(ticker, number)
+            price = Stocks.get_current_price(ticker)
+            self.cash -= price * number
+            self.save() # add method to change data
+            transaction = self.create_transaction(
+                ticker, number, price, kind='S'
+            )
+            transaction.sell(asset)
 
 
 class Asset(models.Model):
@@ -102,16 +110,32 @@ class Transaction(models.Model):
             sum_number=self.number,
         )
 
-    def buy_modify(self, current_asset):
-        pass
+    def buy_modify(self, asset):
+        total_cost = asset.cost * asset.number
+        asset.number += self.number
+        new_cost = total_cost + (self.number * self.price)
+        asset.avg_cost = new_cost/asset.number
 
-    def buy_update(self):
+    def buy(self):
         try:
-            current_asset = self.portfolio.asset.get(stocks=self.stocks)
+            asset = self.portfolio.asset.get(stocks=self.stocks)
         except Asset.DoesNotExist:
             self.create_asset()
         else:
-            self.buy_modify(current_asset)
+            self.buy_modify(asset)
+
+    def sell_modify(self, asset):
+        total_cost = asset.cost * asset.number
+        asset.number -= self.number
+        new_cost = total_cost - (self.number * self.price)
+        asset.avg_cost = new_cost/asset.number
+
+    def sell(self, asset):
+        if self.number == asset.number:
+            asset.is_open = False
+            asset.save()  # add proper method
+        else:
+            self.sell_modify(asset)
 
 
 

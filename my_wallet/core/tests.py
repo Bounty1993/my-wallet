@@ -1,8 +1,6 @@
 from django.test import TestCase
-from .models import *
-import datetime
 from my_wallet.profiles.models import Profile
-from .models import Portfolio, Transaction
+from .models import Portfolio, Transaction, Asset
 from my_wallet.stocks.models import Stocks
 
 class MyModelTests(TestCase):
@@ -35,7 +33,7 @@ class MyModelTests(TestCase):
         asset = Asset.objects.all().first()
         self.assertEqual(asset.portfolio, self.portfolio)
         self.assertEqual(asset.stocks, self.stocks)
-        self.assertEquals(asset.avg_cost, self.stock_price)
+        self.assertEquals(float(asset.avg_cost), self.stock_price)
         self.assertEquals(asset.sum_number, 200)
 
     def test_portfolio_create_transaction(self):
