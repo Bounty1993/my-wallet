@@ -28,12 +28,23 @@ class Portfolio(models.Model):
         return self.name
 
     @property
-    def value(self):
+    def stocks_value(self):
         total_value = 0
         for asset in self.asset:
             total_value += asset.value
         return total_value
 
+    @property
+    def total_value(self):
+        return self.stocks_value + self.cash
+
+    @property
+    def total_return(self):
+        return self.total_value - self.beginning_cash
+
+    @property
+    def percent_return(self):
+        return (self.total_return/self.beginning_cash) - 1
 
     def create_transaction(self, ticker, number, price, kind):
         stocks = Stocks.objects.get(ticker=ticker)
@@ -51,7 +62,7 @@ class Portfolio(models.Model):
         price = Stocks.get_current_price(ticker)
         value = price * number
         if self.cash < value:
-            print ("Not enough money")
+            print("Not enough money")
         self.cash -= price * number
         self.save()  # add method to change data
         transaction = self.create_transaction(
