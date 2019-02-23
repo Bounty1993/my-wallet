@@ -29,12 +29,12 @@ class Portfolio(models.Model):
         return self.name
 
     def get_absolute_url(self):
-        return reverse('portfolioportfolio:details', kwargs={'name': self.name})
+        return reverse('portfolio:details', kwargs={'name': self.name})
 
     @property
     def stocks_value(self):
         total_value = 0
-        for asset in self.asset:
+        for asset in self.asset.all():
             total_value += asset.value
         return total_value
 
@@ -66,7 +66,7 @@ class Portfolio(models.Model):
         price = Stocks.get_current_price(ticker)
         value = price * number
         if self.cash < value:
-            print("Not enough money")
+            raise ValueError('Not enough money')
         self.cash -= price * number
         self.save()  # add method to change data
         transaction = self.create_transaction(
@@ -78,7 +78,7 @@ class Portfolio(models.Model):
         try:
             asset = self.asset.get(ticker=ticker)
         except Asset.DoesNotExist:
-            print('You have no asset')
+            raise ValueError('You have no asset')
         else:
             price = Stocks.get_current_price(ticker)
             self.cash -= price * number

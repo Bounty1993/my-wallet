@@ -22,7 +22,7 @@
     {% include "profiles/sidebar.html" %}
   </div>
   <div class="col-sm-9">
-    <p>Hi {{request.user.username}}</p>
+    <p>Hi {{profile.username}}</p>
     {% if not num_portfolios %}
         <p>Make your first portfolio and start new chapter in your life</p>
         <p>If you have any questions just contact us</p>

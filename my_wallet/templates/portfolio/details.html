@@ -1,6 +1,49 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="container">
-    Hello
+<ul class="breadcrumb">
+          <li class="breadcrumb-item">
+              <a href="{% url 'core:home' %}">
+                  Home
+              </a>
+          </li>
+          <li class="breadcrumb-item">
+              <a href="{% url 'profiles:profile' %}">
+                  Profile
+              </a>
+          </li>
+          <li class="breadcrumb-item active">
+                  Details
+          </li>
+      </ul>
+    <div class="row">
+        <div class="col-sm-3">
+            {% include "profiles/sidebar.html" %}
+        </div>
+        <div class="col-sm-9">
+          <div class="main-panel shadowing">
+            <p>In cash you have {{portoflio.cash}}</p>
+            <p>Total value of your portfolio: {{portfolio.total_value}}</p>
+
+            <div class="btn-group">
+                <a href="#" class="btn btn-success">New Transaction</a>
+                <a href="#" class="btn btn-primary">History</a>
+            </div>
+            {% for asset in assets %}
+                <p>{{asset}}</p>
+
+            {% empty %}
+                <p>You have no assets</p>
+            {% endfor %}
+          </div>
+
+
+
+
+        </div>
+
+
+
+    </div>
 </div>
 {% endblock %}
