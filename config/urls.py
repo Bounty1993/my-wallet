@@ -6,6 +6,7 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('portfolio/', include('my_wallet.portfolio.urls', namespace='portfolio')),
+    path('core/', include('my_wallet.core.urls', namespace='core')),
     path('admin/', admin.site.urls),
     path('profile/', include('my_wallet.profiles.urls', namespace='profiles')),
     path('stocks/', include('my_wallet.stocks.urls', namespace='stocks'))

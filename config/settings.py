@@ -34,6 +34,7 @@ INSTALLED_APPS = [
 
     'my_wallet.profiles',
     'my_wallet.portfolio',
+    'my_wallet.core',
     'my_wallet.stocks',
 ]
 
