@@ -5,7 +5,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    path('', include('my_wallet.core.urls', namespace='core')),
+    path('portfolio/', include('my_wallet.portfolio.urls', namespace='portfolio')),
     path('admin/', admin.site.urls),
     path('profile/', include('my_wallet.profiles.urls', namespace='profiles')),
     path('stocks/', include('my_wallet.stocks.urls', namespace='stocks'))

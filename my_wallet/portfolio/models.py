@@ -29,7 +29,7 @@ class Portfolio(models.Model):
         return self.name
 
     def get_absolute_url(self):
-        return reverse('portfolio:details', kwargs={'name': self.name})
+        return reverse('portfolioportfolio:details', kwargs={'name': self.name})
 
     @property
     def stocks_value(self):

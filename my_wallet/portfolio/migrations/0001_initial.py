@@ -52,7 +52,7 @@ class Migration(migrations.Migration):
                 ('number', models.PositiveIntegerField()),
                 ('kind', models.CharField(choices=[('S', 'SELL'), ('B', 'BUY')], max_length=4)),
                 ('date', models.DateTimeField()),
-                ('portfolio', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='transaction', to='core.Portfolio')),
+                ('portfolio', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='transaction', to='portfolio.Portfolio')),
                 ('stocks', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='stocks.Stocks')),
             ],
         ),

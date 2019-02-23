@@ -4,7 +4,6 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .forms import MyProfileCreationForm, ProfileUpdateForm
 from .models import Profile
-from my_wallet.core.models import Portfolio
 
 
 class MyProfileCreationView(CreateView):
@@ -29,5 +28,5 @@ class ProfileView(LoginRequiredMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['total_wealth'] = self.object.portfolio.get_summary()
+        # context['total_wealth'] = self.object.portfolio.total_value
         return context

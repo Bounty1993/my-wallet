@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('stocks', '0001_initial'),
-        ('core', '0001_initial'),
+        ('portfolio', '0001_initial'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
@@ -24,7 +24,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='asset',
             name='portfolio',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='asset', to='core.Portfolio'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='asset', to='portfolio.Portfolio'),
         ),
         migrations.AddField(
             model_name='asset',

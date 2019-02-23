@@ -3,7 +3,7 @@ from .views import (HomeView, NewPortfolioView,
                    PortfolioDetails,
 )
 
-app_name = 'portfolio'
+app_name = 'portfolioportfolio'
 urlpatterns = [
     path('', HomeView.as_view(), name='home'),
     path('new/', NewPortfolioView.as_view(), name='new'),

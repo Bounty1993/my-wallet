@@ -6,10 +6,6 @@ from .forms import NewPortfolioForm
 from .models import Portfolio
 
 
-class HomeView(TemplateView):
-    template_name = 'portofolio/home.html'
-
-
 class NewPortfolioView(CreateView):
     template_name = 'portfolio/new.html'
     form_class = NewPortfolioForm

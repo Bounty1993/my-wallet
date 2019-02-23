@@ -33,7 +33,7 @@ INSTALLED_APPS = [
     'django_tables2',
 
     'my_wallet.profiles',
-    'my_wallet.core',
+    'my_wallet.portfolio',
     'my_wallet.stocks',
 ]
 

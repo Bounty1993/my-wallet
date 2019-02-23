@@ -16,16 +16,8 @@
 <div class="tab-content" style="background-color: #ffffff">
     <div class="tab-pane container active" id="main">
         <div class="row p-4">
-            <div class="col-sm-4">
-                <div class="card">
-                    <img class="card-img-top" src="{{profile.image.url}}" alt="Profile picture">
-                    <div class="card-body">
-                        <h4 class="card-title">{{profile.username}}</h4>
-                        <p class="card-text">Some example text.</p>
-                        <a href="#" class="btn btn-primary">See Profile</a>
-                    </div>
-                </div>
-            </div>
+            <div col
+            {% include "profiles/sidebar.html" %}
             <div class="col-sm-8">
             <form action="" method="post">
                 {% csrf_token %}
