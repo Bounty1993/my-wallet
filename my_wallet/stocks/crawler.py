@@ -4,7 +4,16 @@ from bs4 import BeautifulSoup
 from abc import ABC, abstractmethod
 import re
 
+def quotes_IEX(ticker):
+    quotes = {'AAPL': 172.97, 'IBM': 139.25,
+              'GOOGL': 1116.56, 'MSFT': 110.97,
+              'BAC': 29.08,
+    }
+    if ticker in quotes:
+        return {'latestPrice': quotes[ticker]}
+    return None
 
+"""
 def quotes_IEX(ticker):
     url = 'https://api.iextrading.com/1.0/stock/{}/book'.format(ticker)
     response = requests.get(url)
@@ -15,7 +24,7 @@ def quotes_IEX(ticker):
         raise ValueError('ticker probable is not correct')
     return quotes
 
-
+"""
 class BaseCrawler(ABC):
 
     def get_soup(self):

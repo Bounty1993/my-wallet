@@ -1,6 +1,7 @@
 from django import forms
 from .models import Asset
-from .models import Portfolio
+from .models import Portfolio, Transaction
+
 
 class NewPortfolioForm(forms.ModelForm):
 
@@ -12,4 +13,13 @@ class NewPortfolioForm(forms.ModelForm):
             'beginning_cash',
             'cash',
             'is_visible'
+        )
+
+
+class TransactionForm(forms.ModelForm):
+    class Meta:
+        model = Transaction
+        fields = (
+            'stocks',
+            'number',
         )

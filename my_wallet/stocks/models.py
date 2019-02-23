@@ -4,6 +4,7 @@ import requests
 import datetime
 from .crawler import quotes_IEX
 from .utils import find_quote_day
+from decimal import Decimal, ROUND_HALF_UP
 
 
 class Stocks(models.Model):
@@ -23,6 +24,12 @@ class Stocks(models.Model):
 
     def __str__(self):
         return self.name
+
+    @property
+    def price(self):
+        cents = Decimal('0.01')
+        price = quotes_IEX(self.ticker)['latestPrice']
+        return Decimal(price).quantize(cents, ROUND_HALF_UP)
 
     @staticmethod
     def get_current_price(ticker):

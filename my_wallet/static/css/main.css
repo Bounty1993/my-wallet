@@ -85,7 +85,19 @@ h1
     padding: 20px;
     border-radius: 4px;
 }
+.my-btn
+{
 
+}
+
+.negative-value
+{
+    color: red;
+}
+.positive-value
+{
+    color: green;
+}
 .articles
 {
     background-color: white;

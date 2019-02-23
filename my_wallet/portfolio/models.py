@@ -1,5 +1,5 @@
 from django.db import models
-from decimal import Decimal
+from decimal import Decimal, getcontext, ROUND_HALF_UP
 import datetime
 from django.utils import timezone
 import pytz
@@ -35,7 +35,7 @@ class Portfolio(models.Model):
     def stocks_value(self):
         total_value = 0
         for asset in self.asset.all():
-            total_value += asset.value
+            total_value += asset.stocks.price * asset.sum_number
         return total_value
 
     @property
@@ -48,45 +48,25 @@ class Portfolio(models.Model):
 
     @property
     def percent_return(self):
-        return (self.total_return/self.beginning_cash) - 1
+        return self.total_return/self.beginning_cash * 100
 
-    def create_transaction(self, ticker, number, price, kind):
-        stocks = Stocks.objects.get(ticker=ticker)
-        transaction = Transaction.objects.create(
-            portfolio=self,
-            stocks=stocks,
-            number=number,
-            price=price,
-            kind=kind,
-            date=timezone.now()
-        )
-        return transaction
-
-    def buy_transaction(self, ticker, number):
+    def verify_buy(self, ticker, number):
         price = Stocks.get_current_price(ticker)
-        value = price * number
+        value = Decimal(price * number)
         if self.cash < value:
             raise ValueError('Not enough money')
-        self.cash -= price * number
-        self.save()  # add method to change data
-        transaction = self.create_transaction(
-            ticker, number, price, kind='B'
-        )
-        transaction.buy()
+        self.cash -= value
+        self.save(update_fields=['cash'])
 
-    def sell_transaction(self, ticker, number):
+    def verify_sell(self, ticker, number):
         try:
             asset = self.asset.get(ticker=ticker)
         except Asset.DoesNotExist:
             raise ValueError('You have no asset')
         else:
             price = Stocks.get_current_price(ticker)
-            self.cash -= price * number
-            self.save() # add method to change data
-            transaction = self.create_transaction(
-                ticker, number, price, kind='S'
-            )
-            transaction.sell(asset)
+            self.cash += Decimal(price * number)
+            self.save(update_fields=['cash'])
 
 
 class Asset(models.Model):
@@ -125,11 +105,17 @@ class Transaction(models.Model):
             sum_number=self.number,
         )
 
+    def get_price(self):
+        self.price = Decimal(Stocks.get_current_price(self.stocks.ticker))
+
     def buy_modify(self, asset):
-        total_cost = asset.cost * asset.number
-        asset.number += self.number
+        total_cost = asset.avg_cost * asset.sum_number
+        asset.sum_number += self.number
+        print(type(total_cost), type(self.price))
         new_cost = total_cost + (self.number * self.price)
-        asset.avg_cost = new_cost/asset.number
+        asset.avg_cost = new_cost/asset.sum_number
+        asset.save()
+        self.save()
 
     def buy(self):
         try:
@@ -140,10 +126,10 @@ class Transaction(models.Model):
             self.buy_modify(asset)
 
     def sell_modify(self, asset):
-        total_cost = asset.cost * asset.number
-        asset.number -= self.number
+        total_cost = asset.avg_cost * asset.sum_number
+        asset.sum_number -= self.number
         new_cost = total_cost - (self.number * self.price)
-        asset.avg_cost = new_cost/asset.number
+        asset.avg_cost = new_cost/asset.sum_number
 
     def sell(self, asset):
         if self.number == asset.number:

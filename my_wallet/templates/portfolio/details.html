@@ -22,28 +22,119 @@
         </div>
         <div class="col-sm-9">
           <div class="main-panel shadowing">
-            <p>In cash you have {{portoflio.cash}}</p>
-            <p>Total value of your portfolio: {{portfolio.total_value}}</p>
-
+              <div id="container" style="min-width: 310px; height: 200px; max-width: 300px; margin: 0 auto"></div>
+              <div class="d-flex justify-content-between">
+                  <p>Value: {{portfolio.total_value}}</p>
+                  <p>beginning cash: {{portfolio.beginning_cash}}</p>
+                  <p>Profit/Loss:
+                      {% if portfolio.total_return < 0 %}
+                      <span class="money negative-value">
+                      {% else %}
+                      <span class="money positive-value">
+                      {% endif %}
+                          {{portfolio.total_return}}
+                      </span>
+                  </p>
+                  <p>In percent:
+                      {% if portfolio.total_value < 0 %}
+                      <span class="money negative-value">
+                      {% else %}
+                      <span class="money positive-value">
+                      {% endif %}
+                          {{portfolio.percent_return}}
+                      </span>
+                  </p>
+              </div>
+            <div class="d-flex justify-content-center">
             <div class="btn-group">
-                <a href="#" class="btn btn-success">New Transaction</a>
-                <a href="#" class="btn btn-primary">History</a>
+                <a href="{% url 'portfolio:transaction' pk=portfolio.pk %}" class="btn btn-success my-btn">New Transaction</a>
+                <a href="#" class="btn btn-primary my-btn">History</a>
             </div>
-            {% for asset in assets %}
-                <p>{{asset}}</p>
-
-            {% empty %}
-                <p>You have no assets</p>
-            {% endfor %}
+            </div>
+            <table class="table">
+              <thead class="thead-dark">
+                <tr>
+                  <th scope="col">Name</th>
+                  <th scope="col">Number</th>
+                  <th scope="col">Cost</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for asset in assets %}
+                    <tr>
+                    <td>{{asset.stocks.name}}</td>
+                    <td>{{asset.sum_number}}</td>
+                    <td>{{asset.avg_cost}}</td>
+                    </tr>
+                {% empty %}
+                    <p>You have no assets</p>
+                {% endfor %}
+              </tbody>
+             </table>
+            <div class="d-flex justify-content-between">
+                <p>Total</p>
+                <p>Cash:   {{portfolio.cash}}</p>
+                <p>Stocks value:   {{portfolio.stocks_value}}</p>
+            </div>
           </div>
-
-
-
-
         </div>
-
-
-
     </div>
 </div>
+{% endblock %}
+{% block javascript %}
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/modules/export-data.js"></script>
+
+<script>
+Highcharts.chart('container', {
+  chart: {
+    plotBackgroundColor: null,
+    plotBorderWidth: 0,
+    plotShadow: false
+  },
+  title: {
+    text: 'Total value<br>{{portfolio.total_value}}',
+    align: 'center',
+    verticalAlign: 'middle',
+    y: 60
+  },
+  tooltip: {
+    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+  },
+  plotOptions: {
+    pie: {
+      dataLabels: {
+        enabled: true,
+        distance: -50,
+        style: {
+          fontWeight: 'bold',
+          color: 'white'
+        }
+      },
+      startAngle: -90,
+      endAngle: 90,
+      center: ['50%', '100%'],
+      size: '180%'
+    }
+  },
+  series: [{
+    type: 'pie',
+    name: 'Company share',
+    innerSize: '50%',
+    data: [
+      {% for field in data %}
+        {{field|safe}},
+      {% endfor %}
+      {
+        name: 'Cash',
+        y: 7.31,
+        dataLabels: {
+          enabled: false
+        }
+      }
+    ]
+  }]
+});
+</script>
 {% endblock %}
