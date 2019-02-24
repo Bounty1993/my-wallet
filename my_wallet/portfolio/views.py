@@ -2,10 +2,10 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.utils import timezone
 from django.views.generic import (
-    TemplateView, CreateView, DetailView, View
+    TemplateView, CreateView, DetailView, View, ListView
 )
 from .forms import NewPortfolioForm, TransactionForm
-from .models import Portfolio, Asset, Transaction
+from .models import Portfolio, Asset, Transaction, PastPortfolio
 
 
 class NewPortfolioView(CreateView):
@@ -83,4 +83,19 @@ class TransactionView(CreateView):
         return redirect('portfolio:details', pk=self.kwargs['pk'])
 
 
+class HistoryView(ListView):
 
+    template_name = 'portfolio/history.html'
+    model = PastPortfolio
+
+    def get_queryset(self):
+        portfolio_pk = self.kwargs.get('pk')
+        portfolio = Portfolio.objects.get(pk=portfolio_pk)
+        past_portfolio = PastPortfolio.objects.filter(portfolio=portfolio)
+        past_portfolio.update_data()
+        return past_portfolio
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['profile'] = self.request.user
+        return context

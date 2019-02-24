@@ -22,6 +22,9 @@ class ProfileView(LoginRequiredMixin, UpdateView):
     form_class = ProfileUpdateForm
     context_object_name = 'profile'
 
+    def get_object(self):
+        return self.request.user
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         # context['total_wealth'] = self.object.portfolio.total_value

@@ -97,6 +97,10 @@ class Transaction(models.Model):
     kind = models.CharField(max_length=4, choices=KIND)
     date = models.DateTimeField()
 
+    class Meta:
+
+        ordering = ('-date',)
+
     def create_asset(self):
         Asset.objects.create(
             portfolio=self.portfolio,
@@ -137,6 +141,39 @@ class Transaction(models.Model):
             asset.save()  # add proper method
         else:
             self.sell_modify(asset)
+
+
+class PastAssets(models.Model):
+    portfolio = models.ForeignKey(Portfolio, on_delete=models.CASCADE,
+                                  related_name='history')
+    stocks = models.ForeignKey(Stocks, on_delete=models.PROTECT)
+    avg_cost = models.DecimalField(max_digits=7, decimal_places=2)
+    sum_number = models.PositiveIntegerField()
+    date = models.DateTimeField(auto_now=True)
+
+    def is_new(self):
+        if self.portfolio.created == datetime.now().day:
+            return True
+        return False
+
+    def has_transactions(self):
+        newest = self.portfolio.transaction.latest('date')
+        if not newest:
+            return "No transaction found!"
+        if newest == datetime.now().day:
+            if
+
+    def update_data(self):
+
+
+class PastPortfolio(models.Model):
+    portfolio = models.ForeignKey(Portfolio,
+                                  related_name='past_data',
+                                  on_delete=models.CASCADE)
+    holdings = models.ForeignKey(PastAssets, on_delete=models.PROTECT)
+    date = models.DateField(auto_now=timezone.now())
+    cash = models.DecimalField(max_digits=11, decimal_places=2)
+
 
 
 
