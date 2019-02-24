@@ -1,9 +1,7 @@
 from django.db import models
-from decimal import Decimal, getcontext, ROUND_HALF_UP
+from decimal import Decimal
 import datetime
 from django.utils import timezone
-import pytz
-import requests
 from my_wallet.stocks.models import Stocks
 from my_wallet.profiles.models import Profile
 from django.urls import reverse
@@ -68,6 +66,20 @@ class Portfolio(models.Model):
             self.cash += Decimal(price * number)
             self.save(update_fields=['cash'])
 
+    def is_new(self):
+        if self.created_at == datetime.now().day:
+            return True
+        return False
+
+    def has_transactions(self):
+        older = self.transaction.filter(date__lte=datetime.now().day)
+        if older.exists():
+            return True
+        newest = self.transaction.latest('date')
+        if not newest:
+            return "No transaction found!"
+        return "Transaction only today"
+
 
 class Asset(models.Model):
     portfolio = models.ForeignKey(Portfolio, on_delete=models.CASCADE,
@@ -100,6 +112,10 @@ class Transaction(models.Model):
     class Meta:
 
         ordering = ('-date',)
+
+    @property
+    def cost(self):
+        return self.price * self.number
 
     def create_asset(self):
         Asset.objects.create(
@@ -143,37 +159,34 @@ class Transaction(models.Model):
             self.sell_modify(asset)
 
 
-class PastAssets(models.Model):
-    portfolio = models.ForeignKey(Portfolio, on_delete=models.CASCADE,
-                                  related_name='history')
-    stocks = models.ForeignKey(Stocks, on_delete=models.PROTECT)
-    avg_cost = models.DecimalField(max_digits=7, decimal_places=2)
-    sum_number = models.PositiveIntegerField()
-    date = models.DateTimeField(auto_now=True)
-
-    def is_new(self):
-        if self.portfolio.created == datetime.now().day:
-            return True
-        return False
-
-    def has_transactions(self):
-        newest = self.portfolio.transaction.latest('date')
-        if not newest:
-            return "No transaction found!"
-        if newest == datetime.now().day:
-            if
-
-    def update_data(self):
-
-
 class PastPortfolio(models.Model):
     portfolio = models.ForeignKey(Portfolio,
                                   related_name='past_data',
                                   on_delete=models.CASCADE)
-    holdings = models.ForeignKey(PastAssets, on_delete=models.PROTECT)
     date = models.DateField(auto_now=timezone.now())
     cash = models.DecimalField(max_digits=11, decimal_places=2)
 
+    class Meta:
+        ordering = ('-date', )
+
+    def lack_data(self):
 
 
+    def update_assets(self):
+        latest_date = Portfolio.objects.first()
+        transactions = Transaction.objects.filter(date__gte=latest_date, portfolio=self.portfolio)
+        for transaction in transactions.order_by('date'):
+            PastAssets.update(transaction)
+            if transaction.kind == 'B':
+                self.cash -= transaction.cost
+            else:
+                self.cash += transaction.cost
 
+
+class PastAssets(models.Model):
+    portfolio = models.ForeignKey(PastPortfolio, on_delete=models.CASCADE,
+                                  related_name='holdings')
+    stocks = models.ForeignKey(Stocks, on_delete=models.PROTECT)
+    avg_cost = models.DecimalField(max_digits=7, decimal_places=2)
+    sum_number = models.PositiveIntegerField()
+    date = models.DateTimeField(auto_now=True)

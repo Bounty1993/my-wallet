@@ -92,7 +92,6 @@ class HistoryView(ListView):
         portfolio_pk = self.kwargs.get('pk')
         portfolio = Portfolio.objects.get(pk=portfolio_pk)
         past_portfolio = PastPortfolio.objects.filter(portfolio=portfolio)
-        past_portfolio.update_data()
         return past_portfolio
 
     def get_context_data(self, **kwargs):
