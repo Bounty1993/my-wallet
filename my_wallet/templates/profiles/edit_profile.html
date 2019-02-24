@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+<div class="container">
+<div class="row">
+  <div class="col-sm-3">
+    <div class="card">
+      <div class="card-header">
+          Account Settings
+      </div>
+      <div class="card-body">
+       <div class="list-group">
+           <a href="/settings/profile/" class="list-group-item">Profile</a>
+           <a href="/settings/emails/" class="list-group-item">Emails</a>
+           <a href="/settings/picture/" class="list-group-item">Picture</a>
+           <a href="/settings/password/" class="list-group-item">Password</a>
+       </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-9">
+    <div class="card">
+      <div class="card-header">
+          Edit your profile ({{profile.username}})
+      </div>
+      <div class="card-body">
+        {{ form|crispy }}
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+{% endblock %}
