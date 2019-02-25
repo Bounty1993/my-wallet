@@ -5,7 +5,7 @@ from django.views.generic import (
     TemplateView, CreateView, DetailView, View, ListView
 )
 from .forms import NewPortfolioForm, TransactionForm
-from .models import Portfolio, Asset, Transaction, PastPortfolio
+from .models import Portfolio, Asset, Transaction
 
 
 class NewPortfolioView(CreateView):
@@ -86,7 +86,7 @@ class TransactionView(CreateView):
 class HistoryView(ListView):
 
     template_name = 'portfolio/history.html'
-    model = PastPortfolio
+    #model = PastPortfolio
 
     def get_queryset(self):
         portfolio_pk = self.kwargs.get('pk')

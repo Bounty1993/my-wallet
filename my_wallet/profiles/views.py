@@ -1,8 +1,12 @@
 from django.shortcuts import render, redirect
 from django.views.generic import UpdateView, CreateView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView
+from django.urls import reverse_lazy
+from django.contrib import messages
+from django.contrib.auth import update_session_auth_hash
 
-from .forms import MyProfileCreationForm, ProfileUpdateForm
+from .forms import MyProfileCreationForm, ProfileUpdateForm, MyPasswordChangeForm
 from .models import Profile
 
 
@@ -43,5 +47,19 @@ class EditProfileView(LoginRequiredMixin, UpdateView):
         context = super().get_context_data(**kwargs)
         context['profile'] = self.request.user
         return context
+
+
+class MyPasswordChangeView(LoginRequiredMixin, PasswordChangeView):
+    template_name = 'profiles/password_change.html'
+    form_class = MyPasswordChangeForm
+
+    def form_valid(self, form):
+        form.save()
+        messages.success(self.request, 'Your password was updated successfully!')
+        update_session_auth_hash(self.request, form.user)
+        return redirect(reverse_lazy('profiles:profile'))
+
+
+
 
 

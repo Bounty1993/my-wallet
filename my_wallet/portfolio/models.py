@@ -158,7 +158,7 @@ class Transaction(models.Model):
         else:
             self.sell_modify(asset)
 
-
+"""
 class PastPortfolio(models.Model):
     portfolio = models.ForeignKey(Portfolio,
                                   related_name='past_data',
@@ -170,7 +170,7 @@ class PastPortfolio(models.Model):
         ordering = ('-date', )
 
     def lack_data(self):
-
+        pass
 
     def update_assets(self):
         latest_date = Portfolio.objects.first()
@@ -190,3 +190,4 @@ class PastAssets(models.Model):
     avg_cost = models.DecimalField(max_digits=7, decimal_places=2)
     sum_number = models.PositiveIntegerField()
     date = models.DateTimeField(auto_now=True)
+"""

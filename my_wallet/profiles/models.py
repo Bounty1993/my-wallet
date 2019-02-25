@@ -9,6 +9,7 @@ class Profile(AbstractUser):
     address = models.CharField(max_length=100, blank=True)
     city = models.CharField(max_length=30, blank=True)
     zip_code = models.CharField(max_length=30, blank=True)
+    description = models.CharField(max_length=250, blank=True)
     image = models.ImageField(upload_to='profile_pics/', default='default.png',
                               blank=True)
 
