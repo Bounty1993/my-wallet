@@ -1,0 +1,26 @@
+version: '3.7'
+volumes:
+  postgres_data:
+services:
+  web:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    volumes:
+      - .:/my_wallet
+    ports:
+      - 8000:8000
+    command: python manage.py runserver 0.0.0.0:8000
+    depends_on:
+      - db
+  db:
+    image: postgres:10.7-alpine
+    environment:
+      POSTGRES_DB: postgres12
+      POSTGRES_USER: postgres13
+      POSRGRES_PASS: example123
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    ports:
+      - 5433:5432
+
