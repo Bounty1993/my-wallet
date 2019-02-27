@@ -80,7 +80,7 @@ class TransactionView(CreateView):
             obj.get_price()
             obj.buy()
             obj.save()
-        return redirect('portfolio:details', pk=self.kwargs['pk'])
+        return redirect('portfolio:transaction', pk=self.kwargs['pk'])
 
 
 class HistoryView(ListView):

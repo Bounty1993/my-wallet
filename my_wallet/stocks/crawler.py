@@ -3,7 +3,7 @@ from json.decoder import JSONDecodeError
 from bs4 import BeautifulSoup
 from abc import ABC, abstractmethod
 import re
-
+"""
 def quotes_IEX(ticker):
     quotes = {'AAPL': 172.97, 'IBM': 139.25,
               'GOOGL': 1116.56, 'MSFT': 110.97,
@@ -24,7 +24,7 @@ def quotes_IEX(ticker):
         raise ValueError('ticker probable is not correct')
     return quotes
 
-"""
+
 class BaseCrawler(ABC):
 
     def get_soup(self):
