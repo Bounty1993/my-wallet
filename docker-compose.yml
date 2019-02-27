@@ -13,6 +13,7 @@ services:
     command: python manage.py runserver 0.0.0.0:8000
     depends_on:
       - db
+      - redis
   db:
     image: postgres:10.7-alpine
     environment:
@@ -23,4 +24,25 @@ services:
       - postgres_data:/var/lib/postgresql/data/
     ports:
       - 5433:5432
-
+  redis:
+    image: redis:alpine
+  celery:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    command: celery -A my_wallet worker -l info
+    volumes:
+      - .:/my_wallet
+    depends_on:
+      - db
+      - redis
+  celery-beat:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    command: celery -A my_wallet beat -l info
+    volumes:
+      - .:/my_wallet
+    depends_on:
+      - db
+      - redis
