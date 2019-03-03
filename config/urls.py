@@ -9,7 +9,9 @@ urlpatterns = [
     path('portfolio/', include('my_wallet.portfolio.urls', namespace='portfolio')),
     path('admin/', admin.site.urls),
     path('profile/', include('my_wallet.profiles.urls', namespace='profiles')),
-    path('stocks/', include('my_wallet.stocks.urls', namespace='stocks'))
+    path('stocks/', include('my_wallet.stocks.urls', namespace='stocks')),
+    path('api/', include('my_wallet.api.urls', namespace='api')),
+
 ]
 
 if settings.DEBUG:

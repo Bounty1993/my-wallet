@@ -2,6 +2,7 @@ import django_tables2 as table
 from django_tables2.utils import A
 from .models import Prices
 
+
 class PricesTable(table.Table):
     class Meta:
         model = Prices

@@ -29,14 +29,18 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    # third-party packages
     'coverage',
     'crispy_forms',
     'django_tables2',
+    'social_django',
 
+    # project's apps
     'my_wallet.profiles',
     'my_wallet.portfolio',
     'my_wallet.core',
     'my_wallet.stocks',
+    'my_wallet.api',
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
@@ -49,6 +53,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    # social-auth-app-django
+    'social_django.middleware.SocialAuthExceptionMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -66,6 +73,10 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+
+                # social-auth-app-django
+                'social_django.context_processors.backends',
+                'social_django.context_processors.login_redirect',
             ],
         },
     },
@@ -108,6 +119,29 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# -------------------------social-auth-app-django------------------------------------------
+AUTHENTICATION_BACKENDS = (
+    'social_core.backends.twitter.TwitterOAuth',
+    'social_core.backends.facebook.FacebookOAuth2',
+
+    'django.contrib.auth.backends.ModelBackend',
+)
+
+SOCIAL_AUTH_POSTGRES_JSONFIELD = True
+SOCIAL_AUTH_URL_NAMESPACE = 'profiles:social'
+
+SOCIAL_AUTH_FACEBOOK_KEY = config('SOCIAL_AUTH_FACEBOOK_KEY')
+SOCIAL_AUTH_FACEBOOK_SECRET = config('SOCIAL_AUTH_FACEBOOK_SECRET')
+
+SOCIAL_AUTH_TWITTER_KEY = config('SOCIAL_AUTH_TWITTER_KEY')
+SOCIAL_AUTH_TWITTER_SECRET = config('SOCIAL_AUTH_TWITTER_SECRET')
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = config('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY')
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = config('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET')
+
+# -----------------------------------------------------------------------------------------
+
+
 LOGIN_URL = '/profile/login/'
 LOGIN_REDIRECT_URL = '/profile/'
 
@@ -149,8 +183,8 @@ CELERY_RESULT_SERIALIZER = 'json'
 
 CELERY_BEAT_SCHEDULE = {
     'hello': {
-        'task': 'my_wallet.portfolio.tasks.hello',
-        'schedule': crontab()  # execute every minute
+        'task': 'my_wallet.portfolio.tasks.price_update',
+        'schedule': crontab(minute='*/15')  # execute every minute
     }
 }
 

@@ -90,6 +90,24 @@ h1
     padding: 20px;
     border-radius: 4px;
 }
+.facebook-btn
+{
+  padding 30px;
+  background-color: #3b5998;
+  color: white;
+  border-radius: 10px;
+  text-align: center;
+
+}
+.twitter-btn
+{
+
+}
+.google-btn
+{
+
+}
+
 .my-btn
 {
 

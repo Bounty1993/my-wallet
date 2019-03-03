@@ -52,7 +52,7 @@ class Stocks(models.Model):
 
         while True:
             try:
-                current_price = self.prices.get(date_price=current_date)
+                current_price = self.past_prices.get(date_price=current_date)
                 current_price = current_price.price
             except Prices.DoesNotExist:
                 current_date -= datetime.timedelta(days=1)
@@ -62,7 +62,7 @@ class Stocks(models.Model):
         past_date = find_quote_day(date=today, num_days=365)
         while True:
             try:
-                past_price = self.prices.get(date_price=past_date)
+                past_price = self.past_prices.get(date_price=past_date)
                 past_price = past_price.price
             except Prices.DoesNotExist:
                 past_date += datetime.timedelta(days=1)
@@ -98,14 +98,14 @@ class Stocks(models.Model):
         function returns min and max price.
         """
 
-        prices_between = self.prices.filter(date_price__gte=start)
+        prices_between = self.past_prices.filter(date_price__gte=start)
         prices_between = prices_between.filter(date_price__lte=end)
         data = prices_between.aggregate(Max('price'), Min('price'))
 
         return data
 
 
-class Prices(models.Model):
+class BasePrices(models.Model):
 
     stock = models.ForeignKey(Stocks, on_delete=models.CASCADE,
                               related_name='prices')
@@ -113,5 +113,15 @@ class Prices(models.Model):
     date_price = models.DateField()
 
     class Meta:
+        abstract = True
         get_latest_by = 'date_price'
         ordering = ('-date_price',)
+
+
+class Prices(BasePrices):
+    stock = models.ForeignKey(Stocks, on_delete=models.CASCADE,
+                              related_name='past_prices')
+
+
+class CurrentPrice(BasePrices):
+    date_price = models.DateTimeField()
