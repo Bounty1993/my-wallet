@@ -4,6 +4,7 @@ from django.views.generic import (
 )
 from .models import Stocks, Prices
 import datetime
+from django.utils import timezone
 from .forms import NewStockForm
 from .crawler import (
     GoogleCrawler,
@@ -19,10 +20,11 @@ class StocksListView(ListView):
     model = Stocks
     template_name = 'stocks/list.html'
     context_object_name = 'stocks'
+    paginate_by = 5
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        date = datetime.date.today()
+        date = timezone.now().date()
         context['today'] = find_quote_day(date, 0, type='earlier')
         return context
 

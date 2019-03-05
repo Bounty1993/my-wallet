@@ -1,5 +1,6 @@
 from django.db import models
 from django.db.models import Max, Min
+from django.utils import timezone
 import requests
 import datetime
 from .crawler import quotes_IEX
@@ -31,6 +32,32 @@ class Stocks(models.Model):
         price = quotes_IEX(self.ticker)['latestPrice']
         return Decimal(price).quantize(cents, ROUND_HALF_UP)
 
+    @property
+    def year_change(self):
+        return self.get_change(num_days=356)['currency']
+
+    @property
+    def perc_year_change(self):
+        return self.get_change(num_days=365)['percent']
+
+    @property
+    def daily_change(self):
+        return self.get_change(num_days=1)['currency']
+
+    @property
+    def perc_daily_change(self):
+        return self.get_change(num_days=1)['percent']
+
+    @property
+    def min_daily(self):
+        start = timezone.now().date() - timezone.timedelta(days=1)
+        return self.get_min_and_max(start=start, end=timezone.now())['price__min']
+
+    @property
+    def max_daily(self):
+        start = timezone.now().date() - timezone.timedelta(days=1)
+        return self.get_min_and_max(start=start, end=timezone.now())['price__max']
+
     @staticmethod
     def get_current_price(ticker):
         return quotes_IEX(ticker)['latestPrice']
@@ -41,56 +68,32 @@ class Stocks(models.Model):
         response = requests.get(url)
         prices = response.json()
         for data in prices:
-            Prices.objects.create(stock=self,
-                                  price=float(data.get('close')),
-                                  date_price=data.get('date'))
+            Prices.objects.create(
+                stock=self,
+                price=float(data.get('close')),
+                date_price=data.get('date'),
+            )
 
-    def year_change(self):
-
-        today = datetime.datetime.now().date()
-        current_date = find_quote_day(date=today)
-
+    def find_past_price(self, num_days):
+        today = timezone.now().date()
+        past_date = find_quote_day(date=today, num_days=num_days)
         while True:
             try:
-                current_price = self.past_prices.get(date_price=current_date)
-                current_price = current_price.price
+                past_price = self.past.get(date_price=past_date).price
             except Prices.DoesNotExist:
-                current_date -= datetime.timedelta(days=1)
+                past_date -= datetime.timedelta(days=1)
             else:
                 break
+        return past_price
 
-        past_date = find_quote_day(date=today, num_days=365)
-        while True:
-            try:
-                past_price = self.past_prices.get(date_price=past_date)
-                past_price = past_price.price
-            except Prices.DoesNotExist:
-                past_date += datetime.timedelta(days=1)
-            else:
-                break
-
+    def get_change(self, num_days):
+        current_price = self.current.latest('date_price').price
+        past_price = self.find_past_price(num_days=num_days)
         currency = current_price - past_price
         perc_change = (current_price/past_price)-1
         percent = '{:.2%}'.format(perc_change)
 
         return {'currency': currency, 'percent': percent}
-
-    @classmethod
-    def get_stocks_with_data(cls, ticker):
-
-        quotes = quotes_IEX(ticker)
-
-        data = {'name': quotes['companyName'],
-                'ticker': quotes['symbol']
-                }
-        stock = cls.objects.create(name=data['name'],
-                                   ticker=data['ticker'])
-        stock.get_past_data()
-        return stock
-
-    @staticmethod
-    def get_updated():
-        pass
 
     def get_min_and_max(self, start, end):
         """
@@ -98,19 +101,36 @@ class Stocks(models.Model):
         function returns min and max price.
         """
 
-        prices_between = self.past_prices.filter(date_price__gte=start)
+        prices_between = self.current.filter(date_price__gte=start)
         prices_between = prices_between.filter(date_price__lte=end)
         data = prices_between.aggregate(Max('price'), Min('price'))
 
         return data
 
+    @classmethod
+    def get_stocks_with_data(cls, ticker):
+
+        quotes = quotes_IEX(ticker)
+
+        data = {
+            'name': quotes['companyName'],
+            'ticker': quotes['symbol']
+        }
+        stock = cls.objects.create(
+            name=data['name'],
+            ticker=data['ticker']
+        )
+        stock.get_past_data()
+        return stock
+
 
 class BasePrices(models.Model):
 
-    stock = models.ForeignKey(Stocks, on_delete=models.CASCADE,
-                              related_name='prices')
+    stock = models.ForeignKey(
+        Stocks, on_delete=models.CASCADE,
+        related_name='past'
+    )
     price = models.DecimalField(max_digits=11, decimal_places=2)
-    date_price = models.DateField()
 
     class Meta:
         abstract = True
@@ -119,9 +139,19 @@ class BasePrices(models.Model):
 
 
 class Prices(BasePrices):
-    stock = models.ForeignKey(Stocks, on_delete=models.CASCADE,
-                              related_name='past_prices')
+    date_price = models.DateField()
 
 
 class CurrentPrice(BasePrices):
+    stock = models.ForeignKey(
+        Stocks, on_delete=models.CASCADE,
+        related_name='current'
+    )
     date_price = models.DateTimeField()
+
+
+    def _daily_min_and_max(self):
+        today = timezone.now().date()
+        start = timezone.datetime(today.year, today.month, today.day)
+        end = timezone.now()
+        return self.get_min_and_max(start, end)

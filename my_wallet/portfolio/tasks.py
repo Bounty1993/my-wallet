@@ -11,16 +11,17 @@ from decimal import Decimal
 def price_update():
     for stock in Stocks.objects.all():
         price = Decimal(quotes_IEX(stock.ticker)['latestPrice'])
-        try:
-            price_data = CurrentPrice.objects.get(stock=stock)
-        except CurrentPrice.DoesNotExist:
-            CurrentPrice.objects.create(
-                stock=stock, price=price, date_price=timezone.now())
-        else:
-            price_data.price = price
-            price_data.date_price = timezone.now()
-            price_data.save(update_fields=['price', 'date_price'])
+        CurrentPrice.objects.create(
+            stock=stock,
+            price=price,
+            date_price=timezone.now()
+        )
     print('I have finished')
+
+
+@shared_task
+def past_price_update():
+    pass
 
 
 
