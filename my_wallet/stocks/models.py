@@ -3,7 +3,13 @@ from django.db.models import Max, Min
 from django.utils import timezone
 import requests
 import datetime
-from .crawler import quotes_IEX
+from .crawler import (
+    QuotesIEX,
+    CompanyIEX,
+    PastIEX,
+    DividendsIEX
+    FinancialIEX
+)
 from .utils import find_quote_day
 from decimal import Decimal, ROUND_HALF_UP
 
@@ -29,12 +35,12 @@ class Stocks(models.Model):
     @property
     def price(self):
         cents = Decimal('0.01')
-        price = quotes_IEX(self.ticker)['latestPrice']
+        price = QuotesIEX(self.ticker).get_data().get('latestPrice', '')
         return Decimal(price).quantize(cents, ROUND_HALF_UP)
 
     @property
     def year_change(self):
-        return self.get_change(num_days=356)['currency']
+        return self.get_change(num_days=365)['currency']
 
     @property
     def perc_year_change(self):
@@ -60,19 +66,7 @@ class Stocks(models.Model):
 
     @staticmethod
     def get_current_price(ticker):
-        return quotes_IEX(ticker)['latestPrice']
-
-    def get_past_data(self):
-        # returns past prices of a Stocks' instance (last 5 years)
-        url = 'https://api.iextrading.com/1.0/stock/{}/chart/5y'.format(self.ticker)
-        response = requests.get(url)
-        prices = response.json()
-        for data in prices:
-            Prices.objects.create(
-                stock=self,
-                price=float(data.get('close')),
-                date_price=data.get('date'),
-            )
+        return QuotesIEX(ticker).get_data().get('latestPrice', '')
 
     def find_past_price(self, num_days):
         today = timezone.now().date()
@@ -107,11 +101,32 @@ class Stocks(models.Model):
 
         return data
 
+    def add_detail(self):
+        # method create or update StockDetail
+        data = CompanyIEX(self.ticker).get_data()
+
+        StockDetail.objects.create(
+            stock=self,
+            sector=data.get('sector', ''),
+            industry=data.get('industry', ''),
+            website=data.get('website', ''),
+            description=data.get('description', '')
+        )
+
+    def get_past_data(self):
+        # past prices of a Stocks' instance (last 5 years)
+        prices = PastIEX(self.ticker).get_data()
+        for data in prices:
+            Prices.objects.create(
+                stock=self,
+                price=float(data.get('close')),
+                date_price=data.get('date'),
+            )
+
     @classmethod
     def get_stocks_with_data(cls, ticker):
-
-        quotes = quotes_IEX(ticker)
-
+        # use when you create new stock class
+        quotes = QuotesIEX(ticker).get_data()
         data = {
             'name': quotes['companyName'],
             'ticker': quotes['symbol']
@@ -120,8 +135,67 @@ class Stocks(models.Model):
             name=data['name'],
             ticker=data['ticker']
         )
+        stock.add_detail()
         stock.get_past_data()
         return stock
+
+
+class StockDetail(models.Model):
+    stock = models.OneToOneField(Stocks, on_delete=models.CASCADE, related_name='detail')
+    sector = models.CharField(max_length=50)
+    industry = models.CharField(max_length=50)
+    website = models.URLField()
+    description = models.CharField(max_length=250)
+
+    class Meta:
+        verbose_name = 'stock details'
+        ordering = 'sector'
+
+
+class Dividends(models.Model):
+    stock = models.ForeignKey(Stocks, on_delete=models.CASCADE, related_name='dividends')
+    payment = models.DateField()
+    record = models.DateField()
+    amount = models.DecimalField(max_digits=11, decimal_places=2)
+
+    @property
+    def get_rate(self):
+        price = Prices.objects.get(stock=self.stock, date_price=self.record).price
+        return self.amount/self.price
+
+
+class Financial(models.Model):
+    stock = models.ForeignKey(Stocks, on_delete=models.CASCADE, related_name='financial')
+    assets = models.DecimalField(max_digits=14, decimal_places=2)
+    liabilities = models.DecimalField(max_digits=14, decimal_places=2)
+    total_revenue = models.DecimalField(max_digits=14, decimal_places=2)
+    gross_profit = models.DecimalField(max_digits=14, decimal_places=2)
+    operating_income = models.DecimalField(max_digits=14, decimal_places=2)
+    net_income = models.DecimalField(max_digits=14, decimal_places=2)
+
+    @property
+    def equity(self):
+        return self.assets - self.liabilities
+
+    @property
+    def operating_margin(self):
+        return self.operating_income/self.total_revenue
+
+    @property
+    def net_margin(self):
+        return self.net_income / self.total_revenue
+
+    @property
+    def roa(self):
+        return self.net_income/self.assets
+
+    @property
+    def roe(self):
+        return self.net_income/self.equity
+
+    class Meta:
+        verbose_name = 'financial results'
+        ordering = '-total_revenue'
 
 
 class BasePrices(models.Model):
@@ -148,7 +222,6 @@ class CurrentPrice(BasePrices):
         related_name='current'
     )
     date_price = models.DateTimeField()
-
 
     def _daily_min_and_max(self):
         today = timezone.now().date()

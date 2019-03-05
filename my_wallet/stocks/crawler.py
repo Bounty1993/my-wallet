@@ -14,15 +14,57 @@ def quotes_IEX(ticker):
     return None
 
 """
-def quotes_IEX(ticker):
-    url = 'https://api.iextrading.com/1.0/stock/{}/book'.format(ticker)
-    response = requests.get(url)
 
-    try:
-        quotes = response.json()['quote']
-    except JSONDecodeError:
-        raise ValueError('ticker probable is not correct')
-    return quotes
+
+class BaseIEX(ABC):
+
+    def __init__(self, ticker):
+        self.url = self.get_url(ticker)
+
+    @abstractmethod
+    def get_url(self, ticker):
+        pass
+
+    def get_data(self):
+        response = requests.get(self.url)
+        try:
+            data = response.json()
+        except JSONDecodeError:
+            raise ValueError('Something is wrong with request')
+        return data
+
+
+class QuotesIEX(BaseIEX):
+    def get_url(self, ticker):
+        return 'https://api.iextrading.com/1.0/stock/{}/book'.format(ticker)
+
+    def get_data(self):
+        data = super().get_data()
+        return data.get('quotes', '')
+
+
+class CompanyIEX(BaseIEX):
+    def get_url(self, ticker):
+        return 'https://api.iextrading.com/1.0/stock/{}/company'.format(ticker)
+
+
+class PastIEX(BaseIEX):
+    def get_url(self, ticker, num=5):
+        return 'https://api.iextrading.com/1.0/stock/{}/chart/{}y'.format(ticker, num)
+
+
+class DividendsIEX(BaseIEX):
+    def get_url(self, ticker, num=5):
+        return 'https://api.iextrading.com/1.0/stock/{}/dividends/{}y'.format(ticker, num)
+
+
+class FinancialIEX(BaseIEX):
+    def get_url(self, ticker):
+        return 'https://api.iextrading.com/1.0/stock/{}/financials'.format(ticker)
+
+    def get_data(self):
+        data = super().get_data()
+        return data.get('financials', '')
 
 
 class BaseCrawler(ABC):

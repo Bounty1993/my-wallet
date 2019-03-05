@@ -41,9 +41,6 @@ class StockDetailView(DetailView):
         table = PricesTable(prices)
         RequestConfig(self.request, paginate={'per_page': 10}).configure(table)
         context['prices'] = table
-        year_change = self.object.year_change()
-        context['percent'] = year_change['percent']
-        context['currency'] = year_change['currency']
         return context
 
 
