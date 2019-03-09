@@ -6,14 +6,25 @@ html
 
 body
 {
-  background: #56CCF2;  /* fallback for old browsers */
-  background: -webkit-linear-gradient(to left, #2F80ED, #56CCF2);  /* Chrome 10-25, Safari 5.1-6 */
-  background: linear-gradient(to left, #2F80ED, #56CCF2); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    background: #DCE35B;  /* fallback for old browsers */
+    background: -webkit-linear-gradient(to left, #45B649, #DCE35B);  /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to left, #45B649, #DCE35B); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
 }
 h1
 {
     color: #000000;
     font-weight: bold;
+}
+a
+{
+    text-decoration: none;
+    color: black
+}
+a:hover
+{
+    text-decoration: none;
+    color: black;
 }
 .wrapper
 {
@@ -26,6 +37,7 @@ h1
 {
    height: 100px;
 }
+
 
 .navbar .navbar-brand
 {

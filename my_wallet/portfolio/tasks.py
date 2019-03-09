@@ -5,12 +5,13 @@ from my_wallet.stocks.crawler import quotes_IEX
 from my_wallet.stocks.models import CurrentPrice, Stocks
 from django.utils import timezone
 from decimal import Decimal
+from my_wallet.stocks.crawler import QuotesIEX
 
 
 @shared_task
 def price_update():
     for stock in Stocks.objects.all():
-        price = Decimal(quotes_IEX(stock.ticker)['latestPrice'])
+        price = Decimal(QuotesIEX(stock.ticker).get_data().get('latestPrice'))
         CurrentPrice.objects.create(
             stock=stock,
             price=price,

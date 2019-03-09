@@ -40,7 +40,7 @@ class QuotesIEX(BaseIEX):
 
     def get_data(self):
         data = super().get_data()
-        return data.get('quotes', '')
+        return data.get('quote', '')
 
 
 class CompanyIEX(BaseIEX):

@@ -1,0 +1,30 @@
+<div class="card shadowing">
+    <div class="card-header">
+        <h3 style="font-weight:bold; text-align: center">{{stocks.name}}</h3>
+    </div>
+    <div class="card-body">
+        <p>Basic Informations:</p>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+                Ticker: <span style="float:right">{{stocks.ticker}}</span>
+            </li>
+            <li class="list-group-item">
+                Nominal change <span style="float:right">{{stocks.year_change}}</span>
+            </li>
+            <li class="list-group-item">
+                Percent change <span style="float:right">{{stocks.perc_year_change}}</span>
+            </li>
+        </ul>
+    </div>
+</div>
+<ul class="side-nav">
+    <a href="#">
+        <li class="nav-btn shadowing">Details</li>
+    </a>
+    <a href="#">
+        <li class="nav-btn shadowing">History</li>
+    </a>
+    <a href="#">
+        <li class="nav-btn shadowing">News</li>
+    </a>
+</ul>

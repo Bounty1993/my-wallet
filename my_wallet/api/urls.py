@@ -6,9 +6,7 @@ from .views import (
 
     StocksListAPIView,
     StocksCreateAPIView,
-    StocksDetailAPIView,
-    StocksUpdateAPIView,
-    StocksDestroyAPIView,
+    StocksRetrieveUpdateDestroyAPIView,
 )
 
 app_name = 'api'
@@ -18,9 +16,8 @@ urlpatterns = [
     path('portfolio/<slug:name>/', PortfolioRetrieveUpdateDeleteAPIView.as_view(), name='portfolio_detail'),
 
     path('stocks/', StocksListAPIView.as_view(), name='stocks'),
-    path('stocks/create', StocksCreateAPIView.as_view(), name='stocks-create'),
-    path('stocks/<slug:ticker>/', StocksDetailAPIView.as_view(), name='stocks-details'),
-    path('stocks/<slug:ticker>/edit', StocksUpdateAPIView.as_view(), name='stocks-edit'),
-    path('stocks/<slug:ticker>/delete', StocksDestroyAPIView.as_view(), name='stocks-delete'),
+    path('stocks/create', StocksCreateAPIView.as_view(), name='stocks_create'),
+    path('stocks/<slug:ticker>/', StocksRetrieveUpdateDestroyAPIView.as_view(), name='stocks_details'),
+
 ]
 

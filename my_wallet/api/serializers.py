@@ -59,7 +59,7 @@ class StocksCreateUpdateSerializer(ModelSerializer):
         )
 
 
-class StocksDetailSerializer(ModelSerializer):
+class StocksRetrieveUpdateDeleteSerializer(ModelSerializer):
     class Meta:
         model = Stocks
         fields = (

@@ -22,7 +22,7 @@ from .serializers import (
 
     StocksCreateUpdateSerializer,
     StocksListSerializer,
-    StocksDetailSerializer,
+    StocksRetrieveUpdateDeleteSerializer,
 )
 from .paginations import StandardPagePagination
 
@@ -60,23 +60,11 @@ class StocksCreateAPIView(CreateAPIView):
         Stocks.get_stocks_with_data(ticker=serializer.data['ticker'])
 
 
-class StocksDetailAPIView(RetrieveAPIView):
+class StocksRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
     queryset = Stocks.objects.all()
-    serializer_class = StocksDetailSerializer
+    serializer_class = StocksRetrieveUpdateDeleteSerializer
 
     lookup_field = 'ticker'
-
-
-class StocksUpdateAPIView(UpdateAPIView):
-    queryset = Stocks.objects.all()
-    serializer_class = StocksCreateUpdateSerializer
-
-    lookup_field = 'ticker'
-
-
-class StocksDestroyAPIView(DestroyAPIView):
-    queryset = Stocks.objects.all()
-    serializer_class = StocksDetailSerializer
 
 
 class StocksListAPIView(ListAPIView):

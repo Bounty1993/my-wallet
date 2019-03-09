@@ -7,11 +7,27 @@ from .crawler import (
     QuotesIEX,
     CompanyIEX,
     PastIEX,
-    DividendsIEX
-    FinancialIEX
+    DividendsIEX,
+    FinancialIEX,
 )
-from .utils import find_quote_day
 from decimal import Decimal, ROUND_HALF_UP
+
+
+def find_quote_day(date, num_days=0, type='earlier'):
+    quote_day = date - timezone.timedelta(days=num_days)
+
+    if type == 'earlier':
+        if quote_day.weekday() == 6:
+            quote_day -= timezone.timedelta(days=2)
+            return quote_day
+        return quote_day
+
+    elif type == 'later':
+        if quote_day.weekday() == 6:
+            quote_day -= datetime.timedelta(days=2)
+            return quote_day
+        quote_day -= datetime.timedelta(days=1)
+        return quote_day
 
 
 class Stocks(models.Model):
@@ -101,44 +117,6 @@ class Stocks(models.Model):
 
         return data
 
-    def add_detail(self):
-        # method create or update StockDetail
-        data = CompanyIEX(self.ticker).get_data()
-
-        StockDetail.objects.create(
-            stock=self,
-            sector=data.get('sector', ''),
-            industry=data.get('industry', ''),
-            website=data.get('website', ''),
-            description=data.get('description', '')
-        )
-
-    def get_past_data(self):
-        # past prices of a Stocks' instance (last 5 years)
-        prices = PastIEX(self.ticker).get_data()
-        for data in prices:
-            Prices.objects.create(
-                stock=self,
-                price=float(data.get('close')),
-                date_price=data.get('date'),
-            )
-
-    @classmethod
-    def get_stocks_with_data(cls, ticker):
-        # use when you create new stock class
-        quotes = QuotesIEX(ticker).get_data()
-        data = {
-            'name': quotes['companyName'],
-            'ticker': quotes['symbol']
-        }
-        stock = cls.objects.create(
-            name=data['name'],
-            ticker=data['ticker']
-        )
-        stock.add_detail()
-        stock.get_past_data()
-        return stock
-
 
 class StockDetail(models.Model):
     stock = models.OneToOneField(Stocks, on_delete=models.CASCADE, related_name='detail')
@@ -149,7 +127,7 @@ class StockDetail(models.Model):
 
     class Meta:
         verbose_name = 'stock details'
-        ordering = 'sector'
+        ordering = ('sector', )
 
 
 class Dividends(models.Model):
@@ -160,8 +138,13 @@ class Dividends(models.Model):
 
     @property
     def get_rate(self):
+        # to do for 4 quarters
+        percents = Decimal('0.0001')
         price = Prices.objects.get(stock=self.stock, date_price=self.record).price
-        return self.amount/self.price
+        return Decimal(self.amount/price * 100).quantize(percents, ROUND_HALF_UP)
+
+    class Meta:
+        ordering = ('-payment', )
 
 
 class Financial(models.Model):
@@ -195,7 +178,7 @@ class Financial(models.Model):
 
     class Meta:
         verbose_name = 'financial results'
-        ordering = '-total_revenue'
+        ordering = ('-total_revenue', )
 
 
 class BasePrices(models.Model):
@@ -213,6 +196,10 @@ class BasePrices(models.Model):
 
 
 class Prices(BasePrices):
+    open = models.DecimalField(max_digits=11, decimal_places=2)
+    volume = models.PositiveIntegerField()
+    change = models.FloatField()
+    percent_change = models.FloatField()
     date_price = models.DateField()
 
 
