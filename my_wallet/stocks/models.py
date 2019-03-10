@@ -122,8 +122,8 @@ class StockDetail(models.Model):
     stock = models.OneToOneField(Stocks, on_delete=models.CASCADE, related_name='detail')
     sector = models.CharField(max_length=50)
     industry = models.CharField(max_length=50)
-    website = models.URLField()
-    description = models.CharField(max_length=250)
+    website = models.URLField(null=True, blank=True)
+    description = models.CharField(max_length=500)
 
     class Meta:
         verbose_name = 'stock details'
@@ -132,9 +132,9 @@ class StockDetail(models.Model):
 
 class Dividends(models.Model):
     stock = models.ForeignKey(Stocks, on_delete=models.CASCADE, related_name='dividends')
-    payment = models.DateField()
-    record = models.DateField()
-    amount = models.DecimalField(max_digits=11, decimal_places=2)
+    payment = models.DateField(null=True, blank=True)
+    record = models.DateField(null=True, blank=True)
+    amount = models.DecimalField(max_digits=11, decimal_places=2, null=True, blank=True)
 
     @property
     def get_rate(self):
@@ -149,12 +149,12 @@ class Dividends(models.Model):
 
 class Financial(models.Model):
     stock = models.ForeignKey(Stocks, on_delete=models.CASCADE, related_name='financial')
-    assets = models.DecimalField(max_digits=14, decimal_places=2)
-    liabilities = models.DecimalField(max_digits=14, decimal_places=2)
-    total_revenue = models.DecimalField(max_digits=14, decimal_places=2)
-    gross_profit = models.DecimalField(max_digits=14, decimal_places=2)
-    operating_income = models.DecimalField(max_digits=14, decimal_places=2)
-    net_income = models.DecimalField(max_digits=14, decimal_places=2)
+    assets = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
+    liabilities = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
+    total_revenue = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
+    gross_profit = models.DecimalField(max_digits=14, decimal_places=2, null=True, blank=True)
+    operating_income = models.DecimalField(max_digits=14, decimal_places=2, null=True, blank=True)
+    net_income = models.DecimalField(max_digits=14, decimal_places=2, null=True, blank=True)
 
     @property
     def equity(self):
@@ -196,11 +196,11 @@ class BasePrices(models.Model):
 
 
 class Prices(BasePrices):
-    open = models.DecimalField(max_digits=11, decimal_places=2)
-    volume = models.PositiveIntegerField()
-    change = models.FloatField()
-    percent_change = models.FloatField()
-    date_price = models.DateField()
+    open = models.DecimalField(max_digits=11, decimal_places=2, null=True, blank=True)
+    volume = models.PositiveIntegerField(null=True, blank=True)
+    change = models.FloatField(null=True, blank=True)
+    percent_change = models.FloatField(null=True, blank=True)
+    date_price = models.DateField(null=True, blank=True)
 
 
 class CurrentPrice(BasePrices):

@@ -1,0 +1,48 @@
+{% extends "base.html" %}}
+{% block content %}
+{% load render_table from django_tables2 %}
+<div class="container">
+      <ul class="breadcrumb">
+          <li class="breadcrumb-item">
+              <a href="{% url 'core:home' %}">
+                  Home
+              </a>
+          </li>
+          <li class="breadcrumb-item">
+              <a href="{% url 'stocks:list' %}">
+                  Stocks
+              </a>
+          </li>
+          <li class="breadcrumb-item active">
+                  History
+          </li>
+      </ul>
+    <div class="row">
+        <div class="col-md-4">
+            {% include "stocks/side_stocks.html" %}
+        </div>
+        <div class="col-md-8">
+            <div class="row">
+                <div class="col-12">
+                    <div id="charLine" class="main-panel shadowing"></div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    {% render_table price_table %}
+                </div>
+            </div>
+            <div class="row">
+                Hello
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block javascript %}
+{{ price_data|json_script:"price_data"}}
+<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+<script src="https://code.highcharts.com/stock/highstock.js"></script>
+<script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/stock/modules/export-data.js"></script>
+{% endblock javascript %}

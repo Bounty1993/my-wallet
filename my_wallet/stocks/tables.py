@@ -2,22 +2,46 @@ import django_tables2 as table
 from django_tables2.utils import A
 import math
 from .models import Prices, Dividends
+from django.utils.html import format_html
 
 
 class PricesTable(table.Table):
+
+    def color_change(self, value):
+        if value < 0:
+            return format_html(f'<div class="falling">{value}</div>')
+        elif value > 0:
+            return format_html(f'<div class="rising">{value}</div>')
+        return value
+
+    def render_change(self, value):
+        value = round(value, 2)
+        return self.color_change(value)
+
+    def render_percent_change(self, value):
+        value = round(value, 3)
+        return self.color_change(value)
+
     class Meta:
         model = Prices
-        fields = ('date_price', 'price')
-        attrs = {"class": "table table-light table-striped table-hover shadowing",
-                 "thead": {"class": "thead-dark"},
-        }
+        fields = ('date_price', 'open', 'price', 'change', 'percent_change', 'volume')
         empty_text = 'No historical data'
+        attrs = {
+            'class': 'main_table',
+            'td': {'class': 'tab-cell'}
+        }
+        row_attrs = {
+            'class': 'custom_rows'
+        }
+        template_name = 'table_draft.html'
 
 
 class Quarter(table.Column):
     def render(self, record):
-        present_quarter = math.ceil(record.record.month/3)
-        return f'{present_quarter}Q {record.record.year}'
+        if record.record:
+            present_quarter = math.ceil(record.record.month/3)
+            return f'{present_quarter}Q {record.record.year}'
+        return None
 
 
 class DividendTable(table.Table):

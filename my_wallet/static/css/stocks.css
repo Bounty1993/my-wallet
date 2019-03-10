@@ -83,3 +83,14 @@ ul.side-nav
 #charStacked{
     height: 300px;
 }
+.falling{
+    color: red;
+}
+.rising{
+    color: green;
+}
+#charLine{
+    height: 400px;
+    min-width: 310px;
+    margin-bottom: 10px;
+}
