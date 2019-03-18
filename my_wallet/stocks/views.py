@@ -13,7 +13,11 @@ from .crawler import (
 )
 from .utils import find_quote_day
 from django_tables2 import RequestConfig
-from .tables import DividendTable, PricesTable
+from .tables import (
+    DividendTable,
+    PricesTable,
+    BestWorstTable,
+)
 
 
 class StocksListView(ListView):
@@ -76,17 +80,19 @@ class StockDetailView(ChartMixin, DetailView):
     slug_field = 'ticker'
     slug_url_kwarg = 'ticker'
 
-    earnings_names = ['total_revenue', 'gross_profit', 'operating_income', 'net_income']
+    earnings_names = [
+        'total_revenue', 'gross_profit',
+        'operating_income', 'net_income',
+    ]
     balance_names = ['assets', 'liabilities']
 
     def get_context_data(self, **kwargs):
         self.instance = Financial.objects.filter(stock=self.object)
         context = super().get_context_data(**kwargs)
-        last_dividend = Dividends.objects.latest('payment')
         table = DividendTable(Dividends.objects.filter(stock=self.object))
         RequestConfig(self.request, paginate={'per_page': 8}).configure(table)
         context['table'] = table
-        context['last_dividend'] = last_dividend
+        context['last_dividend'] = Dividends.objects.filter(stock=self.object).latest('payment')
         return context
 
 
@@ -131,10 +137,24 @@ class HistoryView(DetailView):
         obj = Prices.objects.filter(stock__ticker=ticker)
         return obj
 
+    def change_table(self):
+        sorted_stocks = sorted(Stocks.objects.all(), key=lambda stock: stock.perc_year_change)
+        rising_table = BestWorstTable(sorted_stocks[-5:])
+        RequestConfig(self.request, paginate={'per_page': 5}).configure(rising_table)
+        falling_table = BestWorstTable(sorted_stocks[:5])
+        RequestConfig(self.request, paginate={'per_page': 5}).configure(falling_table)
+        return {'rising_table': rising_table, 'falling_table': falling_table}
+
+    def price_table(self):
+        price_table = PricesTable(self.object)
+        RequestConfig(self.request, paginate={'per_page': 20}).configure(price_table)
+        return price_table
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        table = PricesTable(self.object)
-        RequestConfig(self.request, paginate={'per_page': 20}).configure(table)
-        context['price_table'] = table
+        context['price_table'] = self.price_table()
+        data_table = self.change_table()
+        context['rising_table'] = data_table['rising_table']
+        context['falling_table'] = data_table['falling_table']
         context['price_data'] = PriceChartMixin().get_price_data()
         return context

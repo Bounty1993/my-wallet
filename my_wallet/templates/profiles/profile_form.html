@@ -1,0 +1,77 @@
+<h3 class="text-center">Animated Form</h3>
+<div class="col-md-6 offset-md-6">
+    <div class="form-group">
+        <input type="text" class="form-control" name="first_name"  id="id_first_name"/>
+        <label for="id_first_name" class="animated-label">{% if field.value %}{{field.value}}
+            {% else %} First Name {% endif %}</label>
+    </div>
+    <ul class="form_error">
+        {% for error in form.first_name.errors %}
+        <li><strong>{{ error|escape }}</strong></li>
+        {% endfor %}
+      </ul>
+  <div class="form-group">
+      <input type="text" class="form-control" name="last_name"  id="id_last_name"/>
+      <label for="id_last_name" class="animated-label">Last Name</label>
+  </div>
+      <ul class="form_error">
+        {% for error in form.last_name.errors %}
+        <li><strong>{{ error|escape }}</strong></li>
+        {% endfor %}
+      </ul>
+  <div class="form-group">
+      <input type="text" class="form-control" name="email"  id="id_email"/>
+      <label for="id_email" class="animated-label">Email</label>
+  </div>
+      <ul class="form_error">
+        {% for error in form.email.errors %}
+        <li><strong>{{ error|escape }}</strong></li>
+        {% endfor %}
+      </ul>
+  </div>
+  <div class="form-group">
+      <input type="text" class="form-control" name="address"  id="id_address"/>
+      <label for="id_address" class="animated-label">Address</label>
+  </div>
+      <ul class="form_error">
+        {% for error in form.address.errors %}
+        <li><strong>{{ error|escape }}</strong></li>
+        {% endfor %}
+      </ul>
+  <div class="row">
+  <div class="col-md-6">
+  <div class="form-group">
+      <input type="text" class="form-control" name="city"  id="id_city"/>
+      <label for="id_city" class="animated-label">City</label>
+  </div>
+      <ul class="form_error">
+        {% for error in form.city.errors %}
+        <li><strong>{{ error|escape }}</strong></li>
+        {% endfor %}
+      </ul>
+  </div>
+  <div class="col-md-6">
+  <div class="form-group">
+      <input type="text" class="form-control" name="zip_code"  id="id_zip_code"/>
+      <label for="id_zip_code" class="animated-label">Zip Code</label>
+  </div>
+      <ul class="form_error">
+        {% for error in form.zip_code.errors %}
+        <li><strong>{{ error|escape }}</strong></li>
+        {% endfor %}
+      </ul>
+  </div>
+  </div>
+  <div class="form-group">
+      <input type="text" class="form-control" name="description"  id="id_description"/>
+      <label for="id_description" class="animated-label">Description</label>
+  </div>
+      <ul class="form_error">
+        {% for error in form.description.errors %}
+        <li><strong>{{ error|escape }}</strong></li>
+        {% endfor %}
+      </ul>
+  <div class="submit">
+    <button type="submit" class="btn btn-primary btn-block">Send</button>
+  </div>
+</form>

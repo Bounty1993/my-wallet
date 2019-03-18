@@ -1,16 +1,11 @@
 {% extends "base.html" %}
 {% load crispy_forms_tags %}
 {% block content %}
-    <div class="row">
-    <div class="col-sm-10 offset-sm-1">
-        <div class="bg-white mt-3 p-3" style="border-radius: 30px">
-        <h3 class="mb-5">Registration Form</h3>
-        <form method="post" action="" enctype="multipart/form-data" novalidate>
-            {% csrf_token %}
-            {% include "basic_form.html" %}
-            <button class="btn btn-primary" type="submit">Register</button>
-        </form>
+<div class="container">
+    <div class="col-sm-8 offset-md-4">
+        <div class="main-panel shadowing">
+            {% crispy form %}
         </div>
     </div>
-    </div>
+</div>
 {% endblock content %}

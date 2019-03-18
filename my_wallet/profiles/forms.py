@@ -6,6 +6,29 @@ from crispy_forms.bootstrap import PrependedText
 from .models import Profile
 
 
+class BaseProfileForm(UserCreationForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['password1'].help_text = 'Choose the wise one!'
+
+    def clean_email(self):
+        email = self.cleaned_data['email']
+        if Profile.objects.filter(email=email).exists():
+            raise forms.ValidationError('That email is used')
+        return email
+
+    class Meta:
+        model = Profile
+        fields = ('username', 'password1', 'password2', 'email',
+                  'first_name', 'last_name',
+                  'address', 'city', 'zip_code', 'description')
+
+        help_texts = {
+            'username': None,
+            'password1': None,
+        }
+
+
 class MyProfileCreationForm(UserCreationForm):
     class Meta:
         model = Profile
@@ -16,40 +39,23 @@ class ProfileUpdateForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
-        self.helper.form_show_errors = True
         self.helper.form_show_labels = False
         self.helper.layout = Layout(
             Row(
                 Column(
-                    HTML('<img class="profile-image card-img-top" src="{{profile.image.url}}" '
-                         'alt="Profile picture">'),
-                    Div(Field('image', css_class='form-control-file')),
-                    css_class='col-sm-4',
+                    Field('first_name', placeholder='First Name'),
+                    Field('last_name', placeholder='Last Name'),
+                    Field('email', placeholder='Public Email'),
+                    css_class='col-md-6 offset-6'
                 ),
-                Column(
-                    PrependedText('first_name', 'Your Name'),
-                    PrependedText('last_name', 'Your Last Name'),
-                    PrependedText('email', 'Your public email'),
-                    PrependedText('address', 'Address'),
-                    Row(
-                        Column(
-                            PrependedText('city', 'City'),
-                            css_class='col-sm-6'
-                        ),
-                        Column(
-                            PrependedText('zip_code', 'zip_code'),
-                            css_class='col-sm-6',
-                        )
-                    ),
-                    css_class='col-sm-8',
-                )
             ),
             Row(
-                Div(
-                    'description',
-                    css_class='col-sm-12'
-                )
+                Column(Field('address', placeholder='Address')),
+                Column(Field('city', placeholder='City')),
+                Column(Field('zip_code', placeholder='Zip Code')),
+                css_class='d-flex justify-content-around',
             ),
+            Field('description'),
             Row(
                 Submit('submit', 'Update my profile!', css_class='btn btn-success mx-1'),
                 Reset('reset', 'Reset values', css_class='btn btn-warning mx-1'),
@@ -60,7 +66,7 @@ class ProfileUpdateForm(forms.ModelForm):
 
     class Meta:
         model = Profile
-        fields = ('first_name', 'last_name', 'email', 'image',
+        fields = ('first_name', 'last_name', 'email',
                   'address', 'city', 'zip_code', 'description')
         widgets = {
             'description': forms.Textarea(
@@ -68,6 +74,21 @@ class ProfileUpdateForm(forms.ModelForm):
                        'rows': 5, 'col': 15}
             )
         }
+
+
+class EmailUpdateForm(ProfileUpdateForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper.layout = Layout(
+            Row(
+                Column(Field('email', placeholder='Your private email'), css_class='col-md-8'),
+                Column(Submit('submit', 'Update my email', css_class='mr-0'), css_class='col-md-4'),
+            )
+        )
+
+    class Meta(ProfileUpdateForm.Meta):
+        model = Profile
+        fields = ('email', )
 
 
 class MyPasswordChangeForm(PasswordChangeForm):
@@ -103,3 +124,24 @@ class MyPasswordChangeForm(PasswordChangeForm):
             ),
         )
         self.fields['new_password1'].help_text = None
+
+
+class ContactForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_show_labels = False
+        self.helper.layout = Layout(
+            Field('subject', placeholder='Subject'),
+            Field('message', placeholder='Ask about whatever you want'),
+            Div(
+                Submit('submit', 'Send', css_class='btn btn-success mx-1'),
+                Reset('reset', 'Reset message', css_class='btn btn-warning mx-1'),
+                Button('cancel', 'Cancel', css_class='btn btn-danger mx-1'),
+                css_class='d-flex justify-content-center',
+            ),
+
+        )
+
+    subject = forms.CharField(max_length=50)
+    message = forms.CharField(widget=forms.Textarea(attrs={'rows': 5, 'col': 15}))

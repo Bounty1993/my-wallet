@@ -58,6 +58,7 @@ class Stocks(models.Model):
     def year_change(self):
         return self.get_change(num_days=365)['currency']
 
+
     @property
     def perc_year_change(self):
         return self.get_change(num_days=365)['percent']
@@ -86,7 +87,8 @@ class Stocks(models.Model):
 
     def find_past_price(self, num_days):
         today = timezone.now().date()
-        past_date = find_quote_day(date=today, num_days=num_days)
+        past_date = today - datetime.timedelta(days=num_days)
+
         while True:
             try:
                 past_price = self.past.get(date_price=past_date).price
@@ -97,11 +99,16 @@ class Stocks(models.Model):
         return past_price
 
     def get_change(self, num_days):
-        current_price = self.current.latest('date_price').price
-        past_price = self.find_past_price(num_days=num_days)
+        today = timezone.now().date()
+        past_date = today - datetime.timedelta(days=num_days)
+        try:
+            data = self.past.filter(date_price__gte=past_date, date_price__lte=today)
+            current_price = list(data)[0].price
+            past_price = list(data)[-1].price
+        except AttributeError:
+            return {'currency': 'No data', 'percent': 'no data'}
         currency = current_price - past_price
-        perc_change = (current_price/past_price)-1
-        percent = '{:.2%}'.format(perc_change)
+        percent = ((current_price/past_price)-1) * 100
 
         return {'currency': currency, 'percent': percent}
 
@@ -181,33 +188,39 @@ class Financial(models.Model):
         ordering = ('-total_revenue', )
 
 
-class BasePrices(models.Model):
-
+class Prices(models.Model):
     stock = models.ForeignKey(
         Stocks, on_delete=models.CASCADE,
         related_name='past'
     )
     price = models.DecimalField(max_digits=11, decimal_places=2)
-
-    class Meta:
-        abstract = True
-        get_latest_by = 'date_price'
-        ordering = ('-date_price',)
-
-
-class Prices(BasePrices):
     open = models.DecimalField(max_digits=11, decimal_places=2, null=True, blank=True)
     volume = models.PositiveIntegerField(null=True, blank=True)
     change = models.FloatField(null=True, blank=True)
     percent_change = models.FloatField(null=True, blank=True)
     date_price = models.DateField(null=True, blank=True)
 
+    class Meta:
+        get_latest_by = 'date_price'
+        ordering = ('-date_price',)
 
-class CurrentPrice(BasePrices):
+    @classmethod
+    def year_change(cls, ticker, num_days=365):
+        today = timezone.now().date()
+        past_day = today - datetime.timedelta(days=num_days)
+        instance = cls.objects.filter(stock__ticker=ticker)
+        data = instance.filter(data_price__gte=past_day, data_price__lte=today)
+        current = data.first().price
+        past = data.last().price
+        return ((current.price / past.price)-1) * 100
+
+
+class CurrentPrice(models.Model):
     stock = models.ForeignKey(
         Stocks, on_delete=models.CASCADE,
         related_name='current'
     )
+    price = models.DecimalField(max_digits=11, decimal_places=2)
     date_price = models.DateTimeField()
 
     def _daily_min_and_max(self):
@@ -215,3 +228,7 @@ class CurrentPrice(BasePrices):
         start = timezone.datetime(today.year, today.month, today.day)
         end = timezone.now()
         return self.get_min_and_max(start, end)
+
+    class Meta:
+        get_latest_by = 'date_price'
+        ordering = ('-date_price',)

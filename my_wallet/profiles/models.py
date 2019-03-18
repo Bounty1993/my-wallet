@@ -13,6 +13,12 @@ class Profile(AbstractUser):
     image = models.ImageField(upload_to='profile_pics/', default='default.png',
                               blank=True)
 
+    @property
+    def full_name(self):
+        if self.first_name or self.last_name:
+            return self.first_name + ' ' + self.last_name
+        return self.username
+
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
         img = Image.open(self.image.path)

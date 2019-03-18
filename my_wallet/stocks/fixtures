@@ -1,5 +1,0 @@
-'AAPL','MSFT','GE','BAC','T','BABA','GOOGL','IBM','HPE','JNJ','MS','XOM','KO','WFC','ORCL','TWTR'
-
-Financial.object.create(
-    stock = Stocks.objects.get(ticker='BAC')
-)

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+<div class="container">
+<div class="row">
+    <div class="col-sm-3">
+        <div class="nav_title shadowing"> Account Settings</div>
+        <ul class="side-nav">
+            <a href="{% url 'profiles:edit' %}">
+                <li class="nav-btn shadowing">Personal Data</li>
+            </a>
+            <a href="{% url 'profiles:password_change' %}">
+                <li class="nav-btn shadowing ">Password Change</li>
+            </a>
+            <a href="#">
+                <li class="nav-btn shadowing">Private email</li>
+            </a>
+        </ul>
+    </div>
+    <div class="col-sm-9">
+        <div class="shadowing card">
+            <div class="card-header">
+                Contact and email
+            </div>
+            <div class="card-body">
+            <p>Your email</p>
+            {% crispy email_form %}
+            <p>If you have any question - Contact us</p>
+            {% crispy contact_form %}
+            </div>
+        </div>
+    </div>
+
+</div>
+</div>
+{% endblock %}

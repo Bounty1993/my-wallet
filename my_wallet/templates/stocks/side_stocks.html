@@ -9,10 +9,10 @@
                 Ticker: <span style="float:right">{{stocks.ticker}}</span>
             </li>
             <li class="list-group-item">
-                Nominal change <span style="float:right">{{stocks.year_change}}</span>
+                Nominal change <span style="float:right">{{stocks.year_change}} USD</span>
             </li>
             <li class="list-group-item">
-                Percent change <span style="float:right">{{stocks.perc_year_change}}</span>
+                Percent change <span style="float:right">{{stocks.perc_year_change|floatformat:3}} %</span>
             </li>
         </ul>
     </div>

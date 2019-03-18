@@ -1,7 +1,7 @@
 import django_tables2 as table
 from django_tables2.utils import A
 import math
-from .models import Prices, Dividends
+from .models import Prices, Dividends, Stocks
 from django.utils.html import format_html
 
 
@@ -60,4 +60,32 @@ class DividendTable(table.Table):
             'class': 'custom_rows'
         }
 
+        template_name = 'table_draft.html'
+
+
+class BestWorstTable(table.Table):
+
+    def color_change(self, value, units='USD'):
+        data = f'{value} {units}'
+        if value < 0:
+            return format_html(f'<div class="falling">{data}</div>')
+        elif value > 0:
+            return format_html(f'<div class="rising">{data}</div>')
+        return data
+
+    def render_perc_year_change(self, value):
+        value = round(value, 3)
+        return self.color_change(value, units='%')
+
+    class Meta:
+        model = Stocks
+        fields = ('ticker', 'perc_year_change')
+        empty_text = 'No historical data'
+        attrs = {
+            'class': 'main_table',
+            'td': {'class': 'tab-cell'}
+        }
+        row_attrs = {
+            'class': 'custom_rows'
+        }
         template_name = 'table_draft.html'

@@ -1,0 +1,180 @@
+
+/*--------------------Login Panel ------------------*/
+.login_panel{
+    text-align: center;
+    padding: 10px;
+}
+.social_buttons{
+    margin-top: 10px;
+    border-top: 1px solid grey;
+}
+.loginBtn {
+  box-sizing: border-box;
+  position: relative;
+  padding: 5px 15px 5px 40px;
+  border: none;
+  text-align: left;
+  line-height: 34px;
+  white-space: nowrap;
+  border-radius: 0.2em;
+  font-size: 16px;
+  color: #FFF;
+}
+.loginBtn:before {
+  content: "";
+  box-sizing: border-box;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 34px;
+  height: 100%;
+}
+.loginBtn:focus {
+  outline: none;
+}
+.loginBtn:active {
+  box-shadow: inset 0 0 0 32px rgba(0,0,0,0.1);
+}
+/* Facebook */
+.loginBtn--facebook {
+  background-color: #4C69BA;
+  background-image: linear-gradient(#4C69BA, #3B55A0);
+  text-shadow: 0 -1px 0 #354C8C;
+}
+.loginBtn--facebook:before {
+  border-right: #364e92 1px solid;
+  background: url('https://s3-us-west-2.amazonaws.com/s.cdpn.io/14082/icon_facebook.png') 6px 10px no-repeat;
+}
+.loginBtn--facebook:hover,
+.loginBtn--facebook:focus {
+  background-color: #5B7BD5;
+  background-image: linear-gradient(#5B7BD5, #4864B1);
+}
+
+/* Google */
+.loginBtn--google {
+  /*font-family: "Roboto", Roboto, arial, sans-serif;*/
+  background: #DD4B39;
+}
+.loginBtn--google:before {
+  border-right: #BB3F30 1px solid;
+  background: url('https://s3-us-west-2.amazonaws.com/s.cdpn.io/14082/icon_google.png') 6px 12px no-repeat;
+}
+.loginBtn--google:hover,
+.loginBtn--google:focus {
+  background: #E74B37;
+}
+/*------------------- End Login Panel ----------- */
+/* ------------------ Form Snippet -------------- */
+
+.custom_field{
+    color: #B0B0B0;
+    border: none;
+    border-bottom: 1px solid #B0B0B0;
+    shadow: none;
+}
+.custom_field:focus{
+    outline: 0;
+    box-shadow: none;
+    border-bottom: 1px solid black;
+}
+}
+.custom-form {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  max-width: 360px;
+  margin: 40px auto 40px;
+  background: #fff;
+  padding: 40px;
+  border-radius: 4px;
+}
+.custom-form .btn-primary {
+  background-color: #8e44ad;
+  border-color: #8e44ad;
+}
+.custom-form .form-group {
+  position: relative;
+  padding-top: 16px;
+  margin-bottom: 16px;
+}
+.custom-form .form-group .animated-label {
+  position: absolute;
+  top: 20px;
+  left: 0;
+  bottom: 0;
+  z-index: 2;
+  width: 100%;
+  font-weight: 300;
+  opacity: 0.5;
+  cursor: text;
+  transition: 0.5s ease all;
+  margin: 0;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+}
+.custom-form .form-group .animated-label:after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 45%;
+  height: 2px;
+  width: 10px;
+  visibility: hidden;
+  background-color: #8e44ad;
+  transition: 0.5s ease all;
+}
+.custom-form .form-group.not-empty .animated-label {
+  top: 0;
+  font-size: 12px;
+}
+.custom-form .form-group .form-control {
+  position: relative;
+  z-index: 1;
+  border-radius: 0;
+  border-width: 0 0 1px;
+  border-bottom-color: rgba(0, 0, 0, 0.25);
+  height: auto;
+  padding: 3px 0 5px;
+}
+.custom-form .form-group .form-control:focus {
+  box-shadow: none;
+  border-bottom-color: rgba(0, 0, 0, 0.12);
+}
+.custom-form .form-group .form-control:focus ~ .animated-label {
+  top: 0;
+  opacity: 1;
+  color: #8e44ad;
+  font-size: 12px;
+}
+.custom-form .form-group .form-control:focus ~ .animated-label:after {
+  visibility: visible;
+  width: 100%;
+  left: 0;
+}
+.form_error{
+    color: red;
+    font-size: 12px;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+/* ------------------end Form Snipper --------------*/
+
+.nav_title{
+    text-align: center;
+    font-weight: bold;
+    padding: 15px;
+    background-color: white;
+}
+
+
+
+
+
+
+
+
+
+

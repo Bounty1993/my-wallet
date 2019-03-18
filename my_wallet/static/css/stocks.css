@@ -85,9 +85,11 @@ ul.side-nav
 }
 .falling{
     color: red;
+    text-align: right;
 }
 .rising{
     color: green;
+    text-align: right;
 }
 #charLine{
     height: 400px;

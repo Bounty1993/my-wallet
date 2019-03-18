@@ -1,32 +1,49 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="container">
-<div class="row no-gutters">
-
-    <div class="col-sm-5 offset-sm-1">
-     <div class="main-panel">
-       <h3>Log in to My Wallet</h3>
-       <div>
-       <a href="{% url 'profiles:social:begin' 'facebook' %}">
-         <div class="facebook-btn">Facebook</div>
-       </a>
-       <a href="{% url 'profiles:social:begin' 'twitter' %}" class="twitter-btn">Twitter</a>
-       <a href="{% url 'profiles:social:begin' 'google_oauth2' %}" class="google-btn">Google +</a>
-       </div>
+<div class="container no-gutter">
+<div class="row">
+    <div class="col-sm-6 offset-sm-3">
+    <div class="main-panel login_panel shadowing card card-default mt-4">
+        <div class="card-heading">
+            <h2>Sign in to My Wallet</h2>
+            <div class="card-body">
+                <form method="POST" action="" class="custom-form">
+                    {% csrf_token %}
+                    {% for field in form %}
+                        <div class="form-group">
+                            <input type="text" class="form-control" name="{{ field.html_name }}"  id="{{field.id_for_label}}"/>
+                            <label for="{{field.id_for_label}}" class="animated-label">{{field.label}}</label>
+                        </div>
+                        <ul class="form_error">
+                            {% for error in field.errors %}
+                            <li><strong>{{ error|escape }}</strong></li>
+                            {% endfor %}
+                        </ul>
+                    {% endfor %}
+                    <button class="btn btn-success w-100" type="submit">Login</button>
+                    <div class="form-check-inline ml-0">
+                        <label class="form-check-label">
+                        <input type="checkbox" class="form-check-input" value="" checked>Stay sign in!
+                        </label>
+                    </div>
+                    <a href="{% url 'core:home' %}" class="btn btn-link mr-0">Forget your password?</a>
+                </form>
+               <div class="social_buttons">
+                   <p class="social_title">Or login Via</p>
+                   <a href="{% url 'profiles:social:begin' 'facebook' %}">
+                       <button class="loginBtn loginBtn--facebook">
+                           Login with Facebook
+                       </button>
+                   </a>
+                   <a href="{% url 'profiles:social:begin' 'google_oauth2' %}" class="google-btn">
+                       <button class="loginBtn loginBtn--google">
+                           Login with Google
+                       </button>
+                   </a>
+               </div>
+                <a href="{% url 'profiles:signup' %}" class="btn btn-link mt-4">Dont have an account? Sign up!</a>
      </div>
     </div>
-
-
-    <div class="col-sm-5">
-    <div class="main-panel card card-default">
-        <div class="card-heading">
-            <div class="card-body">
-                <form method="post">
-                    {% csrf_token %}
-                    {% include "basic_form.html" %}
-                    <button class="btn btn-success w-100" type="submit">Login</button>
-                    <a href="{% url 'core:home' %}" class="btn btn-link">Forget your password?</a>
-                </form>
             </div>
         </div>
     </div>

@@ -11,5 +11,5 @@ urlpatterns = [
     path('detail/<slug:ticker>/', StockDetailView.as_view(), name='detail'),
     path('new/', StockCreateView.as_view(), name='new'),
     path('articles/<slug:ticker>/', ArticlesView.as_view(), name='articles'),
-    path('history/<slug:ticker>/', HistoryView.as_view(), name='history')
+    path('history/<slug:ticker>/', HistoryView.as_view(), name='history'),
 ]
