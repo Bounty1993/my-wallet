@@ -159,7 +159,7 @@ $(document).ready(function(){
             },
             yAxis: {
                 title: {
-                    text: 'Exchange rate'
+                    text: 'Price'
                 }
             },
             legend: {

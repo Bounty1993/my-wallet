@@ -12,8 +12,8 @@
             <a href="{% url 'profiles:password_change' %}">
                 <li class="nav-btn shadowing ">Password Change</li>
             </a>
-            <a href="#">
-                <li class="nav-btn shadowing">Private email</li>
+            <a href="{% url 'profiles:contact' %}">
+                <li class="nav-btn shadowing">Contact</li>
             </a>
         </ul>
     </div>
@@ -23,6 +23,14 @@
                 Contact and email
             </div>
             <div class="card-body">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    {{ message }}
+                </div>
+                {% endfor %}
             <p>Your email</p>
             {% crispy email_form %}
             <p>If you have any question - Contact us</p>

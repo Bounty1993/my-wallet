@@ -2,6 +2,7 @@ from django.views.generic import (
     ListView, DetailView,
     CreateView, TemplateView
 )
+from django.core.cache import cache
 from .models import Stocks, Prices, Dividends, Financial
 import datetime
 from django.utils import timezone
@@ -20,15 +21,38 @@ from .tables import (
 )
 
 
-class StocksListView(ListView):
+class CurrentPriceMixin:
+    def current_data(self, object, context):
+        attributes = ['_price', '_day_change', '_percent_change']
+        for attribute in attributes:
+            ticker = object.ticker
+            result = cache.get(ticker + attribute, 'no data')
+            context['stocks' + attribute] = result
+
+
+class BestWorstMixin:
+
+    def change_table(self):
+        sorted_stocks = sorted(Stocks.objects.all(), key=lambda stock: stock.perc_year_change)
+        rising_table = BestWorstTable(sorted_stocks[-5:])
+        RequestConfig(self.request, paginate={'per_page': 5}).configure(rising_table)
+        falling_table = BestWorstTable(sorted_stocks[:5])
+        RequestConfig(self.request, paginate={'per_page': 5}).configure(falling_table)
+        return {'rising_table': rising_table, 'falling_table': falling_table}
+
+
+class StocksListView(BestWorstMixin, ListView):
     model = Stocks
     template_name = 'stocks/list.html'
     context_object_name = 'stocks'
-    paginate_by = 5
+    paginate_by = 10
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         date = timezone.now().date()
+        data_table = self.change_table()
+        context['rising_table'] = data_table['rising_table']
+        context['falling_table'] = data_table['falling_table']
         context['today'] = find_quote_day(date, 0, type='earlier')
         return context
 
@@ -64,17 +88,20 @@ class PriceChartMixin:
 
     instance = Prices.objects.filter(stock__ticker='MSFT').order_by('date_price')
 
+    def get_instance(self):
+        pass
+
     def get_num_seconds(self, date):
         epoch = datetime.date(1970, 1, 1)
         num_seconds = (date - epoch).total_seconds()*1000
         return int(num_seconds)
 
     def get_price_data(self):
-        price_data = [(self.get_num_seconds(field.date_price), float(field.price)) for field in self.instance]
+        price_data = [(self.get_num_seconds(field.date_price), float(field.price)) for field in self.get_instance()]
         return price_data
 
 
-class StockDetailView(ChartMixin, DetailView):
+class StockDetailView(ChartMixin, CurrentPriceMixin, DetailView):
     template_name = 'stocks/detail.html'
     model = Stocks
     slug_field = 'ticker'
@@ -93,6 +120,7 @@ class StockDetailView(ChartMixin, DetailView):
         RequestConfig(self.request, paginate={'per_page': 8}).configure(table)
         context['table'] = table
         context['last_dividend'] = Dividends.objects.filter(stock=self.object).latest('payment')
+        self.current_data(self.object, context)
         return context
 
 
@@ -127,10 +155,13 @@ class ArticlesView(TemplateView):
         return context
 
 
-class HistoryView(DetailView):
+class HistoryView(PriceChartMixin, DetailView):
     template_name = 'stocks/history.html'
     slug_field = 'ticker'
     model = Prices
+
+    def get_instance(self):
+        return Prices.objects.filter(stock__ticker=self.kwargs['ticker']).order_by('date_price')
 
     def get_object(self):
         ticker = self.kwargs.get('ticker', '')
@@ -156,5 +187,5 @@ class HistoryView(DetailView):
         data_table = self.change_table()
         context['rising_table'] = data_table['rising_table']
         context['falling_table'] = data_table['falling_table']
-        context['price_data'] = PriceChartMixin().get_price_data()
+        context['price_data'] = self.get_price_data()
         return context

@@ -6,13 +6,13 @@
         <p>Basic Informations:</p>
         <ul class="list-group list-group-flush">
             <li class="list-group-item">
-                Ticker: <span style="float:right">{{stocks.ticker}}</span>
+                Ticker: <span style="float:right">{{stocks_price}} USD</span>
             </li>
             <li class="list-group-item">
-                Nominal change <span style="float:right">{{stocks.year_change}} USD</span>
+                Nominal change <span style="float:right">{{stocks_day_change}} USD</span>
             </li>
             <li class="list-group-item">
-                Percent change <span style="float:right">{{stocks.perc_year_change|floatformat:3}} %</span>
+                Percent change <span style="float:right">{{stocks_percent_change|floatformat:3}} %</span>
             </li>
         </ul>
     </div>

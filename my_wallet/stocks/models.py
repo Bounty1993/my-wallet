@@ -102,10 +102,10 @@ class Stocks(models.Model):
         today = timezone.now().date()
         past_date = today - datetime.timedelta(days=num_days)
         try:
-            data = self.past.filter(date_price__gte=past_date, date_price__lte=today)
+            data = self.past.filter(date_price__gte=past_date)
             current_price = list(data)[0].price
             past_price = list(data)[-1].price
-        except AttributeError:
+        except (AttributeError, IndexError):
             return {'currency': 'No data', 'percent': 'no data'}
         currency = current_price - past_price
         percent = ((current_price/past_price)-1) * 100

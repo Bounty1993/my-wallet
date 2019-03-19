@@ -72,11 +72,14 @@ def _get_form(request, formcls, prefix):
 
 def contact(request):
     if request.method == 'POST':
+        print(request.POST)
         email_form = _get_form(request, EmailUpdateForm, prefix='email_pre')
         contact_form = _get_form(request, ContactForm, prefix='contact_pre')
         if email_form.is_bound and email_form.is_valid():
+            print('I am email')
             pass
         elif contact_form.is_bound and contact_form.is_valid():
+            print('I am here')
             messages.success(request, 'Thank you for your questions')
             return redirect(reverse_lazy('profiles:contact'))
         context = {'contact_form': contact_form, 'email_form': email_form}
