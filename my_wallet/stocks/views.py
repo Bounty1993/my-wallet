@@ -21,14 +21,23 @@ from .tables import (
     BestDividendsTable
 )
 from django.http import HttpResponse
+import csv
 
 
-class DownloadCsvExcel:
 
-    def download_csv(self, request):
-        reponse = HttpResponse(content_type='text/csv')
+def download_csv(request):
+    model = Prices
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = f'attachment; filename="{model}.csv"'
 
+    writer = csv.writer(response)
+    # writer.writerow()
+    items = model.objects.filter(stock__ticker='AAPL').values_list()
 
+    for item in items:
+        writer.writerow(item)
+
+    return response
 
 
 class CurrentPriceMixin:
