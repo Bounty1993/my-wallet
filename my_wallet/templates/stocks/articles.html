@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load render_table from django_tables2 %}
 {% block content %}
 <div class="container">
   <row>
@@ -21,6 +22,9 @@
   <div class="row">
     <div class="col-sm-4">
         {% include "stocks/side_stocks.html" %}
+        <div>
+            {% render_table dividend_table %}
+        </div>
     </div>
     <div class="col-sm-8">
         <div class="articles shadowing">
@@ -37,29 +41,41 @@
         </ul>
         <div class="tab-content" id="pills-tabContent">
           <div class="tab-pane fade show active" id="pills-google" role="tabpanel" aria-labelledby="pills-google-tab">
-              <h2>Google Articles</h2>
-              <ul class="list-group">
+
+              <form class="form-input">
+                  <input type="text" class="form-control" placeholder="Search" name="srch-term" id="searchArticle">
+                  <div class="input-group-btn">
+                      <button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i>
+                      </button>
+                  </div>
+              </form>
+              <ul class="list-group" id="myArticles">
                   {% for key, article in google_news.items %}
                   <li class="list-group-item">
-                    <p>{{article.title }}</p>
-                    <p>{{article.summary}}</p>
-                    <a class="btn btn-primary" href="{{article.link}}" target="_blank">
-                        See that at Google website
-                    </a>
+                      <h5 class="title">{{article.title}}</h5>
+                      <p class="text-muted"><span class="glyphicon glyphicon-calendar"></span> July 23, 2014 @ 1:30 PM</p>
+                      <p>{{article.summary}}</p>
+                      <p class="text-muted">Presented by
+                        <a class="btn btn-primary" href="{{article.link}}" target="_blank">
+                        Google
+                        </a>
+                      </p>
                   </li>
                   {% endfor %}
               </ul>
           </div>
           <div class="tab-pane fade" id="pills-yahoo" role="tabpanel" aria-labelledby="pills-yahoo-tab">
-              <h2>Yahoo Articles</h2>
               <ul class="list-group">
                   {% for key, article in yahoo_news.items %}
                   <li class="list-group-item">
-                    <p>{{article.title }}</p>
-                    <p>{{article.summary}}</p>
-                    <a class="btn btn-primary" href="{{article.link}}" target="_blank">
-                        See that at Yahoo website
-                    </a>
+                      <h5 class="title">{{article.title}}</h5>
+                      <p class="text-muted"><span class="glyphicon glyphicon-calendar"></span> July 23, 2014 @ 1:30 PM</p>
+                      <p>{{article.summary}}</p>
+                      <p class="text-muted">Presented by
+                        <a class="btn btn-primary" href="{{article.link}}" target="_blank">
+                        Yahoo
+                        </a>
+                      </p>
                   </li>
                   {% endfor %}
               </ul>
@@ -70,5 +86,17 @@
     </div>
   </div>
 </div>
+{% endblock %}
+{% block javascript %}
+<script>
+$("document").ready(function(){
+    $("#searchArticle").on("keyup", function() {
+        var value = $(this).val().toLowerCase();
+        $("#myArticles *").filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+        });
+    });
+});
+</script>
 {% endblock %}
 

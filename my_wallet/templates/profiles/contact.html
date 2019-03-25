@@ -2,6 +2,21 @@
 {% load crispy_forms_tags %}
 {% block content %}
 <div class="container">
+<ul class="breadcrumb">
+          <li class="breadcrumb-item">
+              <a href="{% url 'core:home' %}">
+                  Home
+              </a>
+          </li>
+          <li class="breadcrumb-item">
+              <a href="{% url 'profiles:profile' %}">
+                  Profile
+              </a>
+          </li>
+          <li class="breadcrumb-item active">
+                Settings
+          </li>
+</ul>
 <div class="row">
     <div class="col-sm-3">
         <div class="nav_title shadowing"> Account Settings</div>
@@ -31,7 +46,6 @@
                     {{ message }}
                 </div>
                 {% endfor %}
-            <p>Your email</p>
             {% crispy email_form %}
             <p>If you have any question - Contact us</p>
             {% crispy contact_form %}

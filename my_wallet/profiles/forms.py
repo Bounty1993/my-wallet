@@ -6,33 +6,41 @@ from crispy_forms.bootstrap import PrependedText
 from .models import Profile
 
 
-class BaseProfileForm(UserCreationForm):
+class ProfileCreationForm(UserCreationForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['password1'].help_text = 'Choose the wise one!'
+        self.helper = FormHelper()
+        self.helper.form_show_labels = False
+        self.helper.layout = Layout(
+            Field('username', placeholder='Username'),
+            Field('password1', placeholder='Password'),
+            Field('password2', placeholder='Password'),
+            Fieldset(
+                'Below data is not required',
+                Field('email', placeholder='Email'),
+                Field('first_name', placeholder='First Name'),
+                Field('last_name', placeholder='Last Name'),
+            ),
+            Submit('submit', 'Create the account', css_class='half_btn btn btn-success'),
+            Button('cancel', 'Resign', css_class='half_btn btn btn-danger')
+        )
 
     def clean_email(self):
         email = self.cleaned_data['email']
-        if Profile.objects.filter(email=email).exists():
+        if email and Profile.objects.filter(email=email).exists():
             raise forms.ValidationError('That email is used')
         return email
 
     class Meta:
         model = Profile
         fields = ('username', 'password1', 'password2', 'email',
-                  'first_name', 'last_name',
-                  'address', 'city', 'zip_code', 'description')
+                  'first_name', 'last_name')
 
         help_texts = {
             'username': None,
             'password1': None,
         }
-
-
-class MyProfileCreationForm(UserCreationForm):
-    class Meta:
-        model = Profile
-        fields = ('username', 'email', 'password1', 'password2', 'image')
 
 
 class ProfileUpdateForm(forms.ModelForm):
@@ -43,10 +51,14 @@ class ProfileUpdateForm(forms.ModelForm):
         self.helper.layout = Layout(
             Row(
                 Column(
+                    Field('image'),
+                    css_class='col-md-6 mb-0',
+                ),
+                Column(
                     Field('first_name', placeholder='First Name'),
                     Field('last_name', placeholder='Last Name'),
                     Field('email', placeholder='Public Email'),
-                    css_class='col-md-6 offset-6'
+                    css_class='col-md-6',
                 ),
             ),
             Row(
@@ -66,7 +78,7 @@ class ProfileUpdateForm(forms.ModelForm):
 
     class Meta:
         model = Profile
-        fields = ('first_name', 'last_name', 'email',
+        fields = ('image', 'first_name', 'last_name', 'email',
                   'address', 'city', 'zip_code', 'description')
         widgets = {
             'description': forms.Textarea(

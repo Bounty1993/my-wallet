@@ -1,11 +1,29 @@
 {% extends "base.html" %}
 {% load crispy_forms_tags %}
+{% load static %}
 {% block content %}
 <div class="container">
-    <div class="col-sm-8 offset-md-4">
+<div class="main-panel shadowing signup_banner">
+    <h3>Welcome to My Wallet</h3>
+    <p>My wallet is very innovative platform where you can create and test your inwesting strategy</p>
+</div>
+<div class="row no-gutters">
+    <div class="col-sm-6">
+        <div class="signup_container">
+            <img class="signup_pics" src="{% static 'img/kevin-grieve-1319622-unsplash.jpg' %}" alt="Sign up">
+            <div class="img_text">
+                <h3>When time is now.</h3>
+                <h3>It is all about passing</h3>
+                <p>Today you can change your future</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6">
         <div class="main-panel shadowing">
             {% crispy form %}
         </div>
     </div>
 </div>
+</div>
+
 {% endblock content %}

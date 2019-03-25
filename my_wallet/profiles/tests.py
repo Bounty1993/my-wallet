@@ -2,12 +2,13 @@ from django.test import TestCase
 from django.urls import reverse, resolve
 from .models import Profile
 from .views import MyProfileCreationView
+from .forms import ProfileCreationForm
 
 
 class ProfileModelTest(TestCase):
 
     def setUp(self):
-        Profile.objects.create_user(
+        self.my_user = Profile.objects.create_user(
             username='Bartosz',
             password='Tester123',
             email='bartosz@example.pl'
@@ -22,6 +23,40 @@ class ProfileModelTest(TestCase):
         self.assertEqual(user.username, 'Bartosz')
         self.assertEqual(user.email, 'bartosz@example.pl')
 
+    def test_profile_full_name(self):
+        self.my_user.first_name = 'First'
+        self.my_user.last_name = 'Second'
+        self.my_user.save()
+        self.assertEquals(self.my_user.full_name, 'First Second')
+
+    def test_profile_no_full_name(self):
+        self.assertEquals(self.my_user.full_name, "Bartosz")
+
+
+class ProfileCreationFormTest(TestCase):
+    def setUp(self):
+        self.form = ProfileCreationForm(data={
+            'username': 'Bartosz',
+            'password1': 'Tester123',
+            'password2': 'Tester123',
+        })
+
+    def test_init(self):
+        self.form.save()
+        profile = Profile.objects.filter(username='Bartosz')
+        self.assertTrue(profile.exists())
+
+    def test_is_valid(self):
+        self.assertTrue(self.form.is_valid())
+
+    def test_clean_email(self):
+        Profile.objects.create_user(
+            username='Bartosz',
+            password='TEST',
+            email='tester@example.pl'
+        )
+        self.form.email = 'tester@example.pl'
+        self.assertFalse(self.form.is_valid())
 
 
 class ProfileViewTest(TestCase):

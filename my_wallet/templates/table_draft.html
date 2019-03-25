@@ -1,7 +1,6 @@
 {% load django_tables2 %}
 {% load i18n %}
 {% block table-wrapper %}
-<div class="table-container main-panel shadowing">
     {% block table %}
         <table {% render_attrs table.attrs class="table" %}>
             {% block table.thead %}
@@ -93,5 +92,4 @@
         </nav>
         {% endif %}
     {% endblock pagination %}
-</div>
 {% endblock table-wrapper %}

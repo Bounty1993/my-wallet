@@ -18,7 +18,17 @@ from .tables import (
     DividendTable,
     PricesTable,
     BestWorstTable,
+    BestDividendsTable
 )
+from django.http import HttpResponse
+
+
+class DownloadCsvExcel:
+
+    def download_csv(self, request):
+        reponse = HttpResponse(content_type='text/csv')
+
+
 
 
 class CurrentPriceMixin:
@@ -28,6 +38,14 @@ class CurrentPriceMixin:
             ticker = object.ticker
             result = cache.get(ticker + attribute, 'no data')
             context['stocks' + attribute] = result
+    def current_data_one(self, object):
+        data = {}
+        attributes = ['_price', '_day_change', '_percent_change']
+        for attribute in attributes:
+            ticker = object.ticker
+            result = cache.get(ticker + attribute, 'no data')
+            data['stocks' + attribute] = result
+        return data
 
 
 class BestWorstMixin:
@@ -39,6 +57,20 @@ class BestWorstMixin:
         falling_table = BestWorstTable(sorted_stocks[:5])
         RequestConfig(self.request, paginate={'per_page': 5}).configure(falling_table)
         return {'rising_table': rising_table, 'falling_table': falling_table}
+
+
+class BestDividendsMixin:
+
+    def get_data(self, n):
+        data = Stocks.highest_dividends()
+        best = data[:n]
+        return best
+
+    def dividend_table(self):
+        data = self.get_data(5)
+        table = BestDividendsTable(data)
+        RequestConfig(self.request).configure(table)
+        return table
 
 
 class StocksListView(BestWorstMixin, ListView):
@@ -86,8 +118,6 @@ class ChartMixin:
 
 class PriceChartMixin:
 
-    instance = Prices.objects.filter(stock__ticker='MSFT').order_by('date_price')
-
     def get_instance(self):
         pass
 
@@ -96,8 +126,11 @@ class PriceChartMixin:
         num_seconds = (date - epoch).total_seconds()*1000
         return int(num_seconds)
 
-    def get_price_data(self):
-        price_data = [(self.get_num_seconds(field.date_price), float(field.price)) for field in self.get_instance()]
+    def get_price_data(self, name):
+        instance = self.get_instance()
+        prices = [(self.get_num_seconds(field.date_price), float(field.price)) for field in instance]
+        # need to debug
+        price_data = {'name': name, 'prices': prices}
         return price_data
 
 
@@ -132,7 +165,7 @@ class StockCreateView(CreateView):
         pass
 
 
-class ArticlesView(TemplateView):
+class ArticlesView(BestDividendsMixin, TemplateView):
     template_name = 'stocks/articles.html'
 
     def market_ticker(self):
@@ -151,11 +184,12 @@ class ArticlesView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         market, ticker = self.market_ticker()
+        context['dividend_table'] = self.dividend_table()
         self.process_context(market, ticker, context)
         return context
 
 
-class HistoryView(PriceChartMixin, DetailView):
+class HistoryView(PriceChartMixin, CurrentPriceMixin, DetailView):
     template_name = 'stocks/history.html'
     slug_field = 'ticker'
     model = Prices
@@ -187,5 +221,7 @@ class HistoryView(PriceChartMixin, DetailView):
         data_table = self.change_table()
         context['rising_table'] = data_table['rising_table']
         context['falling_table'] = data_table['falling_table']
-        context['price_data'] = self.get_price_data()
+        stock_name = self.object[0].stock.name
+        context['price_data'] = self.get_price_data(stock_name)
+        self.current_data(object=Stocks.objects.get(ticker=self.kwargs['ticker']), context=context)
         return context

@@ -5,6 +5,19 @@ from .models import Prices, Dividends, Stocks
 from django.utils.html import format_html
 
 
+class TableMetaMixin(table.Table):
+
+    class Meta:
+        attrs = {
+            'class': 'main_table',
+            'td': {'class': 'tab-cell'}
+        }
+        row_attrs = {
+            'class': 'custom_rows'
+        }
+        template_name = 'table_draft.html'
+
+
 class PricesTable(table.Table):
 
     def color_change(self, value):
@@ -83,9 +96,30 @@ class BestWorstTable(table.Table):
         empty_text = 'No historical data'
         attrs = {
             'class': 'main_table',
-            'td': {'class': 'tab-cell'}
+            'td': {'class': 'tab-cell'},
+            'tbody': {'class': 'main_tbody'},
         }
         row_attrs = {
             'class': 'custom_rows'
         }
+
+        template_name = 'table_draft.html'
+
+
+class BestDividendsTable(table.Table):
+    ticker = table.Column()
+    sum_dividends = table.Column()
+
+    class Meta(TableMetaMixin.Meta):
+        empty_text = 'No historical data'
+        fields = ('ticker', 'sum_dividends',)
+        attrs = {
+            'class': 'main_table',
+            'td': {'class': 'tab-cell'},
+            'tbody': {'class': 'main_tbody'},
+        }
+        row_attrs = {
+            'class': 'custom_rows'
+        }
+
         template_name = 'table_draft.html'

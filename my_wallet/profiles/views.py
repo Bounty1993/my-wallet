@@ -6,10 +6,9 @@ from django.urls import reverse_lazy
 from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
 from .forms import (
-    MyProfileCreationForm,
+    ProfileCreationForm,
     ProfileUpdateForm,
     MyPasswordChangeForm,
-    BaseProfileForm,
     ContactForm,
     EmailUpdateForm
 )
@@ -19,7 +18,7 @@ from .models import Profile
 class MyProfileCreationView(CreateView):
     model = Profile
     template_name = 'profiles/signup.html'
-    form_class = ProfileUpdateForm
+    form_class = ProfileCreationForm
 
     def form_valid(self, form):
         profile = form.save()

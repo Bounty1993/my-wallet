@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models import Max, Min
+from django.db.models import Max, Min, Sum, Count, Q
 from django.utils import timezone
 import requests
 import datetime
@@ -11,6 +11,7 @@ from .crawler import (
     FinancialIEX,
 )
 from decimal import Decimal, ROUND_HALF_UP
+from django.core.cache import cache
 
 
 def find_quote_day(date, num_days=0, type='earlier'):
@@ -32,9 +33,7 @@ def find_quote_day(date, num_days=0, type='earlier'):
 
 class Stocks(models.Model):
     """
-    Model is responsible for keeping data about every stock.
-    Other models can use data from Stocks to get to know everything about
-    past prices
+        Model keeps data about every stock.
     """
     name = models.CharField(max_length=50)
     ticker = models.CharField(max_length=10)
@@ -49,37 +48,47 @@ class Stocks(models.Model):
         return self.name
 
     @property
-    def price(self):
-        cents = Decimal('0.01')
-        price = QuotesIEX(self.ticker).get_data().get('latestPrice', '')
-        return Decimal(price).quantize(cents, ROUND_HALF_UP)
+    def current_price(self):
+        return cache.get(self.ticker + '_price')
+
+    @property
+    def day_change(self):
+        return cache.get(self.ticker + '_day_change')
+
+    @property
+    def percent_change(self):
+        return cache.get(self.ticker + '_percent_change')
+
+    @property
+    def day_low(self):
+        return cache.get(self.ticker + '_day_low')
+
+    @property
+    def day_high(self):
+        return cache.get(self.ticker + '_day_high')
 
     @property
     def year_change(self):
         return self.get_change(num_days=365)['currency']
-
 
     @property
     def perc_year_change(self):
         return self.get_change(num_days=365)['percent']
 
     @property
-    def daily_change(self):
-        return self.get_change(num_days=1)['currency']
+    def dividend_amount(self):
+        year_ago = datetime.date.today() - datetime.timedelta(days=365 * 2)
+        four_quarters = self.dividends.filter(payment__gte=year_ago)
+        data = four_quarters.aggregate(amount=Sum('amount'))
+        return data['amount']
 
     @property
-    def perc_daily_change(self):
-        return self.get_change(num_days=1)['percent']
-
-    @property
-    def min_daily(self):
-        start = timezone.now().date() - timezone.timedelta(days=1)
-        return self.get_min_and_max(start=start, end=timezone.now())['price__min']
-
-    @property
-    def max_daily(self):
-        start = timezone.now().date() - timezone.timedelta(days=1)
-        return self.get_min_and_max(start=start, end=timezone.now())['price__max']
+    def dividend_rate(self):
+        price = cache.get(self.ticker + '_price')
+        if not price:
+            return 'No data'
+        price = Decimal(price)
+        return self.dividend_amount/price
 
     @staticmethod
     def get_current_price(ticker):
@@ -112,16 +121,29 @@ class Stocks(models.Model):
 
         return {'currency': currency, 'percent': percent}
 
-    def get_min_and_max(self, start, end):
+    @classmethod
+    def highest_dividends(cls):
         """
-        give start and end as a datetime.
-        function returns min and max price.
+        classmethod responsible for collect data about dividends rate.
+        Dividends model is used. Reversed sorted dict is returned
+        :return: format {'ticker': ..., 'sum_dividends': data in percent}
         """
-
-        prices_between = self.current.filter(date_price__gte=start)
-        prices_between = prices_between.filter(date_price__lte=end)
-        data = prices_between.aggregate(Max('price'), Min('price'))
-
+        year_ago = datetime.date.today() - datetime.timedelta(days=365 * 2)
+        last_year = Sum('dividends__amount', filter=Q(dividends__payment__gte=year_ago))
+        data = cls.objects.values('ticker').annotate(sum_dividends=last_year)
+        for line in data:
+            dividend = line['sum_dividends']
+            dividend = dividend if dividend else 0
+            price = cache.get(line['ticker'] + '_price')
+            if price:
+                price = Decimal(price)
+            percents = Decimal('0.0001')
+            dividend = dividend/price if price else None
+            if dividend:
+                line['sum_dividends'] = Decimal(dividend * 100).quantize(percents, ROUND_HALF_UP)
+            else:
+                line['sum_dividends'] = 0
+        data = sorted(data, key=lambda line: line['sum_dividends'], reverse=True)
         return data
 
 
@@ -147,8 +169,23 @@ class Dividends(models.Model):
     def get_rate(self):
         # to do for 4 quarters
         percents = Decimal('0.0001')
-        price = Prices.objects.get(stock=self.stock, date_price=self.record).price
-        return Decimal(self.amount/price * 100).quantize(percents, ROUND_HALF_UP)
+        price = Prices.objects.filter(stock=self.stock, date_price=self.record)
+        if price:
+            price = price[0].price
+            return Decimal(self.amount/price * 100).quantize(percents, ROUND_HALF_UP)
+        return 'No data'
+
+    @classmethod
+    def year_rate(self):
+        percents = Decimal('0.0001')
+        year_ago = datetime.date.today() - datetime.timedelta(days=365)
+        price = self.stock.current_price
+        last_dividends = Dividends.objects.filter(stock=self.stock, payment__gte=year_ago)
+        sum_dividends = last_dividends.aggragate(year_dividend=Sum('amount'))
+        return sum_dividends
+
+    def __str__(self):
+        return f'{self.stock} - {self.payment}'
 
     class Meta:
         ordering = ('-payment', )
@@ -213,22 +250,3 @@ class Prices(models.Model):
         current = data.first().price
         past = data.last().price
         return ((current.price / past.price)-1) * 100
-
-
-class CurrentPrice(models.Model):
-    stock = models.ForeignKey(
-        Stocks, on_delete=models.CASCADE,
-        related_name='current'
-    )
-    price = models.DecimalField(max_digits=11, decimal_places=2)
-    date_price = models.DateTimeField()
-
-    def _daily_min_and_max(self):
-        today = timezone.now().date()
-        start = timezone.datetime(today.year, today.month, today.day)
-        end = timezone.now()
-        return self.get_min_and_max(start, end)
-
-    class Meta:
-        get_latest_by = 'date_price'
-        ordering = ('-date_price',)

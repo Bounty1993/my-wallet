@@ -13,6 +13,8 @@ def price_update():
         cache.set(stock.ticker + '_price', data.get('latestPrice', 'no data'))
         cache.set(stock.ticker + '_day_change', data.get('change', 'no data'))
         cache.set(stock.ticker + '_percent_change', data.get('changePercent', 'no data') * 100)
+        cache.set(stock.ticker + '_day_low', data.get('low', 'no data'))
+        cache.set(stock.ticker + '_day_high', data.get('high', 'no data'))
         print(f'{stock.ticker} updated successfully')
 
     print('I have finished')
