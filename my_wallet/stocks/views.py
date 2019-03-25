@@ -24,19 +24,31 @@ from django.http import HttpResponse
 import csv
 
 
-
-def download_csv(request):
-    model = Prices
+def _download_csv(request, model, headers, ticker):
     response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = f'attachment; filename="{model}.csv"'
+    response['Content-Disposition'] = f'attachment; filename="{ticker}.csv"'
 
     writer = csv.writer(response)
-    # writer.writerow()
-    items = model.objects.filter(stock__ticker='AAPL').values_list()
+    writer.writerow(headers)
+    items = model.objects.filter(stock__ticker=ticker).values_list(*headers)
 
     for item in items:
         writer.writerow(item)
+    return response
 
+def _download_xml(request, model, headers, ticker):
+    
+
+def download_csv_prices(request, ticker):
+    model = Prices
+    headers = ['date_price', 'price', 'open', 'volume', 'change', 'percent_change']
+    response = _download_csv(request, model=model, headers=headers, ticker=ticker)
+    return response
+
+def download_xml_prices(request, ticker):
+    model = Prices
+    headers = ['date_price', 'price', 'open', 'volume', 'change', 'percent_change']
+    response = _download_csv(request, model=model, headers=headers, ticker=ticker)
     return response
 
 
@@ -47,6 +59,7 @@ class CurrentPriceMixin:
             ticker = object.ticker
             result = cache.get(ticker + attribute, 'no data')
             context['stocks' + attribute] = result
+
     def current_data_one(self, object):
         data = {}
         attributes = ['_price', '_day_change', '_percent_change']

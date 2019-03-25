@@ -35,6 +35,13 @@
             </div>
             <div class="row">
                 <div class="col-12">
+                    <a href="{% url 'stocks:download_csv' ticker='AAPL' %}">
+                        <p>Link to csv</p>
+                    </a>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
                     <div class="table-container shadowing">
                         {% render_table price_table %}
                     </div>
