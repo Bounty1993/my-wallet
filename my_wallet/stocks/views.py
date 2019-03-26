@@ -2,6 +2,7 @@ from django.views.generic import (
     ListView, DetailView,
     CreateView, TemplateView
 )
+from django.views import View
 from django.core.cache import cache
 from .models import Stocks, Prices, Dividends, Financial
 import datetime
@@ -22,34 +23,51 @@ from .tables import (
 )
 from django.http import HttpResponse
 import csv
+from openpyxl import Workbook
 
 
-def _download_csv(request, model, headers, ticker):
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = f'attachment; filename="{ticker}.csv"'
+class BaseCsvExcelMixin:
+    def _download_csv(self, model, headers, ticker):
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = f'attachment; filename="{ticker}.csv"'
 
-    writer = csv.writer(response)
-    writer.writerow(headers)
-    items = model.objects.filter(stock__ticker=ticker).values_list(*headers)
+        writer = csv.writer(response)
+        writer.writerow(headers)
+        items = model.objects.filter(stock__ticker=ticker).values_list(*headers)
 
-    for item in items:
-        writer.writerow(item)
-    return response
+        for item in items:
+            writer.writerow(item)
+        return response
 
-def _download_xml(request, model, headers, ticker):
-    
+    def _download_xml(self, model, headers, ticker):
+        response = HttpResponse(content_type='application/ms-excel')
+        response['Content-Disposition'] = f'attachment; filename="{ticker}.xls"'
 
-def download_csv_prices(request, ticker):
-    model = Prices
-    headers = ['date_price', 'price', 'open', 'volume', 'change', 'percent_change']
-    response = _download_csv(request, model=model, headers=headers, ticker=ticker)
-    return response
+        wb = Workbook()
+        ws = wb.active
+        ws.append(headers)
+        items = model.objects.filter(stock__ticker=ticker).values_list(*headers)
+        for item in items:
+            ws.append(item)
 
-def download_xml_prices(request, ticker):
-    model = Prices
-    headers = ['date_price', 'price', 'open', 'volume', 'change', 'percent_change']
-    response = _download_csv(request, model=model, headers=headers, ticker=ticker)
-    return response
+        wb.save(response)
+        return response
+
+
+class CsvPrices(BaseCsvExcelMixin, View):
+    def get(self, request, ticker):
+        model = Prices
+        headers = ['date_price', 'price', 'open', 'volume', 'change', 'percent_change']
+        response = self._download_csv(model=model, headers=headers, ticker=ticker)
+        return response
+
+
+class ExcelPrices(BaseCsvExcelMixin, View):
+    def get(self, request, ticker):
+        model = Prices
+        headers = ['date_price', 'price', 'open', 'volume', 'change', 'percent_change']
+        response = self._download_xml(model=model, headers=headers, ticker=ticker)
+        return response
 
 
 class CurrentPriceMixin:
@@ -245,5 +263,6 @@ class HistoryView(PriceChartMixin, CurrentPriceMixin, DetailView):
         context['falling_table'] = data_table['falling_table']
         stock_name = self.object[0].stock.name
         context['price_data'] = self.get_price_data(stock_name)
+        context['stock_ticker'] = self.kwargs.get('ticker')
         self.current_data(object=Stocks.objects.get(ticker=self.kwargs['ticker']), context=context)
         return context

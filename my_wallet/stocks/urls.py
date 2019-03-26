@@ -2,7 +2,8 @@ from django.urls import path, include
 from .views import (
     StocksListView, StockDetailView,
     StockCreateView, ArticlesView,
-    HistoryView, download_csv_prices
+    HistoryView,
+    CsvPrices, ExcelPrices
 )
 
 app_name = 'stocks'
@@ -12,5 +13,6 @@ urlpatterns = [
     path('new/', StockCreateView.as_view(), name='new'),
     path('articles/<slug:ticker>/', ArticlesView.as_view(), name='articles'),
     path('history/<slug:ticker>/', HistoryView.as_view(), name='history'),
-    path('download-csv/<slug:ticker>/', download_csv_prices, name='download_csv'),
+    path('download-csv/<slug:ticker>/', CsvPrices.as_view(), name='download_csv'),
+    path('download-xml/<slug:ticker>/', ExcelPrices.as_view(), name='download_xml'),
 ]

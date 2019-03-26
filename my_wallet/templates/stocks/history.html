@@ -35,8 +35,11 @@
             </div>
             <div class="row">
                 <div class="col-12">
-                    <a href="{% url 'stocks:download_csv' ticker='AAPL' %}">
-                        <p>Link to csv</p>
+                    <a href="{% url 'stocks:download_csv' ticker=stock_ticker %}">
+                        Link to csv
+                    </a>
+                    <a href="{% url 'stocks:download_xml' ticker=stock_ticker %}">
+                        Link to xml
                     </a>
                 </div>
             </div>
