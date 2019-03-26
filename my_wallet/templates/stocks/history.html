@@ -35,12 +35,22 @@
             </div>
             <div class="row">
                 <div class="col-12">
-                    <a href="{% url 'stocks:download_csv' ticker=stock_ticker %}">
-                        Link to csv
-                    </a>
-                    <a href="{% url 'stocks:download_xml' ticker=stock_ticker %}">
-                        Link to xml
-                    </a>
+                    <div class="banner">
+                        <form class="filter">
+                            <input placeholder="Search">
+                        </form>
+                        <div class="title_filter">
+                            Past prices
+                        </div>
+                        <div class="download_btn">
+                            <a href="{% url 'stocks:download_csv' ticker=stock_ticker %}">
+                                <button class="btn btn-secondary">Get csv</button>
+                            </a>
+                            <a href="{% url 'stocks:download_xml' ticker=stock_ticker %}">
+                                <button class="btn btn-secondary">Get xml</button>
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="row">
