@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'social_django',
     'rest_framework',
     'django_redis',
+    'django_filters',
 
     # project's apps
     'my_wallet.profiles',
