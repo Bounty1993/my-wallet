@@ -4,7 +4,7 @@ from django.views.generic import (
 )
 from django.views import View
 from django.core.cache import cache
-from .models import Stocks, Prices, Dividends, Financial
+from .models import Stocks, Prices, Dividends, Financial, PricesFilter
 import datetime
 from django.utils import timezone
 from .forms import NewStockForm
@@ -250,14 +250,17 @@ class HistoryView(PriceChartMixin, CurrentPriceMixin, DetailView):
         RequestConfig(self.request, paginate={'per_page': 5}).configure(falling_table)
         return {'rising_table': rising_table, 'falling_table': falling_table}
 
-    def price_table(self):
-        price_table = PricesTable(self.object)
+    def price_table(self, context):
+        f = PricesFilter(self.request.GET, queryset=self.object)
+        context['filter'] = f
+        price_table = PricesTable(f.qs)
         RequestConfig(self.request, paginate={'per_page': 20}).configure(price_table)
+        context['price_table'] = price_table
         return price_table
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['price_table'] = self.price_table()
+        self.price_table(context)
         data_table = self.change_table()
         context['rising_table'] = data_table['rising_table']
         context['falling_table'] = data_table['falling_table']

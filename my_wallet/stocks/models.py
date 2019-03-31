@@ -12,6 +12,7 @@ from .crawler import (
 )
 from decimal import Decimal, ROUND_HALF_UP
 from django.core.cache import cache
+import django_filters
 
 
 def find_quote_day(date, num_days=0, type='earlier'):
@@ -250,3 +251,10 @@ class Prices(models.Model):
         current = data.first().price
         past = data.last().price
         return ((current.price / past.price)-1) * 100
+
+
+class PricesFilter(django_filters.FilterSet):
+    class Meta:
+        model = Prices
+        fields = ('date_price', )
+

@@ -12,6 +12,10 @@ from rest_framework.permissions import (
     IsAuthenticatedOrReadOnly,
     IsAdminUser,
 )
+from rest_framework.filters import (
+    SearchFilter,
+    OrderingFilter,
+)
 
 from my_wallet.stocks.models import Stocks
 from my_wallet.portfolio.models import Portfolio
@@ -25,11 +29,14 @@ from .serializers import (
     StocksRetrieveUpdateDeleteSerializer,
 )
 from .paginations import StandardPagePagination
+from .permissions import IsOwnerOrReadOnly
+
+from my_wallet.stocks.utils import StockMaker
 
 
 class PortfolioListAPIView(ListAPIView):
     serializer_class = PortfolioListSerializer
-    permission_classes = [IsAuthenticated,]
+    permission_classes = [IsAuthenticated, ]
 
     def get_queryset(self):
         queryset = Portfolio.objects.filter(profile=self.request.user)
@@ -48,6 +55,7 @@ class PortfolioCreateAPIView(CreateAPIView):
 class PortfolioRetrieveUpdateDeleteAPIView(RetrieveUpdateDestroyAPIView):
     queryset = Portfolio.objects.all()
     serializer_class = PortfolioRetrieveUpdateDeleteSerializer
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly,]
 
     lookup_field = 'name'
 
@@ -55,9 +63,14 @@ class PortfolioRetrieveUpdateDeleteAPIView(RetrieveUpdateDestroyAPIView):
 class StocksCreateAPIView(CreateAPIView):
     queryset = Stocks.objects.all()
     serializer_class = StocksCreateUpdateSerializer
+    permission_classes = [IsAdminUser, ]
 
     def perform_create(self, serializer):
-        Stocks.get_stocks_with_data(ticker=serializer.data['ticker'])
+        ticker = serializer.data['ticker']
+        try:
+            Stocks.objects.get(ticker=ticker)
+        except Stocks.DoesNotExist:
+            StockMaker(ticker=ticker)
 
 
 class StocksRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
@@ -72,5 +85,7 @@ class StocksListAPIView(ListAPIView):
     serializer_class = StocksListSerializer
     permission_classes = [IsAuthenticated, ]
     pagination_class = StandardPagePagination
+    filter_backends = [SearchFilter, OrderingFilter]
+    search_fields = ['ticker', 'name']
 
 
