@@ -32,6 +32,10 @@ def find_quote_day(date, num_days=0, type='earlier'):
         return quote_day
 
 
+class MarketQueryset(models.QuerySet):
+    pass
+
+
 class Stocks(models.Model):
     """
         Model keeps data about every stock.

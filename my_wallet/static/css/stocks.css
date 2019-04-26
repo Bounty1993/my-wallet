@@ -1,10 +1,8 @@
-
 .sticker{
     position: -webkit-sticky; /* Safari */
     position:sticky;
     top: 2px;
 }
-
 .data-title
 {
     text-align: center;
@@ -119,11 +117,19 @@ main_tbody
     padding: 10px;
     margin-bottom: 10px;
     border-radius: 8px;
-
 }
-
 #charLine{
     height: 400px;
     min-width: 310px;
+    margin-bottom: 10px;
+}
+.my_pill {
+    width: 50%;
+    text-align: center;
+}
+.my_jumbo {
+    padding: 70px;
+    background-color: white;
+    border-radius: 10px;
     margin-bottom: 10px;
 }

@@ -2,6 +2,7 @@ from django.views.generic import (
     ListView, DetailView,
     CreateView, TemplateView
 )
+from django.db.models import Q
 from django.views import View
 from django.core.cache import cache
 from .models import Stocks, Prices, Dividends, Financial, PricesFilter
@@ -100,6 +101,11 @@ class BestWorstMixin:
 
 
 class BestDividendsMixin:
+    """
+    Responsible for returning table with stocks with highest dividends.
+    Use dividends_table method to get a table
+    (e.g context["table"] = self.dividends_table())
+    """
 
     def get_data(self, n):
         data = Stocks.highest_dividends()
@@ -113,11 +119,21 @@ class BestDividendsMixin:
         return table
 
 
-class StocksListView(BestWorstMixin, ListView):
+class StocksListView(BestWorstMixin, BestDividendsMixin, ListView):
     model = Stocks
     template_name = 'stocks/list.html'
     context_object_name = 'stocks'
     paginate_by = 10
+
+    def get_queryset(self, *args):
+        queryset = super().get_queryset(*args)
+        q = self.request.GET.get('q')
+        if q:
+            return queryset.filter(
+                Q(ticker__icontains=q) |
+                Q(name__icontains=q)
+            )
+        return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -126,6 +142,7 @@ class StocksListView(BestWorstMixin, ListView):
         context['rising_table'] = data_table['rising_table']
         context['falling_table'] = data_table['falling_table']
         context['today'] = find_quote_day(date, 0, type='earlier')
+        context['dividend_table'] = self.dividend_table()
         return context
 
 

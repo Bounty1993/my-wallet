@@ -188,3 +188,35 @@ footer
   bottom: 0px;
 
 }
+.my_custom_Btn
+{
+    display:inline-block;
+    border: 2px solid green;
+    color: white;
+    background-color: green;
+    padding: 10px;
+    border-radius: 10px;
+    position: relative;
+    -webkit-transition: all 200ms ease-in;
+    -webkit-transform: scale(1);
+    -ms-transition: all 200ms ease-in;
+    -ms-transform: scale(1);
+    -moz-transition: all 200ms ease-in;
+    -moz-transform: scale(1);
+    transition: all 200ms ease-in;
+    transform: scale(1);
+
+}
+.my_custom_Btn:hover
+{
+    box-shadow: 0px 0px 20px green;
+    z-index: 2;
+    -webkit-transition: all 200ms ease-in;
+    -webkit-transform: scale(1.1);
+    -ms-transition: all 200ms ease-in;
+    -ms-transform: scale(1.1);
+    -moz-transition: all 200ms ease-in;
+    -moz-transform: scale(1.1);
+    transition: all 200ms ease-in;
+    transform: scale(1.1);
+}

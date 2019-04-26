@@ -135,20 +135,22 @@ $(document).ready(function(){
                 data: price_data
             }]
         });
-
-
 });
 
 $(document).ready(function(){
+
     var price_data = JSON.parse(document.getElementById('price_data').textContent);
-    console.log(price_data);
+    var prices = price_data.prices
+    var name = price_data.name
+    console.log(prices);
+    console.log(name);
 
     Highcharts.chart('charLine', {
             chart: {
                 zoomType: 'x'
             },
             title: {
-                text: 'USD to EUR exchange rate over time'
+                text: name
             },
             subtitle: {
                 text: document.ontouchstart === undefined ?
@@ -194,8 +196,8 @@ $(document).ready(function(){
 
             series: [{
                 type: 'area',
-                name: 'USD to EUR',
-                data: price_data
+                name: 'stock price',
+                data: prices
             }]
         });
 

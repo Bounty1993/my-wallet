@@ -4,27 +4,45 @@
 {% load custom_tags %}
 {% block content %}
 <div class="container">
-    <div class="shadowing jumbotron">
-     <h2>Know everything you need about shares. Last data from {{today}}</h2>
+    <div class="my_jumbo shadowing">
+        <h2>Know everything you need about shares. Last data from {{today}}</h2>
     </div>
     <div class="row">
     <div class="col-md-4">
-        <div class="mb-2">
-            <div class="table-container shadowing">
-                <p class='table_title'>Most growing</p>
-                {% render_table rising_table %}
+        <div class="table-container mb-3">
+            <ul class="nav nav-pills mb-2" role="tablist">
+                <li class="nav-item my_pill">
+                    <a class="nav-link active" data-toggle="pill" href="#growing">Growing</a>
+                </li>
+                <li class="nav-item my_pill">
+                    <a class="nav-link" data-toggle="pill" href="#falling">Falling</a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div class="tab-pane container active" id="growing">
+                    {% render_table rising_table %}
+                </div>
+                <div class="tab-pane container fade" id="falling">
+                    {% render_table falling_table %}
+                </div>
             </div>
         </div>
-        <div class="table-container shadowing">
-            <p class='table_title'>Most falling</p>
-            {% render_table falling_table %}
+        <div class="table-container">
+            <p class="table_title">Highest dividends</p>
+            {% render_table dividend_table %}
         </div>
     </div>
     <div class="col-md-8">
+        <div class="banner shadowing">
+            <form action="" method="get">
+                <input type="text" name="q" placeholder="Search" />
+                <input type="submit" value="Find"/>
+            </form>
+        </div>
         <div id="accordion">
             {% for stock in stocks %}
             {% with current=stock.current.latest%}
-            <div class="shadowing card">
+            <div class="shadowing card" id="myStocks">
                 <div class="card-header">
                     <a class="card-link" data-toggle="collapse" href="#collapse{{forloop.counter}}">
                     <span class="fa-stack fa-sm">
@@ -60,13 +78,13 @@
                          Year change: \ In %:
                      </div>
                      <div>
-                          <a class="btn btn-info" href="{% url 'stocks:detail' stock.ticker %}">
+                          <a class="my_custom_Btn" href="{% url 'stocks:detail' stock.ticker %}">
                               Details
                           </a>
-                           <a class="btn btn-info" href="{% url 'stocks:articles' ticker=stock.ticker %}">
+                           <a class="my_custom_Btn" href="{% url 'stocks:articles' ticker=stock.ticker %}">
                               News
                           </a>
-                           <a class="btn btn-info" href="#">
+                           <a class="my_custom_Btn" href="#">
                               Historic Data
                           </a>
                      </div>
@@ -103,3 +121,4 @@
    </div>
 </div>
 {% endblock %}
+
