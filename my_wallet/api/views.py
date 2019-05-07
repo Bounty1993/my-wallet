@@ -16,6 +16,7 @@ from rest_framework.filters import (
     SearchFilter,
     OrderingFilter,
 )
+from rest_framework.views import APIView
 
 from my_wallet.stocks.models import Stocks
 from my_wallet.portfolio.models import Portfolio
