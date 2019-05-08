@@ -72,10 +72,11 @@ class ExcelPrices(BaseCsvExcelMixin, View):
 
 
 class CurrentPriceMixin:
-    def current_data(self, object, context):
+
+    def add_current_data(self, object, context):
         attributes = ['_price', '_day_change', '_percent_change']
         for attribute in attributes:
-            ticker = object.ticker
+            ticker = self.object.ticker
             result = cache.get(ticker + attribute, 'no data')
             context['stocks' + attribute] = result
 
@@ -107,14 +108,9 @@ class BestDividendsMixin:
     (e.g context["table"] = self.dividends_table())
     """
 
-    def get_data(self, n):
-        data = Stocks.highest_dividends()
-        best = data[:n]
-        return best
-
     def dividend_table(self):
-        data = self.get_data(5)
-        table = BestDividendsTable(data)
+        best_stocks = Stocks.highest_dividends()[:5]
+        table = BestDividendsTable(best_stocks)
         RequestConfig(self.request).configure(table)
         return table
 
@@ -137,21 +133,28 @@ class StocksListView(BestWorstMixin, BestDividendsMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        date = timezone.now().date()
+        today = timezone.now().date()
         data_table = self.change_table()
         context['rising_table'] = data_table['rising_table']
         context['falling_table'] = data_table['falling_table']
-        context['today'] = find_quote_day(date, 0, type='earlier')
+        context['today'] = find_quote_day(today, 0, type='earlier')
         context['dividend_table'] = self.dividend_table()
         return context
 
 
 class ChartMixin:
 
+    earnings_names = [
+        'total_revenue', 'gross_profit',
+        'operating_income', 'net_income',
+    ]
+    balance_names = ['assets', 'liabilities']
+
     def get_earnings_data(self, earnings_names):
         finance_data = []
         for name in earnings_names:
-            data = [float(field) for field in self.instance.values_list(name, flat=True) if field]
+            financial = self.object.financial.all()
+            data = [float(field) for field in financial.values_list(name, flat=True) if field]
             finance_data.append({'name': name, 'data': data})
         return finance_data
 
@@ -166,11 +169,9 @@ class ChartMixin:
         balance_data.append({'name': 'equity', 'data': equity})
         return balance_data
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+    def add_statement_data(self, context):
         context['finance_data'] = self.get_earnings_data(self.earnings_names)
         context['balance_data'] = self.get_balance_data(self.balance_names)
-        return context
 
 
 class PriceChartMixin:
@@ -197,20 +198,14 @@ class StockDetailView(ChartMixin, CurrentPriceMixin, DetailView):
     slug_field = 'ticker'
     slug_url_kwarg = 'ticker'
 
-    earnings_names = [
-        'total_revenue', 'gross_profit',
-        'operating_income', 'net_income',
-    ]
-    balance_names = ['assets', 'liabilities']
-
     def get_context_data(self, **kwargs):
-        self.instance = Financial.objects.filter(stock=self.object)
         context = super().get_context_data(**kwargs)
-        table = DividendTable(Dividends.objects.filter(stock=self.object))
+        table = DividendTable(self.object.dividends.all())
         RequestConfig(self.request, paginate={'per_page': 8}).configure(table)
         context['table'] = table
         context['last_dividend'] = Dividends.objects.filter(stock=self.object).latest('payment')
-        self.current_data(self.object, context)
+        self.add_current_data(self.object, context)
+        self.add_statement_data(context)
         return context
 
 
@@ -230,7 +225,7 @@ class ArticlesView(BestDividendsMixin, TemplateView):
         market = 'NASDAQ'
         return market, ticker
 
-    def process_context(self, market, ticker, context):
+    def add_articles(self, market, ticker, context):
         google_art = GoogleCrawler(market, ticker)
         context['google_news'] = google_art.get_data()
         yahoo_art = YahooCrawler(ticker)
@@ -241,8 +236,8 @@ class ArticlesView(BestDividendsMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         market, ticker = self.market_ticker()
+        self.add_articles(market, ticker, context)
         context['dividend_table'] = self.dividend_table()
-        self.process_context(market, ticker, context)
         return context
 
 
@@ -284,5 +279,5 @@ class HistoryView(PriceChartMixin, CurrentPriceMixin, DetailView):
         stock_name = self.object[0].stock.name
         context['price_data'] = self.get_price_data(stock_name)
         context['stock_ticker'] = self.kwargs.get('ticker')
-        self.current_data(object=Stocks.objects.get(ticker=self.kwargs['ticker']), context=context)
+        self.add_current_data(object=Stocks.objects.get(ticker=self.kwargs['ticker']), context=context)
         return context

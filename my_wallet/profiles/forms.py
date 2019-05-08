@@ -44,38 +44,6 @@ class ProfileCreationForm(UserCreationForm):
 
 
 class ProfileUpdateForm(forms.ModelForm):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.form_show_labels = False
-        self.helper.layout = Layout(
-            Row(
-                Column(
-                    Field('image'),
-                    css_class='col-md-6 mb-0',
-                ),
-                Column(
-                    Field('first_name', placeholder='First Name'),
-                    Field('last_name', placeholder='Last Name'),
-                    Field('email', placeholder='Public Email'),
-                    css_class='col-md-6',
-                ),
-            ),
-            Row(
-                Column(Field('address', placeholder='Address')),
-                Column(Field('city', placeholder='City')),
-                Column(Field('zip_code', placeholder='Zip Code')),
-                css_class='d-flex justify-content-around',
-            ),
-            Field('description'),
-            Row(
-                Submit('submit', 'Update my profile!', css_class='btn btn-success mx-1'),
-                Reset('reset', 'Reset values', css_class='btn btn-warning mx-1'),
-                Button('cancel', 'Cancel', css_class='btn btn-danger mx-1'),
-                css_class='d-flex justify-content-center',
-            ),
-        )
-
     class Meta:
         model = Profile
         fields = ('image', 'first_name', 'last_name', 'email',
