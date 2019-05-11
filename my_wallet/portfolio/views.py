@@ -1,12 +1,14 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.utils import timezone
 from django.views.generic import (
     TemplateView, CreateView, DetailView, View, ListView
 )
+
 from .forms import NewPortfolioForm, TransactionForm
 from .models import Portfolio, Asset, Transaction
 from django.contrib.auth.mixins import LoginRequiredMixin
+from my_wallet.stocks.models import Stocks
 
 
 class NewPortfolioView(CreateView):
@@ -52,27 +54,24 @@ class PortfolioDetails(LoginRequiredMixin, DetailView):
         return context
 
 
-class TransactionView(LoginRequiredMixin, CreateView):
-    model = Transaction
-    form_class = TransactionForm
-    template_name = 'portfolio/transaction.html'
-
-    def form_valid(self, form):
-        obj = form.save(commit=False)
-        portfolio = Portfolio.objects.get(pk=self.kwargs['pk'])
-        data = (obj.stocks.ticker, obj.number)
-        try:
-            portfolio.verify_buy(*data)
-        except ValueError:
-            messages.warning(self.request, 'You do not have enough money!')
-        else:
-            obj.portfolio = portfolio
-            obj.date = timezone.now()
-            obj.kind = 'B'  #just for tests
-            obj.get_price()
-            obj.buy()
-            obj.save()
-        return redirect('portfolio:transaction', pk=self.kwargs['pk'])
+def transaction(request, pk):
+    portfolio = get_object_or_404(Portfolio, pk=pk)
+    kind = request.POST.get('kind') or 'B'
+    if request.method == "POST":
+        stock_id = request.POST.get('stocks')
+        stock = Stocks.objects.get(id=stock_id)
+        price = 10
+        data = request.POST.copy()
+        data['portfolio'] = portfolio.id
+        data['kind'] = kind
+        data['price'] = price
+        form = TransactionForm(data)
+        if form.is_valid():
+            print('Hooray')
+    else:
+        form = TransactionForm()
+    context = {'form': form}
+    return render(request, 'portfolio/transaction.html', context)
 
 
 class HistoryView(ListView):
