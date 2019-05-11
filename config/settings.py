@@ -2,6 +2,7 @@ import os
 import string
 from decouple import Csv, config
 from celery.schedules import crontab
+import dj_database_url
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -93,6 +94,12 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
 DATABASES = {
+    'default': dj_database_url.config(
+        default=config('DATABASE_URL')
+    )
+}
+"""
+DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': config('DB_NAME'),
@@ -102,6 +109,7 @@ DATABASES = {
         'PORT': '5432',
     }
 }
+"""
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
