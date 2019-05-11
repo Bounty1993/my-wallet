@@ -5,7 +5,7 @@
 {% block content %}
 <div class="container">
     <div class="my_jumbo shadowing">
-        <h2>Know everything you need about shares. Last data from {{today}}</h2>
+        <h2>Dane pochodzą z dnia {{today}}</h2>
     </div>
     <div class="row">
     <div class="col-md-4">
@@ -62,30 +62,31 @@
                 <div class="card-body">
                   <div class="d-flex justify-content-between">
                     <div>
-                         <div>Daily change:</div>
+                         <div>Zmiana dzienna</div>
                          <div>{{ stock.day_change|color_field }}\{{stock.percent_change|color_percent:3}}</div>
                     </div>
                     <div>
-                        <div>Daily</div>
+                        <div>Zmiana dzienna</div>
                         <div>min: {{ stock.day_min }} \ Max: {{stock.day_max}}</div>
                     </div>
                     <div>
-                        <p>Last update price</p>
+                        <p>Dane są opóźnione do 5 minut</p>
                     </div>
                   </div>
                   <div class="d-flex justify-content-between mt-3">
                      <div>
-                         Year change: \ In %:
+                         <div>Zmiana roczna:</div>
+                         <div>{{ stock.year_change | color_field }} \ In %: {{ stock.perc_year_change | color_percent:3}} </div>
                      </div>
                      <div>
                           <a class="my_custom_Btn" href="{% url 'stocks:detail' stock.ticker %}">
-                              Details
+                              Szczegóły
                           </a>
                            <a class="my_custom_Btn" href="{% url 'stocks:articles' ticker=stock.ticker %}">
-                              News
+                              Informacje
                           </a>
                            <a class="my_custom_Btn" href="#">
-                              Historic Data
+                              Dane historyczne
                           </a>
                      </div>
                   </div>

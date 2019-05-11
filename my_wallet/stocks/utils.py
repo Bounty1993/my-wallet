@@ -105,3 +105,4 @@ class StockMaker:
         self.add_dividends()
         self.add_financial()
         self.add_past_data()
+        print(f'date for {self.ticker} collected')

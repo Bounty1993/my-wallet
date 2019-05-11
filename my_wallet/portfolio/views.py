@@ -6,6 +6,7 @@ from django.views.generic import (
 )
 from .forms import NewPortfolioForm, TransactionForm
 from .models import Portfolio, Asset, Transaction
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
 class NewPortfolioView(CreateView):
@@ -16,22 +17,18 @@ class NewPortfolioView(CreateView):
         context = super().get_context_data(**kwargs)
         profile = self.request.user
         context['profile'] = profile
-        context['num_portfolios'] = len(profile.portfolio.all())
+        context['num_portfolios'] = profile.portfolio.count()
         return context
-
-    def get_initial(self):
-        initial = super().get_initial()
-        initial['profile'] = self.request.user
-        return initial
 
     def form_valid(self, form):
         portfolio = form.save(commit=False)
         portfolio.profile = self.request.user
+        portfolio.cash = form.cleaned_data['beginning_cash']
         portfolio.save()
         return redirect('portfolio:details', pk=portfolio.pk)
 
 
-class PortfolioDetails(DetailView):
+class PortfolioDetails(LoginRequiredMixin, DetailView):
     template_name = 'portfolio/details.html'
     model = Portfolio
     context_object_name = 'portfolio'
@@ -39,7 +36,7 @@ class PortfolioDetails(DetailView):
     def chart_data(self, assets):
         data = []
         for asset in assets:
-            stocks_value = asset.stocks.price * asset.sum_number
+            stocks_value = asset.stocks.current_price * asset.sum_number
             percent = (stocks_value / self.object.total_value) * 100
             percent = float(round(percent, 2))
             asset_data = [asset.stocks.ticker, percent]
@@ -55,15 +52,10 @@ class PortfolioDetails(DetailView):
         return context
 
 
-class TransactionView(CreateView):
+class TransactionView(LoginRequiredMixin, CreateView):
     model = Transaction
     form_class = TransactionForm
     template_name = 'portfolio/transaction.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['profile'] = self.request.user
-        return context
 
     def form_valid(self, form):
         obj = form.save(commit=False)

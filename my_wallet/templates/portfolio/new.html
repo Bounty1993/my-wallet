@@ -22,19 +22,21 @@
     {% include "profiles/sidebar.html" %}
   </div>
   <div class="col-sm-9">
-    <p>Hi {{profile.username}}</p>
-    {% if not num_portfolios %}
-        <p>Make your first portfolio and start new chapter in your life</p>
-        <p>If you have any questions just contact us</p>
-    {% else %}
-        <p>You have currently {{num_portfolios}} portfolios</p>
-        <p>Feel free to create new one!</p>
-    {% endif %}
-    <form method="post">
-        {% csrf_token %}
-        {{ form|crispy }}
-        <button class="btn btn-success">Create New</button>
-    </form>
+      <div class="main-panel">
+        <p>Hi {{profile.username}}</p>
+        {% if not num_portfolios %}
+            <p>Make your first portfolio and start new chapter in your life</p>
+            <p>If you have any questions just contact us</p>
+        {% else %}
+            <p>You have currently {{num_portfolios}} portfolios</p>
+            <p>Feel free to create new one!</p>
+        {% endif %}
+        <form method="post">
+            {% csrf_token %}
+            {{ form|crispy }}
+            <button class="btn btn-success">Create New</button>
+        </form>
+      </div>
   </div>
 </div>
 </>

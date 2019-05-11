@@ -65,7 +65,46 @@ a:hover
     margin: auto;
 }
 
-.benefits
+/* -------------------------- main page ---------------------------------- */
+.home-title {
+    text-align: center;
+    margin-top: 80px;
+    margin-bottom: 80px;
+}
+.home-title h1 {
+    color: white;
+    font-weight: bold;
+}
+.home-title p {
+    font-size: 20px;
+}
+
+.home-panel {
+    background-color: white;
+    padding: 40px 50px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+.home-icons {
+    font-size: 4em;
+    text-align: center;
+    display: block;
+    margin-bottom: 10px;
+}
+.main-header {
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+.main-text {
+    text-align: center;
+
+}
+.main-text > li {
+    margin: 20px;
+}
+
+.benefits //do usunięcia?
 {
     border-radius: 30px;
     margin-top: 50px;
@@ -75,6 +114,7 @@ a:hover
 
 
 }
+/* -------------------------------- end of main page -------------------------- */
 .special
 {
     background-color: pink;
@@ -179,15 +219,6 @@ a:hover
     border-radius: 4px;
 
 }
-
-footer
-{
-  background-color: #ffffff;
-  height: 100px;
-  position: fixed;
-  bottom: 0px;
-
-}
 .my_custom_Btn
 {
     display:inline-block;
@@ -219,4 +250,14 @@ footer
     -moz-transform: scale(1.1);
     transition: all 200ms ease-in;
     transform: scale(1.1);
+}
+footer {
+    margin-top: 20px;
+}
+.my-footer {
+    text-align: center;
+    color: white;
+    font-size: 20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
 }

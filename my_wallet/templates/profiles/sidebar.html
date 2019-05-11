@@ -1,9 +1,9 @@
 {% load humanize %}
 <div class="card shadowing">
-        <img class="profile-image card-img-top" src="{{profile.image.url}}" alt="Profile picture">
+        <img class="profile-image card-img-top" src="{{request.user.image.url}}" alt="Profile picture">
         <div class="card-body">
             <h5 class="card-title">Hello {{request.user.full_name}}</h5>
-            <p>Joined:  {{profile.date_joined|naturaltime }}</p>
+            <p>Joined:  {{request.user.date_joined|naturaltime }}</p>
             <a href="{% url 'profiles:edit' %}" class="btn btn-success w-100">See Profile</a>
             <a href="{% url 'profiles:password_change' %}" class="btn btn-primary w-100 mt-2">Change Password</a>
         </div>

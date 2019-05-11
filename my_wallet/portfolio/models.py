@@ -33,12 +33,12 @@ class Portfolio(models.Model):
     def stocks_value(self):
         total_value = 0
         for asset in self.asset.all():
-            total_value += asset.stocks.price * asset.sum_number
+            total_value += asset.stocks.current_price * asset.sum_number
         return total_value
 
     @property
     def total_value(self):
-        return self.stocks_value + self.cash
+        return Decimal(self.stocks_value) + self.cash
 
     @property
     def total_return(self):
