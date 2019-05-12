@@ -48,6 +48,39 @@ class Portfolio(models.Model):
     def percent_return(self):
         return self.total_return/self.beginning_cash * 100
 
+    def buy(self, number, stock, price):
+        total_value = number * price
+        asset = self.asset.filter(stocks=stock)
+        if asset.count() == 1:
+            asset = asset.first()
+            self.cash -= total_value
+            new_cost = asset.total_cost + total_value
+            asset.avg_cost = new_cost / (asset.sum_number + number)
+            asset.sum_number += number
+            asset.save()
+            self.save()
+        else:
+            self.cash -= total_value
+            Asset.objects.create(
+                portfolio=self,
+                stocks=stock,
+                avg_cost=total_value,
+                sum_number=number
+            )
+            self.save()
+
+    def sell(self, number, stock, price):
+        total_value = number * price
+        asset = self.assets.get(stocks=stock)
+        self.cash += total_value
+        new_cost = asset.total_cost - total_value
+        asset.avg_cost = new_cost / (asset.sum_number - number)
+        asset.sum_number -= number
+        asset.save()
+        self.save()
+        if asset.sum_number == 0:
+            asset.delete()
+
     def verify_buy(self, ticker, number):
         price = Stocks.get_current_price(ticker)
         value = Decimal(price * number)
@@ -95,6 +128,10 @@ class Asset(models.Model):
         verbose_name = 'Asset'
         verbose_name_plural = 'Assets'
 
+    @property
+    def total_cost(self):
+        return self.avg_cost * self.sum_number
+
 
 class Transaction(models.Model):
     KIND = (
@@ -107,7 +144,7 @@ class Transaction(models.Model):
     price = models.DecimalField(max_digits=7, decimal_places=2)
     number = models.PositiveIntegerField()
     kind = models.CharField(max_length=4, choices=KIND)
-    date = models.DateTimeField()
+    date = models.DateTimeField(auto_now_add=True)
 
     class Meta:
 
