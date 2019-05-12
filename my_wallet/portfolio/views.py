@@ -1,9 +1,13 @@
+from decimal import Decimal
+
 from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse
 from django.contrib import messages
 from django.utils import timezone
 from django.views.generic import (
     TemplateView, CreateView, DetailView, View, ListView
 )
+from django.db import transaction
 
 from .forms import NewPortfolioForm, TransactionForm
 from .models import Portfolio, Asset, Transaction
@@ -38,7 +42,7 @@ class PortfolioDetails(LoginRequiredMixin, DetailView):
     def chart_data(self, assets):
         data = []
         for asset in assets:
-            stocks_value = asset.stocks.current_price * asset.sum_number
+            stocks_value = Decimal(asset.stocks.current_price * asset.sum_number)
             percent = (stocks_value / self.object.total_value) * 100
             percent = float(round(percent, 2))
             asset_data = [asset.stocks.ticker, percent]
@@ -54,20 +58,32 @@ class PortfolioDetails(LoginRequiredMixin, DetailView):
         return context
 
 
-def transaction(request, pk):
+def transactions(request, pk):
     portfolio = get_object_or_404(Portfolio, pk=pk)
     kind = request.POST.get('kind') or 'B'
     if request.method == "POST":
         stock_id = request.POST.get('stocks')
         stock = Stocks.objects.get(id=stock_id)
-        price = 10
+        price = Stocks.get_current_price(ticker=stock.ticker)
         data = request.POST.copy()
         data['portfolio'] = portfolio.id
         data['kind'] = kind
         data['price'] = price
         form = TransactionForm(data)
-        if form.is_valid():
-            print('Hooray')
+        with transaction.atomic():
+            if form.is_valid():
+                obj = form.save()
+                data_for_transaction = {
+                    'number': obj.number,
+                    'stock': obj.stocks,
+                    'price': obj.price,
+                }
+                if obj.kind == 'B':
+                    portfolio.buy(**data_for_transaction)
+                else:
+                    portfolio.sell(**data_for_transaction)
+
+                return redirect('portfolio:details', pk=pk)
     else:
         form = TransactionForm()
     context = {'form': form}
