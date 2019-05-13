@@ -1,18 +1,20 @@
+from datetime import datetime
 from decimal import Decimal
 
-from django.shortcuts import render, redirect, get_object_or_404
-from django.urls import reverse
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db import transaction
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.utils import timezone
 from django.views.generic import (
-    TemplateView, CreateView, DetailView, View, ListView
+    CreateView, DetailView, ListView, TemplateView, View,
 )
-from django.db import transaction
+
+from my_wallet.stocks.models import Stocks
 
 from .forms import NewPortfolioForm, TransactionForm
-from .models import Portfolio, Asset, Transaction
-from django.contrib.auth.mixins import LoginRequiredMixin
-from my_wallet.stocks.models import Stocks
+from .models import Asset, Portfolio, Transaction
 
 
 class NewPortfolioView(CreateView):
@@ -49,8 +51,7 @@ class PortfolioDetails(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['profile'] = self.request.user
-        assets = Asset.objects.filter(portfolio=self.object)
+        assets = self.object.asset.all()
         context['assets'] = assets
         context['data'] = self.chart_data(assets)
         return context
@@ -88,18 +89,12 @@ def transactions(request, pk):
     return render(request, 'portfolio/transaction.html', context)
 
 
-class HistoryView(ListView):
+class PastTransactionsView(ListView):
 
-    template_name = 'portfolio/history.html'
-    #model = PastPortfolio
+    template_name = 'portfolio/past_transactions.html'
+    model = Transaction
+    context_object_name = 'transactions'
 
     def get_queryset(self):
-        portfolio_pk = self.kwargs.get('pk')
-        portfolio = Portfolio.objects.get(pk=portfolio_pk)
-        past_portfolio = PastPortfolio.objects.filter(portfolio=portfolio)
-        return past_portfolio
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['profile'] = self.request.user
-        return context
+        portfolio_id = self.kwargs['pk']
+        return Transaction.objects.filter(portfolio_id=portfolio_id)

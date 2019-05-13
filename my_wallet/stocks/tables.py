@@ -1,8 +1,11 @@
+import math
+
+from django.utils.html import format_html
+
 import django_tables2 as table
 from django_tables2.utils import A
-import math
-from .models import Prices, Dividends, Stocks
-from django.utils.html import format_html
+
+from .models import Dividends, Prices, Stocks
 
 
 class TableMetaMixin(table.Table):

@@ -1,8 +1,11 @@
-import requests
-from json.decoder import JSONDecodeError
-from bs4 import BeautifulSoup
-from abc import ABC, abstractmethod
 import re
+from abc import ABC, abstractmethod
+from json.decoder import JSONDecodeError
+
+import requests
+from bs4 import BeautifulSoup
+
+
 """
 def quotes_IEX(ticker):
     quotes = {'AAPL': 172.97, 'IBM': 139.25,

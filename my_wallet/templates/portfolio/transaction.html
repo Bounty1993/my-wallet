@@ -2,21 +2,21 @@
 {% load crispy_forms_tags %}
 {% block content %}
 <div class="container">
-<ul class="breadcrumb">
-          <li class="breadcrumb-item">
-              <a href="{% url 'core:home' %}">
-                  Portfolio
-              </a>
-          </li>
-          <li class="breadcrumb-item">
-              <a href="{% url 'profiles:profile' %}">
-                  Details
-              </a>
-          </li>
-          <li class="breadcrumb-item active">
-                  Transaction
-          </li>
-      </ul>
+    <ul class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{% url 'core:home' %}">
+                Portfolio
+            </a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="{% url 'profiles:profile' %}">
+                Details
+            </a>
+        </li>
+        <li class="breadcrumb-item active">
+            Transaction
+        </li>
+    </ul>
     <div class="row">
         <div class="col-sm-3">
             {% include "profiles/sidebar.html" %}

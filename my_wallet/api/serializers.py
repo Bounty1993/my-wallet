@@ -1,10 +1,9 @@
 from rest_framework.serializers import (
-    ModelSerializer,
-    HyperlinkedIdentityField,
-    SerializerMethodField,
+    HyperlinkedIdentityField, ModelSerializer, SerializerMethodField,
 )
-from my_wallet.stocks.models import Stocks
+
 from my_wallet.portfolio.models import Portfolio
+from my_wallet.stocks.models import Stocks
 
 
 class PortfolioListSerializer(ModelSerializer):

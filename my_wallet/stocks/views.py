@@ -1,30 +1,23 @@
-from django.views.generic import (
-    ListView, DetailView,
-    CreateView, TemplateView
-)
-from django.db.models import Q
-from django.views import View
-from django.core.cache import cache
-from .models import Stocks, Prices, Dividends, Financial, PricesFilter
+import csv
 import datetime
+
+from django.core.cache import cache
+from django.db.models import Q
+from django.http import HttpResponse
 from django.utils import timezone
+from django.views import View
+from django.views.generic import CreateView, DetailView, ListView, TemplateView
+
+from django_tables2 import RequestConfig
+from openpyxl import Workbook
+
+from .crawler import BloombergCrawler, GoogleCrawler, YahooCrawler
 from .forms import NewStockForm
-from .crawler import (
-    GoogleCrawler,
-    YahooCrawler,
-    BloombergCrawler,
+from .models import Dividends, Financial, Prices, PricesFilter, Stocks
+from .tables import (
+    BestDividendsTable, BestWorstTable, DividendTable, PricesTable,
 )
 from .utils import find_quote_day
-from django_tables2 import RequestConfig
-from .tables import (
-    DividendTable,
-    PricesTable,
-    BestWorstTable,
-    BestDividendsTable
-)
-from django.http import HttpResponse
-import csv
-from openpyxl import Workbook
 
 
 class BaseCsvExcelMixin:

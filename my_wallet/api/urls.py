@@ -1,12 +1,9 @@
-from django.urls import path, include
-from .views import (
-    PortfolioCreateAPIView,
-    PortfolioListAPIView,
-    PortfolioRetrieveUpdateDeleteAPIView,
+from django.urls import include, path
 
-    StocksListAPIView,
-    StocksCreateAPIView,
-    StocksRetrieveUpdateDestroyAPIView,
+from .views import (
+    PortfolioCreateAPIView, PortfolioListAPIView,
+    PortfolioRetrieveUpdateDeleteAPIView, StocksCreateAPIView,
+    StocksListAPIView, StocksRetrieveUpdateDestroyAPIView,
 )
 
 app_name = 'api'
@@ -20,4 +17,3 @@ urlpatterns = [
     path('stocks/<slug:ticker>/', StocksRetrieveUpdateDestroyAPIView.as_view(), name='stocks_details'),
 
 ]
-

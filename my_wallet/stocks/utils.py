@@ -1,19 +1,9 @@
 import datetime
+
 from django.utils import timezone
-from .crawler import (
-    QuotesIEX,
-    CompanyIEX,
-    PastIEX,
-    DividendsIEX,
-    FinancialIEX,
-)
-from .models import (
-    Stocks,
-    StockDetail,
-    Dividends,
-    Financial,
-    Prices,
-)
+
+from .crawler import CompanyIEX, DividendsIEX, FinancialIEX, PastIEX, QuotesIEX
+from .models import Dividends, Financial, Prices, StockDetail, Stocks
 
 
 def find_quote_day(date, num_days=0, type='earlier'):

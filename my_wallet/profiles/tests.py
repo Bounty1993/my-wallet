@@ -1,8 +1,9 @@
 from django.test import TestCase
-from django.urls import reverse, resolve
+from django.urls import resolve, reverse
+
+from .forms import ProfileCreationForm
 from .models import Profile
 from .views import MyProfileCreationView
-from .forms import ProfileCreationForm
 
 
 class ProfileModelTest(TestCase):
@@ -86,6 +87,3 @@ class ProfileViewTest(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertTrue(profile)
         self.assertEqual(profile.image, 'default.png')
-
-
-

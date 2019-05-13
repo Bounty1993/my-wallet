@@ -1,8 +1,12 @@
-from django.test import TestCase, Client
-from my_wallet.stocks.models import Stocks, Prices, Dividends, Financial, find_quote_day
-from my_wallet.stocks.utils import StockMaker
 from datetime import date
+
 from django.core.cache import cache
+from django.test import Client, TestCase
+
+from my_wallet.stocks.models import (
+    Dividends, Financial, Prices, Stocks, find_quote_day,
+)
+from my_wallet.stocks.utils import StockMaker
 
 
 class StocksModels(TestCase):
@@ -115,7 +119,3 @@ class FinancialTest(TestCase):
 
     def test_net_margin(self):
         self.assertEquals(self.model.net_margin, 0.05)
-
-
-
-

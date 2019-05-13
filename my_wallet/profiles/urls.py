@@ -1,13 +1,10 @@
-from django.urls import path, include, re_path
+from django.contrib.auth.views import LoginView, LogoutView
+from django.urls import include, path, re_path
+
 from .views import (
-    MyProfileCreationView,
-    ProfileView,
-    EditProfileView,
-    MyPasswordChangeView,
+    EditProfileView, MyPasswordChangeView, MyProfileCreationView, ProfileView,
     contact,
 )
-from django.contrib.auth.views import LoginView, LogoutView
-
 
 app_name = 'profiles'
 urlpatterns = [

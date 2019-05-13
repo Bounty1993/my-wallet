@@ -1,9 +1,8 @@
-from django.urls import path, include
+from django.urls import include, path
+
 from .views import (
-    StocksListView, StockDetailView,
-    StockCreateView, ArticlesView,
-    HistoryView,
-    CsvPrices, ExcelPrices
+    ArticlesView, CsvPrices, ExcelPrices, HistoryView, StockCreateView,
+    StockDetailView, StocksListView,
 )
 
 app_name = 'stocks'

@@ -1,16 +1,14 @@
-from django.shortcuts import render, redirect
-from django.views.generic import UpdateView, CreateView
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView
-from django.urls import reverse_lazy
 from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView
+from django.shortcuts import redirect, render
+from django.urls import reverse_lazy
+from django.views.generic import CreateView, UpdateView
+
 from .forms import (
-    ProfileCreationForm,
+    ContactForm, EmailUpdateForm, MyPasswordChangeForm, ProfileCreationForm,
     ProfileUpdateForm,
-    MyPasswordChangeForm,
-    ContactForm,
-    EmailUpdateForm
 )
 from .models import Profile
 

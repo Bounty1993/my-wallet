@@ -1,6 +1,7 @@
+import logging
+
 from django.shortcuts import render
 from django.views.generic import TemplateView
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -11,6 +12,3 @@ class HomeView(TemplateView):
     def get(self, *args):
         logger.debug('Hello from here')
         return super().get(*args)
-
-
-

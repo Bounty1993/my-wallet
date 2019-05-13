@@ -1,6 +1,8 @@
-from django.test import TestCase, Client
+from django.test import Client, TestCase
 from django.urls import resolve
+
 from ..views import StocksListView
+
 
 """
 class TestDownloadCsvExcel(TestCase):

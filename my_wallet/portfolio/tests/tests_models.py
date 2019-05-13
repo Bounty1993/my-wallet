@@ -1,7 +1,9 @@
 from django.test import TestCase
+
+from my_wallet.portfolio.models import Asset, Portfolio, Transaction
 from my_wallet.profiles.models import Profile
-from my_wallet.portfolio.models import Portfolio, Transaction, Asset
 from my_wallet.stocks.models import Stocks
+
 
 class MyModelTests(TestCase):
 

@@ -1,18 +1,15 @@
-from django.db import models
-from django.db.models import Max, Min, Sum, Count, Q
-from django.utils import timezone
-import requests
 import datetime
-from .crawler import (
-    QuotesIEX,
-    CompanyIEX,
-    PastIEX,
-    DividendsIEX,
-    FinancialIEX,
-)
-from decimal import Decimal, ROUND_HALF_UP
+from decimal import ROUND_HALF_UP, Decimal
+
 from django.core.cache import cache
+from django.db import models
+from django.db.models import Count, Max, Min, Q, Sum
+from django.utils import timezone
+
 import django_filters
+import requests
+
+from .crawler import CompanyIEX, DividendsIEX, FinancialIEX, PastIEX, QuotesIEX
 
 
 def find_quote_day(date, num_days=0, type='earlier'):
@@ -261,4 +258,3 @@ class PricesFilter(django_filters.FilterSet):
     class Meta:
         model = Prices
         fields = ('date_price', )
-

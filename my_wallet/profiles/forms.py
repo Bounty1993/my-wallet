@@ -1,8 +1,12 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm, PasswordChangeForm
-from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Submit, Div, HTML, Row, Column, Fieldset, Field, Reset, Button
+from django.contrib.auth.forms import PasswordChangeForm, UserCreationForm
+
 from crispy_forms.bootstrap import PrependedText
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import (
+    HTML, Button, Column, Div, Field, Fieldset, Layout, Reset, Row, Submit,
+)
+
 from .models import Profile
 
 

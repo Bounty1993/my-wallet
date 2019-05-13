@@ -1,8 +1,9 @@
 import os
 import string
-from decouple import Csv, config
-from celery.schedules import crontab
+
 import dj_database_url
+from celery.schedules import crontab
+from decouple import Csv, config
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -98,18 +99,7 @@ DATABASES = {
         default=config('DATABASE_URL')
     )
 }
-"""
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': config('DB_NAME'),
-        'USER': config('DB_USER'),
-        'PASSWORD': config('DB_PASSWORD'),
-        'HOST': 'db',
-        'PORT': '5432',
-    }
-}
-"""
+
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
@@ -209,8 +199,15 @@ CELERY_BEAT_SCHEDULE = {
     'hello': {
         'task': 'my_wallet.portfolio.tasks.price_update',
         'schedule': crontab(minute='*/15')  # execute every minute
-    }
+    },
 }
+"""
+    'update_portfolio_history': {
+        'task': 'my_wallet.portfolio.tasks.update_portfolio_history',
+
+    }
+"""
+
 
 # DEBUG settings
 if DEBUG:

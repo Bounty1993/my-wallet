@@ -1,10 +1,11 @@
 from django import forms
 from django.forms import ValidationError
-from .models import Asset
-from .models import Portfolio, Transaction
+
+from crispy_forms.bootstrap import Tab, TabHolder
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Row, Column, Fieldset, Layout, Field
-from crispy_forms.bootstrap import TabHolder, Tab
+from crispy_forms.layout import Column, Field, Fieldset, Layout, Row
+
+from .models import Asset, Portfolio, Transaction
 
 
 class NewPortfolioForm(forms.ModelForm):
@@ -61,4 +62,3 @@ class TransactionForm(forms.ModelForm):
             num_of_stocks = stocks_in_portfolio.first().sum_number
             if num_of_stocks < number:
                 raise ValidationError('Nie możesz sprzedać więcej akcji niż posiadasz')
-

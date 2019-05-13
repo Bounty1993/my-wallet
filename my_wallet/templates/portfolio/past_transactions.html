@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+<ul class="breadcrumb">
+          <li class="breadcrumb-item">
+              <a href="{% url 'profiles:profile' %}">
+                  Profile
+              </a>
+          </li>
+          <li class="breadcrumb-item">
+              <a href="{% url 'portfolio:details' pk=7 %}">
+                  Portfolio
+              </a>
+          </li>
+          <li class="breadcrumb-item active">
+                  History
+          </li>
+      </ul>
+<div class="row">
+  <div class="col-sm-3">
+    {% include "profiles/sidebar.html" %}
+  </div>
+  <div class="col-sm-9">
+      <div class="main-panel shadowing">
+      <table class="table">
+          <thead class="thead-dark">
+          <tr>
+              <th scope="col">Ticker</th>
+              <th scope="col">Rodzaj</th>
+              <th scope="col">Ilość</th>
+              <th scope="col">Cena</th>
+              <th scope="col">Data</th>
+          </tr>
+          </tr>
+          </thead>
+          <tbody>
+                {% for transact in transactions %}
+                    <tr>
+                        <td>{{transact.stocks}}</td>
+                        <td>{{transact.kind}}</td>
+                        <td>{{transact.number}}</td>
+                        <td>{{transact.price}}</td>
+                        <td>{{transact.date.date}}</td>
+                    </tr>
+                {% empty %}
+                    <p>You have no assets</p>
+                {% endfor %}
+          </tbody>
+      </table>
+      </div>
+  </div>
+</div>
+</div>
+{% endblock %}

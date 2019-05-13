@@ -1,38 +1,24 @@
+from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.generics import (
-    CreateAPIView,
-    DestroyAPIView,
-    ListAPIView,
-    UpdateAPIView,
-    RetrieveAPIView,
-    RetrieveUpdateDestroyAPIView,
-
+    CreateAPIView, DestroyAPIView, ListAPIView, RetrieveAPIView,
+    RetrieveUpdateDestroyAPIView, UpdateAPIView,
 )
 from rest_framework.permissions import (
-    IsAuthenticated,
-    IsAuthenticatedOrReadOnly,
-    IsAdminUser,
-)
-from rest_framework.filters import (
-    SearchFilter,
-    OrderingFilter,
+    IsAdminUser, IsAuthenticated, IsAuthenticatedOrReadOnly,
 )
 from rest_framework.views import APIView
 
-from my_wallet.stocks.models import Stocks
 from my_wallet.portfolio.models import Portfolio
-from .serializers import (
-    PortfolioCreateSerializer,
-    PortfolioListSerializer,
-    PortfolioRetrieveUpdateDeleteSerializer,
+from my_wallet.stocks.models import Stocks
+from my_wallet.stocks.utils import StockMaker
 
-    StocksCreateUpdateSerializer,
-    StocksListSerializer,
-    StocksRetrieveUpdateDeleteSerializer,
-)
 from .paginations import StandardPagePagination
 from .permissions import IsOwnerOrReadOnly
-
-from my_wallet.stocks.utils import StockMaker
+from .serializers import (
+    PortfolioCreateSerializer, PortfolioListSerializer,
+    PortfolioRetrieveUpdateDeleteSerializer, StocksCreateUpdateSerializer,
+    StocksListSerializer, StocksRetrieveUpdateDeleteSerializer,
+)
 
 
 class PortfolioListAPIView(ListAPIView):
@@ -88,5 +74,3 @@ class StocksListAPIView(ListAPIView):
     pagination_class = StandardPagePagination
     filter_backends = [SearchFilter, OrderingFilter]
     search_fields = ['ticker', 'name']
-
-

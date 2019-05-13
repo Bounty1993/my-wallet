@@ -1,9 +1,14 @@
 # Create your tasks here
 from __future__ import absolute_import, unicode_literals
-from celery import shared_task
+
 from django.core.cache import cache
-from my_wallet.stocks.models import Stocks
+
+from celery import shared_task
+
 from my_wallet.stocks.crawler import QuotesIEX
+from my_wallet.stocks.models import Stocks
+
+from my_wallet.portfolio.models import Portfolio, PastPortfolio
 
 
 @shared_task
@@ -20,5 +25,7 @@ def price_update():
     print('I have finished')
 
 
-
-
+@shared_task
+def update_portfolio_history():
+    for portfolio in Portfolio.objects.all():
+        portfolio.make_past_portfolio()
