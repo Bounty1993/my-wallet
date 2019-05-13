@@ -81,24 +81,6 @@ class Portfolio(models.Model):
         if asset.sum_number == 0:
             asset.delete()
 
-    def verify_buy(self, ticker, number):
-        price = Stocks.get_current_price(ticker)
-        value = Decimal(price * number)
-        if self.cash < value:
-            raise ValueError('Not enough money')
-        self.cash -= value
-        self.save(update_fields=['cash'])
-
-    def verify_sell(self, ticker, number):
-        try:
-            asset = self.asset.get(ticker=ticker)
-        except Asset.DoesNotExist:
-            raise ValueError('You have no asset')
-        else:
-            price = Stocks.get_current_price(ticker)
-            self.cash += Decimal(price * number)
-            self.save(update_fields=['cash'])
-
     def is_new(self):
         if self.created_at == datetime.now().day:
             return True
@@ -154,46 +136,9 @@ class Transaction(models.Model):
     def cost(self):
         return self.price * self.number
 
-    def create_asset(self):
-        Asset.objects.create(
-            portfolio=self.portfolio,
-            stocks=self.stocks,
-            avg_cost=self.price,
-            sum_number=self.number,
-        )
-
     def get_price(self):
         self.price = Decimal(Stocks.get_current_price(self.stocks.ticker))
 
-    def buy_modify(self, asset):
-        total_cost = asset.avg_cost * asset.sum_number
-        asset.sum_number += self.number
-        print(type(total_cost), type(self.price))
-        new_cost = total_cost + (self.number * self.price)
-        asset.avg_cost = new_cost/asset.sum_number
-        asset.save()
-        self.save()
-
-    def buy(self):
-        try:
-            asset = self.portfolio.asset.get(stocks=self.stocks)
-        except Asset.DoesNotExist:
-            self.create_asset()
-        else:
-            self.buy_modify(asset)
-
-    def sell_modify(self, asset):
-        total_cost = asset.avg_cost * asset.sum_number
-        asset.sum_number -= self.number
-        new_cost = total_cost - (self.number * self.price)
-        asset.avg_cost = new_cost/asset.sum_number
-
-    def sell(self, asset):
-        if self.number == asset.number:
-            asset.is_open = False
-            asset.save()  # add proper method
-        else:
-            self.sell_modify(asset)
 
 """
 class PastPortfolio(models.Model):

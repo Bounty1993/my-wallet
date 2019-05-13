@@ -21,9 +21,7 @@ class NewPortfolioView(CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        profile = self.request.user
-        context['profile'] = profile
-        context['num_portfolios'] = profile.portfolio.count()
+        context['num_portfolios'] = self.request.user.portfolio.count()
         return context
 
     def form_valid(self, form):
