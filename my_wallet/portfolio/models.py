@@ -8,13 +8,13 @@ from django.urls import reverse
 
 
 class Portfolio(models.Model):
-    name = models.CharField(max_length=50)
+    name = models.CharField('nazwa', max_length=50)
     profile = models.ForeignKey(Profile, related_name='portfolio',
-                                on_delete=models.CASCADE)
-    beginning_cash = models.DecimalField(max_digits=11, decimal_places=2)
-    cash = models.DecimalField(max_digits=11, decimal_places=2)
+                                on_delete=models.CASCADE, verbose_name='profil')
+    beginning_cash = models.DecimalField('początkowa gotówka', max_digits=11, decimal_places=2)
+    cash = models.DecimalField('gotówka', max_digits=11, decimal_places=2)
     created_at = models.DateTimeField(auto_now_add=True)
-    description = models.CharField(max_length=250, blank=True)
+    description = models.CharField('opis', max_length=250, blank=True)
     is_visible = models.BooleanField(default=True)
     is_active = models.BooleanField(default=True)
 
@@ -123,10 +123,10 @@ class Transaction(models.Model):
     portfolio = models.ForeignKey(Portfolio, related_name='transaction',
                                   on_delete=models.CASCADE)
     stocks = models.ForeignKey(Stocks, on_delete=models.PROTECT)
-    price = models.DecimalField(max_digits=7, decimal_places=2)
+    price = models.DecimalField('cena', max_digits=7, decimal_places=2)
     number = models.PositiveIntegerField()
-    kind = models.CharField(max_length=4, choices=KIND)
-    date = models.DateTimeField(auto_now_add=True)
+    kind = models.CharField('rodzaj', max_length=4, choices=KIND)
+    date = models.DateTimeField('data', auto_now_add=True)
 
     class Meta:
 
@@ -139,37 +139,3 @@ class Transaction(models.Model):
     def get_price(self):
         self.price = Decimal(Stocks.get_current_price(self.stocks.ticker))
 
-
-"""
-class PastPortfolio(models.Model):
-    portfolio = models.ForeignKey(Portfolio,
-                                  related_name='past_data',
-                                  on_delete=models.CASCADE)
-    date = models.DateField(auto_now=timezone.now())
-    cash = models.DecimalField(max_digits=11, decimal_places=2)
-
-    class Meta:
-        ordering = ('-date', )
-
-    def lack_data(self):
-        pass
-
-    def update_assets(self):
-        latest_date = Portfolio.objects.first()
-        transactions = Transaction.objects.filter(date__gte=latest_date, portfolio=self.portfolio)
-        for transaction in transactions.order_by('date'):
-            PastAssets.update(transaction)
-            if transaction.kind == 'B':
-                self.cash -= transaction.cost
-            else:
-                self.cash += transaction.cost
-
-
-class PastAssets(models.Model):
-    portfolio = models.ForeignKey(PastPortfolio, on_delete=models.CASCADE,
-                                  related_name='holdings')
-    stocks = models.ForeignKey(Stocks, on_delete=models.PROTECT)
-    avg_cost = models.DecimalField(max_digits=7, decimal_places=2)
-    sum_number = models.PositiveIntegerField()
-    date = models.DateTimeField(auto_now=True)
-"""

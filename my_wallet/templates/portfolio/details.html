@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load custom_tags %}
 {% block content %}
 <div class="container">
     <ul class="breadcrumb">
@@ -9,11 +10,11 @@
           </li>
           <li class="breadcrumb-item">
               <a href="{% url 'profiles:profile' %}">
-                  Profile
+                  Profil
               </a>
           </li>
           <li class="breadcrumb-item active">
-                  Details
+                  Szczegóły
           </li>
       </ul>
     <div class="row">
@@ -24,31 +25,19 @@
           <div class="main-panel shadowing">
               <div id="container" style="min-width: 310px; height: 200px; max-width: 300px; margin: 0 auto"></div>
               <div class="d-flex justify-content-between">
-                  <p>Value: {{portfolio.total_value}}</p>
-                  <p>beginning cash: {{portfolio.beginning_cash}}</p>
-                  <p>Profit/Loss:
-                      {% if portfolio.total_return < 0 %}
-                      <span class="money negative-value">
-                      {% else %}
-                      <span class="money positive-value">
-                      {% endif %}
-                          {{portfolio.total_return}}
-                      </span>
+                  <p>Wartość: {{portfolio.total_value | floatformat:2 }}</p>
+                  <p>Początkowa gotówka: {{portfolio.beginning_cash | floatformat:2}}</p>
+                  <p>Zysk/Strata:
+                      {{portfolio.total_return | color_field}}
                   </p>
-                  <p>In percent:
-                      {% if portfolio.total_return < 0 %}
-                      <span class="money negative-value">
-                      {% else %}
-                      <span class="money positive-value">
-                      {% endif %}
-                          {{portfolio.percent_return}}
-                      </span>
+                  <p>W procentach:
+                      {{portfolio.percent_return | color_percent:3}}
                   </p>
               </div>
             <div class="d-flex justify-content-center">
             <div class="btn-group">
-                <a href="{% url 'portfolio:transaction' pk=portfolio.pk %}" class="btn btn-success my-btn">New Transaction</a>
-                <a href="{% url 'portfolio:history' pk=portfolio.pk %}" class="btn btn-primary my-btn">History</a>
+                <a href="{% url 'portfolio:transaction' pk=portfolio.pk %}" class="btn btn-success my-btn">Nowa Transakcja</a>
+                <a href="{% url 'portfolio:past_transactions' pk=portfolio.pk %}" class="btn btn-primary my-btn">Historia</a>
             </div>
             </div>
             <table class="table">
@@ -73,8 +62,8 @@
              </table>
             <div class="d-flex justify-content-between">
                 <p>Total</p>
-                <p>Cash:   {{portfolio.cash}}</p>
-                <p>Stocks value:   {{portfolio.stocks_value}}</p>
+                <p>Cash:   {{portfolio.cash | floatformat:2}}</p>
+                <p>Stocks value:   {{portfolio.stocks_value | floatformat:2 }}</p>
             </div>
           </div>
         </div>
@@ -94,7 +83,7 @@ Highcharts.chart('container', {
     plotShadow: false
   },
   title: {
-    text: 'Total value<br>{{portfolio.total_value}}',
+    text: 'Total value<br>{{portfolio.total_value | floatformat:2 }}',
     align: 'center',
     verticalAlign: 'middle',
     y: 60
