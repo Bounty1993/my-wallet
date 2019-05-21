@@ -1,24 +1,9 @@
 import math
 
 from django.utils.html import format_html
-
 import django_tables2 as table
-from django_tables2.utils import A
 
-from .models import Dividends, Prices, Stocks
-
-
-class TableMetaMixin(table.Table):
-
-    class Meta:
-        attrs = {
-            'class': 'main_table',
-            'td': {'class': 'tab-cell'}
-        }
-        row_attrs = {
-            'class': 'custom_rows'
-        }
-        template_name = 'table_draft.html'
+from .models import Dividends, Prices
 
 
 class PricesTable(table.Table):
@@ -71,55 +56,6 @@ class DividendTable(table.Table):
         attrs = {
             'class': 'main_table',
             'td': {'class': 'tab-cell'}
-        }
-        row_attrs = {
-            'class': 'custom_rows'
-        }
-
-        template_name = 'table_draft.html'
-
-
-class BestWorstTable(table.Table):
-
-    def color_change(self, value, units='USD'):
-        data = f'{value} {units}'
-        if value < 0:
-            return format_html(f'<div class="falling">{data}</div>')
-        elif value > 0:
-            return format_html(f'<div class="rising">{data}</div>')
-        return data
-
-    def render_perc_year_change(self, value):
-        value = round(value, 3)
-        return self.color_change(value, units='%')
-
-    class Meta:
-        model = Stocks
-        fields = ('ticker', 'perc_year_change')
-        empty_text = 'No historical data'
-        attrs = {
-            'class': 'main_table',
-            'td': {'class': 'tab-cell'},
-            'tbody': {'class': 'main_tbody'},
-        }
-        row_attrs = {
-            'class': 'custom_rows'
-        }
-
-        template_name = 'table_draft.html'
-
-
-class BestDividendsTable(table.Table):
-    ticker = table.Column()
-    sum_dividends = table.Column()
-
-    class Meta(TableMetaMixin.Meta):
-        empty_text = 'No historical data'
-        fields = ('ticker', 'sum_dividends',)
-        attrs = {
-            'class': 'main_table',
-            'td': {'class': 'tab-cell'},
-            'tbody': {'class': 'main_tbody'},
         }
         row_attrs = {
             'class': 'custom_rows'

@@ -12,31 +12,48 @@
         <div class="table-container mb-3">
             <ul class="nav nav-pills mb-2" role="tablist">
                 <li class="nav-item my_pill">
-                    <a class="nav-link active" data-toggle="pill" href="#growing">Growing</a>
+                    <a class="nav-link active" data-toggle="pill" href="#growing">Rosnące</a>
                 </li>
                 <li class="nav-item my_pill">
-                    <a class="nav-link" data-toggle="pill" href="#falling">Falling</a>
+                    <a class="nav-link" data-toggle="pill" href="#falling">Spadające</a>
                 </li>
             </ul>
             <div class="tab-content">
                 <div class="tab-pane container active" id="growing">
-                    {% render_table rising_table %}
+                    <ul class="list-group list-group-flush">
+                      {% for stock in rising %}
+                        <li class="list-group-item">
+                          {{stock.ticker}} - {{stock.perc_year_change | color_percent:3}}
+                        </li>
+                      {% endfor %}
+                    </ul>
                 </div>
                 <div class="tab-pane container fade" id="falling">
-                    {% render_table falling_table %}
+                    <ul class="list-group list-group-flush">
+                      {% for stock in falling %}
+                        <li class="list-group-item">
+                          {{stock.ticker}} - {{stock.perc_year_change | color_percent:3}}
+                        </li>
+                      {% endfor %}
+                    </ul>
                 </div>
             </div>
         </div>
         <div class="table-container">
-            <p class="table_title">Highest dividends</p>
-            {% render_table dividend_table %}
+            <p class="table_title">Najwyższe dywidendy</p>
+
+            <ul class="list-group list-group-flush">
+              {% for stock in dividend_stocks %}
+                <li class="list-group-item">{{stock.ticker}} - {{stock.sum_dividends}}</li>
+              {% endfor %}
+            </ul>
         </div>
     </div>
     <div class="col-md-8">
         <div class="banner shadowing">
             <form action="" method="get">
-                <input type="text" name="q" placeholder="Search" />
-                <input type="submit" value="Find"/>
+                <input type="text" name="q" placeholder="Nazwa spółki" />
+                <input type="submit" value="Szukaj"/>
             </form>
         </div>
         <div id="accordion">
@@ -67,7 +84,10 @@
                     </div>
                     <div>
                         <div>Zmiana dzienna</div>
-                        <div>min: {{ stock.day_min }} \ Max: {{stock.day_max}}</div>
+                        <div>
+                          min: <span style="color: red">{{ stock.day_low }} USD</span> \
+                          Max: <span style="color: green">{{stock.day_high}} USD</span>
+                        </div>
                     </div>
                     <div>
                         <p>Dane są opóźnione do 5 minut</p>

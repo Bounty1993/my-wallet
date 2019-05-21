@@ -31,8 +31,14 @@
       <div class="main-panel shadowing">
         {% with stocks.detail as detail %}
         <div class="row">
-          <p class="col-md-5">Capitalisation: 100 000 USD</p>
-          <div class="col-md-7">
+          <div class="col-md-6">
+              <p class="data-title">Wskaźniki finansowe:</p>
+              <div class="dividend-data">
+                    <div class="valid-data">Marża: 15%</div>
+                    <div>ROE: 25%</div>
+              </div>
+          </div>
+          <div class="col-md-6">
               <p class="data-title">Dividend amount:</p>
               <div class="dividend-data">
                     <div class="valid-data">{{last_dividend.amount}}<span class="usd-sign">USD</span></div>
@@ -40,8 +46,10 @@
               </div>
           </div>
         </div>
-        <p>{{detail.industry}}</p>
-        <p>{{detail.sector}}</p>
+        <div class="d-flex justify-content-around mt-4">
+          <p><span class="data-title">Branża:</span> {{detail.industry}}</p>
+          <p><span class="data-title">Sektor:</span> {{detail.sector}}</p>
+        </div>
         <p>{{detail.description}}</p>
         <a href="{{detail.website}}" target="_blank">Check out the {{stocks.name}} website to get more</a>
 

@@ -1,18 +1,18 @@
 <div class="card shadowing">
     <div class="card-header">
-        <h3 style="font-weight:bold; text-align: center">{{stocks.name}}</h3>
+        <h3 style="font-weight:bold; text-align: center">{{side_stock}}</h3>
     </div>
     <div class="card-body">
-        <p>Basic Informations:</p>
+        <p>Podstawowe informacje:</p>
         <ul class="list-group list-group-flush">
             <li class="list-group-item">
                 Ticker: <span style="float:right">{{stocks_price}} USD</span>
             </li>
             <li class="list-group-item">
-                Nominal change <span style="float:right">{{stocks_day_change}} USD</span>
+                Zmiana ceny <span style="float:right">{{stocks_day_change}} USD</span>
             </li>
             <li class="list-group-item">
-                Percent change <span style="float:right">{{stocks_percent_change|floatformat:3}} %</span>
+                Zmiana procentowa <span style="float:right">{{stocks_percent_change|floatformat:3}} %</span>
             </li>
         </ul>
     </div>

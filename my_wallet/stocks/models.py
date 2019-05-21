@@ -29,14 +29,7 @@ def find_quote_day(date, num_days=0, type='earlier'):
         return quote_day
 
 
-class MarketQueryset(models.QuerySet):
-    pass
-
-
 class Stocks(models.Model):
-    """
-        Model keeps data about every stock.
-    """
     name = models.CharField(max_length=50)
     ticker = models.CharField(max_length=10)
 
@@ -169,22 +162,12 @@ class Dividends(models.Model):
 
     @property
     def get_rate(self):
-        # to do for 4 quarters
         percents = Decimal('0.0001')
         price = Prices.objects.filter(stock=self.stock, date_price=self.record)
         if price:
             price = price[0].price
             return Decimal(self.amount/price * 100).quantize(percents, ROUND_HALF_UP)
         return 'No data'
-
-    @classmethod
-    def year_rate(self):
-        percents = Decimal('0.0001')
-        year_ago = datetime.date.today() - datetime.timedelta(days=365)
-        price = self.stock.current_price
-        last_dividends = Dividends.objects.filter(stock=self.stock, payment__gte=year_ago)
-        sum_dividends = last_dividends.aggragate(year_dividend=Sum('amount'))
-        return sum_dividends
 
     def __str__(self):
         return f'{self.stock} - {self.payment}'
@@ -242,16 +225,6 @@ class Prices(models.Model):
     class Meta:
         get_latest_by = 'date_price'
         ordering = ('-date_price',)
-
-    @classmethod
-    def year_change(cls, ticker, num_days=365):
-        today = timezone.now().date()
-        past_day = today - datetime.timedelta(days=num_days)
-        instance = cls.objects.filter(stock__ticker=ticker)
-        data = instance.filter(data_price__gte=past_day, data_price__lte=today)
-        current = data.first().price
-        past = data.last().price
-        return ((current.price / past.price)-1) * 100
 
 
 class PricesFilter(django_filters.FilterSet):

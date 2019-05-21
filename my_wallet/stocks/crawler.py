@@ -1,22 +1,8 @@
 import re
 from abc import ABC, abstractmethod
 from json.decoder import JSONDecodeError
-
 import requests
 from bs4 import BeautifulSoup
-
-
-"""
-def quotes_IEX(ticker):
-    quotes = {'AAPL': 172.97, 'IBM': 139.25,
-              'GOOGL': 1116.56, 'MSFT': 110.97,
-              'BAC': 29.08,
-    }
-    if ticker in quotes:
-        return {'latestPrice': quotes[ticker]}
-    return None
-
-"""
 
 
 class BaseIEX(ABC):
@@ -73,7 +59,7 @@ class FinancialIEX(BaseIEX):
 class BaseCrawler(ABC):
 
     def get_soup(self):
-        url = self.url.format(*self.formats)
+        url = self.url.format(self.formats)
         response = requests.get(url)
         if response.status_code != 200:
             return None
@@ -110,12 +96,11 @@ class BaseCrawler(ABC):
 
 class GoogleCrawler(BaseCrawler):
 
-    def __init__(self, market, ticker):
-        self.market = market
+    def __init__(self, ticker):
         self.ticker = ticker
-        self.formats = self.market, self.ticker
+        self.formats = self.ticker
 
-    url = 'https://www.google.com/search?q={}:{}&tbm=nws'
+    url = 'https://www.google.com/search?q=NASDAQ:{}&tbm=nws'
 
     def get_news(self, soup):
         return soup.find_all('div', 'g')
@@ -130,7 +115,7 @@ class GoogleCrawler(BaseCrawler):
 class YahooCrawler(BaseCrawler):
 
     def __init__(self, ticker):
-        self.formats = (ticker,)
+        self.formats = ticker
 
     url = 'https://finance.yahoo.com/quote/{}'
 
@@ -142,22 +127,4 @@ class YahooCrawler(BaseCrawler):
         link = article.h3.a.get('href')
         link = 'https://finance.yahoo.com/' + link
         summary = article.p.text
-        return title, link, summary
-
-
-class BloombergCrawler(BaseCrawler):
-
-    def __init__(self, ticker):
-        self.formats = ticker, 'US'
-
-    url = 'https://www.bloomberg.com/profile/company/{}:{}'
-
-    def get_news(self, soup):
-        print(soup.find('div', re.compile("^newsContainer")))
-        return soup.find('div', 'newsContainer')
-
-    def article_text(self, article):
-        title = article['headline'].text
-        link = article.a.get('href')
-        summary = None
         return title, link, summary

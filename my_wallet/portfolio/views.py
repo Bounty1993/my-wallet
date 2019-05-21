@@ -85,6 +85,9 @@ def transactions(request, pk):
                 return redirect('portfolio:details', pk=pk)
     else:
         form = TransactionForm()
+        if kind == 'S':
+            print('To Do')
+            # form.fields['stocks'].queryset = possessed_stocks
     context = {'form': form}
     return render(request, 'portfolio/transaction.html', context)
 
