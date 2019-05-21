@@ -145,7 +145,6 @@ class Transaction(models.Model):
     def get_price(self):
         self.price = Decimal(Stocks.get_current_price(self.stocks.ticker))
 
-
 class PastPortfolio(models.Model):
     parent = models.ForeignKey(Portfolio, on_delete=models.CASCADE)
     beginning_cash = models.DecimalField(max_digits=11, decimal_places=2)

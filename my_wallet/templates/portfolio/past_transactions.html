@@ -21,33 +21,7 @@
     {% include "profiles/sidebar.html" %}
   </div>
   <div class="col-sm-9">
-      <div class="main-panel shadowing">
-      <table class="table">
-          <thead class="thead-dark">
-          <tr>
-              <th scope="col">Ticker</th>
-              <th scope="col">Rodzaj</th>
-              <th scope="col">Ilość</th>
-              <th scope="col">Cena</th>
-              <th scope="col">Data</th>
-          </tr>
-          </tr>
-          </thead>
-          <tbody>
-                {% for transact in transactions %}
-                    <tr>
-                        <td>{{transact.stocks}}</td>
-                        <td>{{transact.kind}}</td>
-                        <td>{{transact.number}}</td>
-                        <td>{{transact.price}}</td>
-                        <td>{{transact.date.date}}</td>
-                    </tr>
-                {% empty %}
-                    <p>You have no assets</p>
-                {% endfor %}
-          </tbody>
-      </table>
-      </div>
+      Hello
   </div>
 </div>
 </div>

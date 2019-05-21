@@ -37,7 +37,7 @@ https://localhost:8000
 ###Virtaul environment
 ```
 $ mkdir my_wallet
-$ git clone adres
+$ git clone https://github.com/Bounty1993/my-wallet.git
 $ cd my_wallet
 ```
 Instalacja virtual environment:

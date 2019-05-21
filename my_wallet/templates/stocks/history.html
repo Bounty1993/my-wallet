@@ -31,22 +31,19 @@
             </div>
             <div class="row">
                 <div class="col-12">
-                    <div class="banner">
+                    <div class="banner d-flex justify-content-between">
                         {% if filter %}
                             <form action="" method="get" class="form form-inline">
                                 {{ filter.form.date_price}}
-                                <input type="submit" />
+                                <input type="submit" value="Szukaj" />
                             </form>
                         {% endif %}
-                        <div class="title_filter">
-                            Past prices
-                        </div>
-                        <div class="download_btn">
+                        <div class="download_btn f-left">
                             <a href="{% url 'stocks:download_csv' ticker=stock_ticker %}">
-                                <button class="btn btn-secondary">Get csv</button>
+                                <button class="btn btn-secondary">Plik csv</button>
                             </a>
                             <a href="{% url 'stocks:download_xml' ticker=stock_ticker %}">
-                                <button class="btn btn-secondary">Get xml</button>
+                                <button class="btn btn-secondary">Plik xml</button>
                             </a>
                         </div>
                     </div>
