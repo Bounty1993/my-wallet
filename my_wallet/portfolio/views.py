@@ -101,3 +101,4 @@ class PastTransactionsView(ListView):
     def get_queryset(self):
         portfolio_id = self.kwargs['pk']
         return Transaction.objects.filter(portfolio_id=portfolio_id)
+

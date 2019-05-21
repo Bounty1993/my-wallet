@@ -1,7 +1,10 @@
 from django.urls import include, path
 
 from .views import (
-    NewPortfolioView, PastTransactionsView, PortfolioDetails, transactions,
+    NewPortfolioView,
+    PortfolioDetails,
+    transactions,
+    PastTransactionsView,
 )
 
 app_name = 'portfolio'
