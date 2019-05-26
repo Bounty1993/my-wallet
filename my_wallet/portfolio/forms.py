@@ -1,10 +1,6 @@
 from django import forms
 from django.forms import ValidationError
 
-from crispy_forms.bootstrap import Tab, TabHolder
-from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Column, Field, Fieldset, Layout, Row
-
 from .models import Asset, Portfolio, Transaction
 
 
@@ -12,7 +8,8 @@ class NewPortfolioForm(forms.ModelForm):
 
     description = forms.CharField(
         widget=forms.Textarea(attrs={'rows': 5}),
-        help_text='Staraj się zmieścić w 250 słowach'
+        help_text='Staraj się zmieścić w 250 słowach',
+        label='Opis'
     )
 
     class Meta:

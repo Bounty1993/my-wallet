@@ -7,11 +7,11 @@ from PIL import Image
 
 class Profile(AbstractUser):
 
-    address = models.CharField(max_length=100, blank=True)
-    city = models.CharField(max_length=30, blank=True)
-    zip_code = models.CharField(max_length=30, blank=True)
-    description = models.CharField(max_length=250, blank=True)
-    image = models.ImageField(upload_to='profile_pics/', default='default.png',
+    address = models.CharField('adres', max_length=100, blank=True)
+    city = models.CharField('miasto', max_length=30, blank=True)
+    zip_code = models.CharField('kod pocztowy', max_length=30, blank=True)
+    description = models.CharField('Opis', max_length=250, blank=True)
+    image = models.ImageField('Zdjęcie', upload_to='profile_pics/', default='default.png',
                               blank=True)
 
     @property

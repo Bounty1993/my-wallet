@@ -7,34 +7,43 @@
             {% include "profiles/sidebar.html" %}
         </div>
         <div class="main-panel shadowing col-sm-9">
-            <ul class="nav nav-pills nav-justified mb-3" id="pills-tab" role="tablist">
-                <li class="nav-item">
-                    <a class="nav-link active" data-toggle="tab" href="#main">My Data</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" data-toggle="tab" href="#portfolio">Portfolio</a>
-                </li>
-            </ul>
-            <div class="tab-content" style="background-color: #ffffff">
-                <div class="tab-pane container active" id="main">
-                    {% for message in messages %}
-                        <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert">
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                        </button>
-                        {{ message }}
-                        </div>
-                    {% endfor %}
-                    <form action="" method="post">
-                        {% csrf_token %}
-                        {% crispy form %}
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                    </form>
-                </div>
-                <div class="tab-pane container fade" id="portfolio">
-                    Hello
-                </div>
+            <div class="jumbotron">
+                Witaj na swoim profilu w My Wallet! Tutaj znajdziesz wszystkie potrzebne informacje
             </div>
+            {% for portfolio in portfolios %}
+                <div class="row">
+                    <div class="col-6">
+                        <div>{{ portfolio.name }}</div>
+                        <div>{{portfolio.description}}</div>
+                    </div>
+                    <div class="col-6">
+                        <div>{{portfolio.total_value}}</div>
+                        <div>{{portfolio.percent_return}}</div>
+                    </div>
+                </div>
+                <div class="text-center">
+                        <a href="{% url 'portfolio:details' portfolio.pk %}">
+                            <button class="btn btn-secondary">
+                                Szczegóły portfela
+                            </button>
+                        </a>
+                        <a href="{% url 'portfolio:transaction' portfolio.pk %}">
+                            <button class="btn btn-success">
+                                Nowa transakcja
+                            </button>
+                        </a>
+                </div>
+            {% empty %}
+                <div class="text-center">
+                    <p>Nie posiadasz jeszcze żadnego portfela.</p>
+                    <p>Utwórz nowy portfel i wypróbuj My Wallet</p>
+                    <a href="{% url 'portfolio:new' %}">
+                        <button class="btn btn-success">
+                            Utwórz nowe portfolio
+                        </button>
+                    </a>
+                </div>
+            {% endfor %}
         </div>
     </div>
 </div>

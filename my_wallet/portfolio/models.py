@@ -17,7 +17,7 @@ class Portfolio(models.Model):
     cash = models.DecimalField('gotówka', max_digits=11, decimal_places=2)
     created_at = models.DateTimeField(auto_now_add=True)
     description = models.CharField('opis', max_length=250, blank=True)
-    is_visible = models.BooleanField(default=True)
+    is_visible = models.BooleanField('widoczne?', default=True)
     is_active = models.BooleanField(default=True)
 
     class Meta:

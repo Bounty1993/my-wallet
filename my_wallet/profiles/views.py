@@ -4,13 +4,14 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, UpdateView
+from django.views.generic import CreateView, UpdateView, ListView
 
 from .forms import (
     ContactForm, EmailUpdateForm, MyPasswordChangeForm, ProfileCreationForm,
     ProfileUpdateForm,
 )
 from .models import Profile
+from my_wallet.portfolio.models import Portfolio
 
 
 class MyProfileCreationView(CreateView):
@@ -23,19 +24,14 @@ class MyProfileCreationView(CreateView):
         return redirect(profile)
 
 
-class ProfileView(LoginRequiredMixin, UpdateView):
-    model = Profile
+class ProfileView(LoginRequiredMixin, ListView):
     template_name = 'profiles/profile.html'
-    form_class = ProfileUpdateForm
-    context_object_name = 'profile'
+    context_object_name = 'portfolios'
 
-    def get_object(self):
-        return self.request.user
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        # context['total_wealth'] = self.object.portfolio.total_value
-        return context
+    def get_queryset(self):
+        profile = self.request.user
+        print(Portfolio.objects.filter(profile=profile))
+        return Portfolio.objects.filter(profile=profile)
 
 
 class EditProfileView(LoginRequiredMixin, UpdateView):

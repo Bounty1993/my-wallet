@@ -14,27 +14,6 @@ class ProfileCreationForm(UserCreationForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['password1'].help_text = 'Choose the wise one!'
-        self.helper = FormHelper()
-        self.helper.form_show_labels = False
-        self.helper.layout = Layout(
-            Field('username', placeholder='Username'),
-            Field('password1', placeholder='Password'),
-            Field('password2', placeholder='Password'),
-            Fieldset(
-                'Below data is not required',
-                Field('email', placeholder='Email'),
-                Field('first_name', placeholder='First Name'),
-                Field('last_name', placeholder='Last Name'),
-            ),
-            Submit('submit', 'Create the account', css_class='half_btn btn btn-success'),
-            Button('cancel', 'Resign', css_class='half_btn btn btn-danger')
-        )
-
-    def clean_email(self):
-        email = self.cleaned_data['email']
-        if email and Profile.objects.filter(email=email).exists():
-            raise forms.ValidationError('That email is used')
-        return email
 
     class Meta:
         model = Profile
@@ -45,6 +24,20 @@ class ProfileCreationForm(UserCreationForm):
             'username': None,
             'password1': None,
         }
+        labels = {
+            'username': 'Nazwa użytkownika',
+            'password1': 'Hasło',
+            'password2': 'Potwierdź hasło',
+            'email': 'Adres email',
+            'first_name': 'Imię',
+            'last_name': 'Nazwisko',
+        }
+
+    def clean_email(self):
+        email = self.cleaned_data['email']
+        if email and Profile.objects.filter(email=email).exists():
+            raise forms.ValidationError('That email is used')
+        return email
 
 
 class ProfileUpdateForm(forms.ModelForm):
