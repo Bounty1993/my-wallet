@@ -39,12 +39,50 @@
           Edit your profile ({{profile.username}})
       </div>
       <div class="card-body">
-          <form method="post" enctype="multipart/form-data">
+          <form method="post" novalidate>
             {% csrf_token %}
-            {{ form | crispy }}
-              <input type="submit" class="btn btn-success mx-1" value="Update my profile">
-            <input type="" class="btn btn-warning mx-1" placeholder="Reset">
-            <input type="submit" class="btn btn-danger mx-1" placeholder="Update my profile">
+
+            {% if form.non_field_errors %}
+              <ul>
+                {% for error in form.non_field_errors %}
+                  <li>{{ error }}</li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+
+            {% for hidden_field in form.hidden_fields %}
+              {% if hidden_field.errors %}
+                <ul>
+                  {% for error in hidden_field.errors %}
+                    <li>(Hidden field {{ hidden_field.name }}) {{ error }}</li>
+                  {% endfor %}
+                </ul>
+              {% endif %}
+              {{ hidden_field }}
+            {% endfor %}
+            <div class="row">
+              <div class="col-6">{{form.first_name|as_crispy_field}}</div>
+              <div class="col-6">{{form.last_name|as_crispy_field}}</div>
+            </div>
+            <div class="row">
+              <div class="col-6">{{form.email|as_crispy_field}}</div>
+              <div class="col-6">{{form.city|as_crispy_field}}</div>
+            </div>
+            <div class="row">
+              <div class="col-8">{{form.address|as_crispy_field}}</div>
+              <div class="col-4">{{form.zip_code|as_crispy_field}}</div>
+            </div>
+            <div class="row">
+              <div class="col-12">{{form.description|as_crispy_field}}</div>
+            </div>
+            <div class="row">
+              <div class="col-6">{{form.image|as_crispy_field}}</div>
+              <div class="col-6">
+                <input type="submit" class="btn btn-success mx-1" value="Update my profile">
+                <input type="reset" class="btn btn-warning mx-1" placeholder="Reset">
+                <input type="submit" class="btn btn-danger mx-1" placeholder="Update my profile">
+              </div>
+            <div>
           </form>
       </div>
     </div>

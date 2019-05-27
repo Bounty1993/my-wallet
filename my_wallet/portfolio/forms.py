@@ -20,6 +20,19 @@ class NewPortfolioForm(forms.ModelForm):
             'beginning_cash',
             'is_visible'
         )
+        help_text = {
+            'beginning_cash': 'Kwota powinna być między 100 a 10 milionów złotych',
+        }
+
+    def clean_beginning_cash(self):
+        beginning_cash = self.cleaned_data['beginning_cash']
+        if beginning_cash < 1000:
+            msg = 'Początkowa gotówka musi wynosić co najmniej 1000'
+            raise ValidationError(msg)
+        if beginning_cash > 10_000_000:
+            msg = 'Maksymalna wartośc początkowej gotówki to 10 milionów złotych'
+            raise ValidationError(msg)
+        return beginning_cash
 
 
 class TransactionForm(forms.ModelForm):

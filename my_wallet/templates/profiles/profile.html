@@ -1,5 +1,9 @@
 {% extends "base.html" %}
 {% load crispy_forms_tags %}
+{% load staticfiles %}
+{% block stylesheet %}
+<link rel="stylesheet" href="{% static 'css/profile_home.css' %}">
+{% endblock stylesheet %}
 {% block content %}
 <div class="container">
     <div class="row p-4">
@@ -7,10 +11,21 @@
             {% include "profiles/sidebar.html" %}
         </div>
         <div class="main-panel shadowing col-sm-9">
-            <div class="jumbotron">
-                Witaj na swoim profilu w My Wallet! Tutaj znajdziesz wszystkie potrzebne informacje
+            <div class="jumbotron text-center">
+                <div class="main-text">
+                     Witaj na swoim profilu w My Wallet!
+                </div>
+                <div class="secondary-text">
+                    Tutaj znajdziesz wszystkie potrzebne informacje!
+                </div>
+                <a href="{% url 'portfolio:new' %}">
+                    <button class="btn btn-primary mt-2">
+                        Stwórz nowy portfel
+                    </button>
+                </a>
             </div>
             {% for portfolio in portfolios %}
+            <div class="portfolio-detail">
                 <div class="row">
                     <div class="col-6">
                         <div>{{ portfolio.name }}</div>
@@ -33,6 +48,7 @@
                             </button>
                         </a>
                 </div>
+            </div>
             {% empty %}
                 <div class="text-center">
                     <p>Nie posiadasz jeszcze żadnego portfela.</p>
