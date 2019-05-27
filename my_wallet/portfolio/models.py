@@ -34,7 +34,7 @@ class Portfolio(models.Model):
     @property
     def stocks_value(self):
         total_value = 0
-        for asset in self.asset.all():
+        for asset in self.asset.all().select_related('stocks'):
             total_value += asset.stocks.current_price * asset.sum_number
         return total_value
 

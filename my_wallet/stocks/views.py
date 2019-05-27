@@ -93,7 +93,9 @@ class StocksListView(ListView):
         context['today'] = find_quote_day(today, 0, type='earlier')
         best_stocks = Stocks.highest_dividends()[:5]
         context['dividend_stocks'] = best_stocks
-        sorted_stocks = sorted(Stocks.objects.all(), key=lambda stock: stock.perc_year_change)
+        # sorted_stocks = sorted(Stocks.objects.all(), key=lambda stock: stock.perc_year_change)
+        sorted_stocks = Prices.objects.year_change()
+        print(sorted_stocks)
         context['rising'] = sorted_stocks[-5:]
         context['falling'] = sorted_stocks[:5]
         return context

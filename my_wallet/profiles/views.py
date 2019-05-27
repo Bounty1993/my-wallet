@@ -30,7 +30,6 @@ class ProfileView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         profile = self.request.user
-        print(Portfolio.objects.filter(profile=profile))
         return Portfolio.objects.filter(profile=profile)
 
 

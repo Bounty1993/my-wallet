@@ -41,9 +41,10 @@ class PortfolioDetails(LoginRequiredMixin, DetailView):
 
     def chart_data(self, assets):
         data = []
+        total_value = self.object.total_value
         for asset in assets:
             stocks_value = Decimal(asset.stocks.current_price * asset.sum_number)
-            percent = (stocks_value / self.object.total_value) * 100
+            percent = (stocks_value / total_value) * 100
             percent = float(round(percent, 2))
             asset_data = [asset.stocks.ticker, percent]
             data.append(asset_data)
@@ -51,7 +52,7 @@ class PortfolioDetails(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        assets = self.object.asset.all()
+        assets = self.object.asset.all().prefetch_related('stocks')
         context['assets'] = assets
         context['data'] = self.chart_data(assets)
         return context

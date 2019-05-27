@@ -1,6 +1,17 @@
-.main-text {
-    font-weight: bold;
-    font-size: 24px;
+.main-data {
+  font-weight: bold;
+  font-size: 24px;
+}
+.small-data {
+  font-size: 12px;
+  color: grey;
+  margin-top: -5px;
+  margin-bottom: 10px;
+}
+.horizontal-line {
+    border-bottom: 1px solid grey;
+    width: 80%;
+    margin-left: 10%;
 }
 .portfolio-detail {
     border: 1px solid grey;

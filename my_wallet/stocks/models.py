@@ -210,6 +210,30 @@ class Financial(models.Model):
         ordering = ('-total_revenue', )
 
 
+class PriceManager(models.Manager):
+    def year_change(self):
+        today = datetime.datetime.now().date()
+        present_date = find_quote_day(today, num_days=50)
+        past_date = find_quote_day(today, num_days=365)
+        data = (
+            self.values_list('stock__ticker', 'date_price', 'price')
+                .filter(date_price__in=[present_date, past_date])
+                .order_by('stock__ticker')
+        )
+        results = {}
+        for (ticker, _, price) in data:
+            if not ticker in results:
+                results[ticker] = [price, ]
+            else:
+                results[ticker].append(price)
+        final = []
+        for (key, values) in results.items():
+            if len(values) == 2:
+                perc_return = ((values[0] / values[1]) - 1) * 100
+                final.append([key, perc_return])
+        return sorted(final, key=lambda x: x[1])
+
+
 class Prices(models.Model):
     stock = models.ForeignKey(
         Stocks, on_delete=models.CASCADE,
@@ -221,6 +245,8 @@ class Prices(models.Model):
     change = models.FloatField(null=True, blank=True)
     percent_change = models.FloatField(null=True, blank=True)
     date_price = models.DateField(null=True, blank=True)
+
+    objects = PriceManager()
 
     class Meta:
         get_latest_by = 'date_price'

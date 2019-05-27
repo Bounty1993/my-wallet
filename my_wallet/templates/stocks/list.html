@@ -5,7 +5,9 @@
 {% block content %}
 <div class="container">
     <div class="my_jumbo shadowing">
-        <h2>Dane pochodzą z dnia {{today}}</h2>
+        <div>Poniżej znajdziesz informację o instrumentach notowanych na amerykańskiej giełdzie</div>
+        <div>Wszystkie dane finansowe pobierane są z platformy IEX Group.</div>
+        <div>Dane pochodzą z dnia {{today}}</div>
     </div>
     <div class="row">
     <div class="col-md-4">
@@ -23,7 +25,7 @@
                     <ul class="list-group list-group-flush">
                       {% for stock in rising %}
                         <li class="list-group-item">
-                          {{stock.ticker}} - {{stock.perc_year_change | color_percent:3}}
+                          {{stock.0}} - {{stock.1 | color_percent:3}}
                         </li>
                       {% endfor %}
                     </ul>
@@ -32,7 +34,7 @@
                     <ul class="list-group list-group-flush">
                       {% for stock in falling %}
                         <li class="list-group-item">
-                          {{stock.ticker}} - {{stock.perc_year_change | color_percent:3}}
+                          {{stock.0}} - {{stock.1 | color_percent:3}}
                         </li>
                       {% endfor %}
                     </ul>
@@ -105,7 +107,7 @@
                            <a class="my_custom_Btn" href="{% url 'stocks:articles' ticker=stock.ticker %}">
                               Informacje
                           </a>
-                           <a class="my_custom_Btn" href="#">
+                           <a class="my_custom_Btn" href="{% url 'stocks:history' ticker=stock.ticker %}">
                               Dane historyczne
                           </a>
                      </div>
