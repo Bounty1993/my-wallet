@@ -13,7 +13,8 @@ from .models import Profile
 class ProfileCreationForm(UserCreationForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['password1'].help_text = 'Choose the wise one!'
+        self.fields['password1'].help_text = 'Wybierz bezpieczne hasło'
+        self.fields['password2'].help_text = 'Wpisz ponownie swoje hasło'
 
     class Meta:
         model = Profile
@@ -36,7 +37,7 @@ class ProfileCreationForm(UserCreationForm):
     def clean_email(self):
         email = self.cleaned_data['email']
         if email and Profile.objects.filter(email=email).exists():
-            raise forms.ValidationError('That email is used')
+            raise forms.ValidationError('Wprowadzony email jest nieprawidłowy')
         return email
 
 
@@ -47,78 +48,33 @@ class ProfileUpdateForm(forms.ModelForm):
                   'address', 'city', 'zip_code', 'description')
         widgets = {
             'description': forms.Textarea(
-                attrs={'placeholder': 'Tell us something about yourself. Let other to get to know You!',
+                attrs={'placeholder': 'Powiedz nam coś o sobie. Pozwól innym się poznać!',
                        'rows': 5, 'col': 15}
             )
         }
+        labels = {
+            'first_name': 'Imię',
+            'last_name': 'Nazwisko',
+            'email': 'Adres email',
+        }
 
-
-class EmailUpdateForm(ProfileUpdateForm):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.helper.layout = Layout(
-            Row(
-                Column(Field('email', placeholder='Your private email'), css_class='col-md-8'),
-                Column(Submit('submit', 'Update my email', css_class='mr-0'), css_class='col-md-4'),
-            )
-        )
-
-    class Meta(ProfileUpdateForm.Meta):
-        model = Profile
-        fields = ('email', )
+    def clean_email(self):
+        email = self.cleaned_data['email']
+        id = self.instance.id
+        if email:
+            is_taken = Profile.objects.exclude(id=id).filter(email=email)
+            if is_taken:
+                msg = 'Ten adres email jest już zajęty'
+                raise forms.ValidationError(msg)
+        return email
 
 
 class MyPasswordChangeForm(PasswordChangeForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.form_show_labels = False
-        self.helper.layout = Layout(
-            Row(
-                Column(
-                    Field('old_password', placeholder='Current Password'),
-                    Field('new_password1', placeholder='New Password'),
-                    Field('new_password2', placeholder='Repeat Password'),
-                    css_class='col-sm-6',
-                ),
-                Column(
-                    HTML("""<b>Care about security and follow below rules:</b>
-                         <ul style="font-size: 14px">
-                             <li>Your password can't be too similar to your other personal information.</li>
-                             <li>Your password must contain at least 8 characters.</li>
-                             <li>Your password can't be a commonly used password.</li>
-                             <li>Your password can't be entirely numeric.</li>
-                         </ul>"""
-                         ),
-                    css_class='col-sm-6',
-                ),
-            ),
-            Row(
-                Submit('submit', 'Update my profile!', css_class='btn btn-success mx-1'),
-                Reset('reset', 'Reset values', css_class='btn btn-warning mx-1'),
-                Button('cancel', 'Cancel', css_class='btn btn-danger mx-1'),
-                css_class='d-flex justify-content-center',
-            ),
-        )
         self.fields['new_password1'].help_text = None
 
 
 class ContactForm(forms.Form):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.form_show_labels = False
-        self.helper.layout = Layout(
-            Field('subject', placeholder='Subject'),
-            Field('message', placeholder='Ask about whatever you want'),
-            Div(
-                Submit('submit', 'Send', css_class='btn btn-success mx-1'),
-                Reset('reset', 'Reset message', css_class='btn btn-warning mx-1'),
-                Button('cancel', 'Cancel', css_class='btn btn-danger mx-1'),
-                css_class='d-flex justify-content-center',
-            ),
-
-        )
-
     subject = forms.CharField(max_length=50)
-    message = forms.CharField(widget=forms.Textarea(attrs={'rows': 5, 'col': 15}))
+    content = forms.CharField(widget=forms.Textarea(attrs={'rows': 5, 'col': 15}))

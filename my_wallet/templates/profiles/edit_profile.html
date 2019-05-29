@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 {% load crispy_forms_tags %}
 {% block content %}
-<div class="container">
 <ul class="breadcrumb">
           <li class="breadcrumb-item">
               <a href="{% url 'core:home' %}">
@@ -10,33 +9,38 @@
           </li>
           <li class="breadcrumb-item">
               <a href="{% url 'profiles:profile' %}">
-                  Profile
+                  Profil
               </a>
           </li>
           <li class="breadcrumb-item active">
-                Settings
+                Ustawienia
           </li>
 </ul>
 <div class="row">
   <div class="col-sm-3">
-      <div class="nav_title shadowing"> Account Settings</div>
+    <div class="nav_title shadowing">Mój Profil</div>
       <ul class="side-nav">
-        <a href="{% url 'profiles:edit' %}">
-            <li class="nav-btn shadowing">Personal Data</li>
-        </a>
-        <a href="{% url 'profiles:password_change' %}">
-            <li class="nav-btn shadowing ">Password Change</li>
-        </a>
-        <a href="{% url 'profiles:contact' %}">
-            <li class="nav-btn shadowing">Contact</li>
-        </a>
+        <li class="nav-btn shadowing">
+          <a href="{% url 'profiles:edit' %}">
+            Aktualizuj dane
+          </a>
+        </li>
+        <li class="nav-btn shadowing ">
+          <a href="{% url 'profiles:password_change' %}">
+            Zmiana hasła
+          </a>
+        </li>
+        <li class="nav-btn shadowing">
+          <a href="{% url 'profiles:contact' %}">
+            Kontakt
+          </a>
+        </li>
       </ul>
   </div>
-
   <div class="col-sm-9">
     <div class="shadowing card">
       <div class="card-header">
-          Edit your profile ({{profile.username}})
+          Zaaktualizuj swój profil ({{profile.username}})
       </div>
       <div class="card-body">
           <form method="post" novalidate>
@@ -78,15 +82,18 @@
             <div class="row">
               <div class="col-6">{{form.image|as_crispy_field}}</div>
               <div class="col-6">
-                <input type="submit" class="btn btn-success mx-1" value="Update my profile">
-                <input type="reset" class="btn btn-warning mx-1" placeholder="Reset">
-                <input type="submit" class="btn btn-danger mx-1" placeholder="Update my profile">
+                <input type="submit" class="btn btn-success mx-1" value="Aktualizuj">
+                <input type="reset" class="btn btn-warning mx-1" placeholder="Wyczyść">
+                <a href="{% url 'profiles:profile' %}">
+                  <button class="btn btn-danger mx-1" placeholder="Zrezygnuj">
+                    Zrezygnuj
+                  </button>
+                </a>
               </div>
             <div>
           </form>
       </div>
     </div>
   </div>
-</div>
 </div>
 {% endblock %}

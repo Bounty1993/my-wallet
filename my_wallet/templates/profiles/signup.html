@@ -2,23 +2,24 @@
 {% load crispy_forms_tags %}
 {% load static %}
 {% block content %}
-<div class="container">
-<div class="main-panel shadowing signup_banner">
+<header>
+  <div class="main-panel shadowing signup_banner">
     <h3>Witaj na stronie My Wallet</h3>
     <p>My Wallet jest stroną na której możesz tworzyć i testować różnorodne strategie inwestycyjne</p>
-</div>
-<div class="row no-gutters">
+  </div>
+</header>
+<main>
+  <div class="row no-gutters">
     <div class="col-sm-8 offset-2">
-        <div class="main-panel shadowing">
-            <form method="POST" action="">
-                {% csrf_token %}
-                {{ form | crispy }}
-                <button type="submit" class="btn btn-success">Zarejestruj</button>
-                <button type="reset" class="btn btn-warning">Wyczyść</button>
-            </form>
-        </div>
+      <div class="main-panel shadowing">
+        <form method="POST" action="">
+          {% csrf_token %}
+          {{ form | crispy }}
+          <button type="submit" class="btn btn-success">Zarejestruj</button>
+          <button type="reset" class="btn btn-warning">Wyczyść</button>
+        </form>
+      </div>
     </div>
-</div>
-</div>
-
+  </div>
+</main>
 {% endblock content %}

@@ -10,7 +10,6 @@ urlpatterns = [
     path('profile/', include('my_wallet.profiles.urls', namespace='profiles')),
     path('stocks/', include('my_wallet.stocks.urls', namespace='stocks')),
     path('api/', include('my_wallet.api.urls', namespace='api')),
-
 ]
 
 if settings.DEBUG:

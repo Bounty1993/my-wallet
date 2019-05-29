@@ -162,9 +162,9 @@ LOGOUT_REDIRECT_URL = '/'
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'pl'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Warsaw'
 
 USE_I18N = True
 
@@ -196,18 +196,24 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 
 CELERY_BEAT_SCHEDULE = {
+    """
     'hello': {
         'task': 'my_wallet.portfolio.tasks.price_update',
         'schedule': crontab(minute='*/15')  # execute every minute
     },
+    """
+    'update_stock_price': {
+        'task': 'my_wallet.stocks.tasks.update_stock_price',
+        'schedule': crontab(minute='05', hour='19')
+    },
 }
-"""
-    'update_portfolio_history': {
-        'task': 'my_wallet.portfolio.tasks.update_portfolio_history',
 
-    }
-"""
-
+# for gmail
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = config('EMAIL_USER')
+EMAIL_HOST_PASSWORD = config('EMAIL_PASSWORD')
+EMAIL_PORT = 587
 
 # DEBUG settings
 if DEBUG:

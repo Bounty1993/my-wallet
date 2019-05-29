@@ -1,13 +1,21 @@
+from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth import authenticate, login, update_session_auth_hash
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView
+from django.contrib.auth.views import PasswordChangeView, PasswordResetView, PasswordResetConfirmView
 from django.shortcuts import redirect, render
-from django.urls import reverse_lazy
-from django.views.generic import CreateView, UpdateView, ListView
-
+from django.urls import reverse_lazy, reverse
+from django.views.generic import (
+    CreateView,
+    UpdateView,
+    ListView,
+    FormView,
+)
+from django.core.mail import send_mail
 from .forms import (
-    ContactForm, EmailUpdateForm, MyPasswordChangeForm, ProfileCreationForm,
+    ContactForm,
+    MyPasswordChangeForm,
+    ProfileCreationForm,
     ProfileUpdateForm,
 )
 from .models import Profile
@@ -21,6 +29,11 @@ class MyProfileCreationView(CreateView):
 
     def form_valid(self, form):
         profile = form.save()
+        login(
+            self.request,
+            profile,
+            backend='django.contrib.auth.backends.ModelBackend'
+        )
         return redirect(profile)
 
 
@@ -52,33 +65,43 @@ class MyPasswordChangeView(LoginRequiredMixin, PasswordChangeView):
 
     def form_valid(self, form):
         form.save()
-        messages.success(self.request, 'Your password was updated successfully!')
+        messages.success(self.request, 'Twoje hasło zostało pomyślnie zaaktualizowane')
         update_session_auth_hash(self.request, form.user)
         return redirect(reverse_lazy('profiles:profile'))
 
 
-def _get_form(request, formcls, prefix):
-    data = request.POST if prefix in request.POST else None
-    return formcls(data, prefix=prefix)
+class MyPasswordResetView(PasswordResetView):
+    template_name = 'registration/password_reset_form.html'
+    email_template_name = 'registration/password_reset_email.html'
+    subject_template_name = 'registration/password_reset_subject.txt'
+    success_url = reverse_lazy('profiles:login')
+
+    def form_valid(self, form):
+        msg = """Na twój adres email został wysłany token służący do zmiany hasła
+        Sprawdz czy dostałem wiadomość. Jeśli nie prosimy o kontakt"""
+        messages.success(self.request, msg)
+        return super().form_valid(form)
 
 
-def contact(request):
-    if request.method == 'POST':
-        print(request.POST)
-        email_form = _get_form(request, EmailUpdateForm, prefix='email_pre')
-        contact_form = _get_form(request, ContactForm, prefix='contact_pre')
-        if email_form.is_bound and email_form.is_valid():
-            print('I am email')
-            pass
-        elif contact_form.is_bound and contact_form.is_valid():
-            print('I am here')
-            messages.success(request, 'Thank you for your questions')
-            return redirect(reverse_lazy('profiles:contact'))
-        context = {'contact_form': contact_form, 'email_form': email_form}
-        return render(request, 'profiles/contact.html', context)
+class MyPasswordResetConfirmView(PasswordResetConfirmView):
+    template_name = 'registration/password_reset_confirm.html'
+    success_url = reverse_lazy('profiles:login')
 
-    if request.method == 'GET':
-        email_form = EmailUpdateForm(instance=request.user, prefix='email_pre')
-        contact_form = ContactForm(prefix='contact_pre')
-        context = {'contact_form': contact_form, 'email_form': email_form}
-        return render(request, 'profiles/contact.html', context)
+
+class Contact(FormView):
+    template_name = 'profiles/contact.html'
+    form_class = ContactForm
+
+    def form_valid(self, form):
+        subject = form.cleaned_data['subject']
+        content = form.cleaned_data['content']
+        send_mail(
+            subject=subject,
+            message=content,
+            from_email=settings.EMAIL_HOST_USER,
+            recipient_list=[settings.EMAIL_HOST_USER + '@gmail.com'],
+            fail_silently=False,
+        )
+        msg = 'Dziękuję za kontakt. Odpowiem w ciągu 2 dni'
+        messages.success(self.request, msg)
+        return redirect(reverse_lazy('profiles:profile'))

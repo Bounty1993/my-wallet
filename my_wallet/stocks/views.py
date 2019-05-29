@@ -95,7 +95,6 @@ class StocksListView(ListView):
         context['dividend_stocks'] = best_stocks
         # sorted_stocks = sorted(Stocks.objects.all(), key=lambda stock: stock.perc_year_change)
         sorted_stocks = Prices.objects.year_change()
-        print(sorted_stocks)
         context['rising'] = sorted_stocks[-5:]
         context['falling'] = sorted_stocks[:5]
         return context
@@ -191,6 +190,7 @@ class HistoryView(CurrentPriceMixin, PriceChartMixin, DetailView):
     template_name = 'stocks/history.html'
     slug_field = 'ticker'
     model = Prices
+
 
     def sidebar_stock_id(self):
         return self.object.first().stock.id

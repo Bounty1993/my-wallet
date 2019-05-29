@@ -1,50 +1,60 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="container">
-      <div class="home-title">
-        <h1>
-            Twórz, analizuj i kontroluj swoją finansową przyszłości.
-        </h1>
-        <p class="text-secondary">
-            Jeśli szukasz prostego ale funkcjonalnego narzędzia do tworzenia wirtualnego portfela to
-            ta platforma jest właśnie dla Ciebie. Zacznij już dzisiaj korzystać z My Wallet, a nie będziesz chciał
-            używac jakiej kolwiek innej platformy.
-        </p>
-
-        <a class="btn btn-info" id="scroller" href="#first-panel">Korzyści</a>
-      </div>
-        <div class="home-panel shadowing" id="first-panel">
-            <i class="home-icons fas fa-chart-line"></i>
-            <h3 class="main-header">Notowania i bieżące informacje o spółkach</h3>
-            <ul class="main-text">
-                <li>Używając My Wallet będziesz zawsze na bieżąco ze wszystkimi informacjami giełdowymi.
-                    Celem My Wallet jest dostarczanie w przystępny i wygodny sposób wszystkich najistotniejszych danych
-                    giełdowych wszystkim inwestorom.
-                </li>
-                <li>Wszystkie dane są pobierane z API platformy
-                    <a href="iextrading.com">IEX Group</a> - jednej z wiodących platform na rynku amerykańskim dla
-                    indywidualnych inwestorów.
-                </li>
-                <li>Ponadto My Wallet pozwala śledzić najważniejsze informacje dotyczące
-                    konkretnych spółek jakie pojawiają się na Google Finance oraz Yahoo Finance.
-                </li>
-            </ul>
-        </div>
-        <div class="home-panel shadowing">
-            <i class="home-icons fas fa-chart-pie"></i>
-            <h3 class="main-header">Stwórz swój własny portfel inwestycyjny</h3>
-            <ul class="main-text">
-                <li>
-                    Nabywaj i sprzedawaj instrumenty finansowe w swoim własnym wirtualnym portfelu
-                </li>
-                <li>
-                    Testuj strategie inwestycyjne. My Wallet pozwala na bieżąco śledzić wyniki portfela inwestycyjnego.
-                    Ponadto przechowywana jest cała historia operacji.
-                </li>
-                <li>
-                    Przetestuj wiele strategii i wybierz tę najlepszą która pozwoli Ci osiągnąć fiansowy sukces.
-                </li>
-            </ul>
-        </div>
-</div>
+<header>
+  <div class="home-title">
+    <h1>
+      Twórz, analizuj i kontroluj swoją finansową przyszłości.
+    </h1>
+    <p class="text-secondary">
+      Jeśli szukasz prostego ale funkcjonalnego narzędzia do tworzenia wirtualnego portfela to
+      ta platforma jest właśnie dla Ciebie. Zacznij już dzisiaj korzystać z My Wallet, a nie będziesz chciał
+      używac jakiej kolwiek innej platformy.
+    </p>
+    <a class="btn btn-info" id="scroller" href="#first-panel">
+      Korzyści
+    </a>
+  </div>
+</header>
+<main>
+  <article>
+    <div class="home-panel shadowing" id="first-panel">
+      <i class="home-icons fas fa-chart-line"></i>
+      <h3 class="main-header">Notowania i bieżące informacje o spółkach</h3>
+      <ul class="main-text">
+        <li>
+          Używając My Wallet będziesz zawsze na bieżąco ze wszystkimi informacjami giełdowymi.
+          Celem My Wallet jest dostarczanie w przystępny i wygodny sposób wszystkich najistotniejszych danych
+          giełdowych wszystkim inwestorom.
+        </li>
+        <li>
+          Wszystkie dane są pobierane z API platformy
+          <a href="iextrading.com">IEX Group</a> - jednej z wiodących platform na rynku amerykańskim dla
+          indywidualnych inwestorów.
+        </li>
+        <li>
+          Ponadto My Wallet pozwala śledzić najważniejsze informacje dotyczące
+          konkretnych spółek jakie pojawiają się na Google Finance oraz Yahoo Finance.
+        </li>
+      </ul>
+    </div>
+  </article>
+  <article>
+    <div class="home-panel shadowing">
+      <i class="home-icons fas fa-chart-pie"></i>
+      <h3 class="main-header">Stwórz swój własny portfel inwestycyjny</h3>
+      <ul class="main-text">
+        <li>
+          Nabywaj i sprzedawaj instrumenty finansowe w swoim własnym wirtualnym portfelu
+        </li>
+        <li>
+          Testuj strategie inwestycyjne. My Wallet pozwala na bieżąco śledzić wyniki portfela inwestycyjnego.
+          Ponadto przechowywana jest cała historia operacji.
+        </li>
+        <li>
+          Przetestuj wiele strategii i wybierz tę najlepszą która pozwoli Ci osiągnąć fiansowy sukces.
+        </li>
+      </ul>
+    </div>
+  </article>
+</main>
 {% endblock content %}

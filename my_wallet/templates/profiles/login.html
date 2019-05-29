@@ -1,38 +1,53 @@
 {% extends "base.html" %}
 {% load crispy_forms_tags %}
 {% block content %}
-<div class="container no-gutter">
-<div class="row">
+<main>
+  <div class="row">
+    <div class="col-8 offset-2">
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        {{ message }}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="row">
     <div class="col-sm-6 offset-sm-3">
-    <div class="main-panel login_panel shadowing card card-default mt-4">
+      <div class="main-panel login_panel shadowing card card-default mt-2">
         <div class="card-heading">
-            <h2>Sign in to My Wallet</h2>
-            <div class="card-body">
-                <form method="POST" action="">
-                    {% csrf_token %}
-                    {{ form | crispy }}
-                    <button type="submit" class="btn btn-success w-100">Zaloguj</button>
-                </form>
-               <div class="social_buttons">
-                   <p class="social_title">Lub zaloguj przez</p>
-                   <a href="{% url 'profiles:social:begin' 'facebook' %}">
-                       <button class="loginBtn loginBtn--facebook">
-                           Login with Facebook
-                       </button>
-                   </a>
-                   <a href="{% url 'profiles:social:begin' 'google_oauth2' %}" class="google-btn">
-                       <button class="loginBtn loginBtn--google">
-                           Login with Google
-                       </button>
-                   </a>
-               </div>
-                <a href="{% url 'profiles:signup' %}" class="btn btn-link mt-4">Nie masz jeszcze konta? Zarejestruj się</a>
-     </div>
-    </div>
+          <h2>Zaloguj się do  My Wallet</h2>
+          <div class="card-body">
+            <form method="POST" action="">
+              {% csrf_token %}
+              {{ form | crispy }}
+              <button type="submit" class="btn btn-success w-100">Zaloguj</button>
+            </form>
+            <div class="social_buttons">
+              <p class="social_title">Media społecznościowe</p>
+              <a href="{% url 'profiles:social:begin' 'facebook' %}">
+                <button class="loginBtn loginBtn--facebook">
+                  Zaloguj przez Facebook
+                </button>
+              </a>
+              <a href="{% url 'profiles:social:begin' 'google_oauth2' %}" class="google-btn">
+                <button class="loginBtn loginBtn--google">
+                  Zaloguj przez Google
+                </button>
+              </a>
             </div>
+            <a href="{% url 'profiles:signup' %}" class="btn btn-link mt-4">
+              Nie masz jeszcze konta? Zarejestruj się
+            </a>
+            <a href="{% url 'profiles:password_reset' %}" class="btn btn-link">
+              Zapmniałeś hasła? Pomożemy Ci
+            </a>
+          </div>
         </div>
+      </div>
     </div>
-    </div>
-</div>
-</div>
+  </div>
+</main>
 {% endblock content %}
