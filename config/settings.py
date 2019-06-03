@@ -216,7 +216,7 @@ EMAIL_PORT = 587
 
 IEX_API_KEY = config('IEX_API_KEY')
 
-"""
+
 # DEBUG settings
 if DEBUG:
     INTERNAL_IPS = ('127.0.0.1', 'localhost',)
@@ -247,4 +247,3 @@ if DEBUG:
         # DELETE THAT
         "SHOW_TOOLBAR_CALLBACK": lambda request: True,
     }
-"""

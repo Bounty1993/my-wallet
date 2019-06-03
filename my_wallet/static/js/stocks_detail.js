@@ -1,5 +1,4 @@
 $(document).ready(function(){
-
     var finance_data = JSON.parse(document.getElementById('finance_data').textContent);
     console.log(finance_data);
 
@@ -11,10 +10,10 @@ $(document).ready(function(){
         type: 'column'
       },
       title: {
-        text: 'Monthly Average Rainfall'
+        text: 'Wyniki finansowe w czterech ostatnich kwartałach'
       },
       subtitle: {
-        text: 'Source: WorldClimate.com'
+        text: 'Zródło IEX Group'
       },
       xAxis: {
         categories: [
@@ -28,13 +27,13 @@ $(document).ready(function(){
       yAxis: {
         min: 0,
         title: {
-          text: 'Rainfall (mm)'
+          text: 'USD (w milionach)'
         }
       },
       tooltip: {
         headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
         pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
-          '<td style="padding:0"><b>{point.y:.1f} mm</b></td></tr>',
+          '<td style="padding:0"><b>{point.y:.1f}</b></td></tr>',
         footerFormat: '</table>',
         shared: true,
         useHTML: true
@@ -54,15 +53,18 @@ $(document).ready(function(){
         type: 'column'
       },
       title: {
-        text: 'Stacked column chart'
+        text: 'Kompozycja bilansu na tle czterech kwartałów'
+      },
+      subtitle: {
+        text: 'Zródło IEX Group'
       },
       xAxis: {
-        categories: ['Apples', 'Oranges', 'Pears', 'Grapes', 'Bananas']
+        categories: ['I Q', 'II Q', 'III Q', 'IV Q']
       },
       yAxis: {
         min: 0,
         title: {
-          text: 'Total fruit consumption'
+          text: 'USD (w milionach)'
         }
       },
       tooltip: {

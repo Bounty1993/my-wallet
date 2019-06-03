@@ -1,30 +1,30 @@
 <div class="card shadowing">
-    <div class="card-header">
-        <h3 style="font-weight:bold; text-align: center">{{side_stock}}</h3>
-    </div>
-    <div class="card-body">
-        <p>Podstawowe informacje:</p>
-        <ul class="list-group list-group-flush">
-            <li class="list-group-item">
-                Ticker: <span style="float:right">{{stocks_price}} USD</span>
-            </li>
-            <li class="list-group-item">
-                Zmiana ceny <span style="float:right">{{stocks_day_change}} USD</span>
-            </li>
-            <li class="list-group-item">
-                Zmiana procentowa <span style="float:right">{{stocks_percent_change|floatformat:3}} %</span>
-            </li>
-        </ul>
-    </div>
+  <div class="card-header">
+    <h3 style="font-weight:bold; text-align: center">{{side_stock}}</h3>
+  </div>
+  <div class="card-body">
+    <p>Podstawowe informacje:</p>
+    <ul class="list-group list-group-flush">
+      <li class="list-group-item">
+        Ticker: <span style="float:right">{{stocks_price}} USD</span>
+      </li>
+      <li class="list-group-item">
+        Zmiana ceny <span style="float:right">{{stocks_day_change}} USD</span>
+      </li>
+      <li class="list-group-item">
+        Zmiana procentowa <span style="float:right">{{stocks_percent_change|floatformat:3}} %</span>
+      </li>
+    </ul>
+  </div>
 </div>
 <ul class="side-nav">
-    <a href="{% url 'stocks:detail' view.kwargs.ticker %}">
-        <li class="nav-btn shadowing">Details</li>
-    </a>
-    <a href="{% url 'stocks:history' view.kwargs.ticker %}">
-        <li class="nav-btn shadowing " href="{% url 'stocks:detail' view.kwargs.ticker %}">History</li>
-    </a>
-    <a href="{% url 'stocks:articles' view.kwargs.ticker %}">
-        <li class="nav-btn shadowing">News</li>
-    </a>
+  <a href="{% url 'stocks:detail' view.kwargs.ticker %}">
+    <li class="nav-btn shadowing">Szczegóły</li>
+  </a>
+  <a href="{% url 'stocks:history' view.kwargs.ticker %}">
+    <li class="nav-btn shadowing " href="{% url 'stocks:detail' view.kwargs.ticker %}">Historia</li>
+  </a>
+  <a href="{% url 'stocks:articles' view.kwargs.ticker %}">
+    <li class="nav-btn shadowing">Informacje</li>
+  </a>
 </ul>

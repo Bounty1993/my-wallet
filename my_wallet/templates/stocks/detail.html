@@ -49,7 +49,7 @@
           <p><span class="data-title">Branża:</span> {{detail.industry}}</p>
           <p><span class="data-title">Sektor:</span> {{detail.sector}}</p>
         </div>
-        <p>{{detail.description}}</p>
+        <p>{{detail.description | truncatechars:400}}</p>
         <a href="{{detail.website}}" target="_blank">Check out the {{stock.name}} website to get more</a>
 
         {% endwith %}

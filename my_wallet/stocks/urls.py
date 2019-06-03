@@ -2,13 +2,13 @@ from django.urls import include, path
 
 from .views import (
     ArticlesView, CsvPrices, ExcelPrices, HistoryView,
-    StockDetailView, StocksListView,
+    StockView, StocksListView,
 )
 
 app_name = 'stocks'
 urlpatterns = [
     path('', StocksListView.as_view(), name='list'),
-    path('detail/<ticker>/', StockDetailView.as_view(), name='detail'),
+    path('detail/<ticker>/', StockView.as_view(), name='detail'),
     path('articles/<ticker>/', ArticlesView.as_view(), name='articles'),
     path('history/<ticker>/', HistoryView.as_view(), name='history'),
     path('download-csv/<slug:ticker>/', CsvPrices.as_view(), name='download_csv'),

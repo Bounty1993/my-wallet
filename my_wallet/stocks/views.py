@@ -14,7 +14,7 @@ from django_tables2 import RequestConfig
 from openpyxl import Workbook
 
 from .crawler import GoogleCrawler, YahooCrawler
-from .models import Dividends, Prices, Stocks
+from .models import Dividends, Prices, Stocks, Financial
 from .tables import (
     DividendTable, PricesTable,
 )
@@ -64,12 +64,10 @@ class SideBarMixin:
         context = super().get_context_data(*args, **kwargs)
         attributes = ['_price', '_day_change', '_percent_change']
         ticker = self.kwargs.get('ticker')
-        sidebar_stock_id = Stocks.objects.get(ticker=ticker).id
-        stock = Stocks.objects.get(id=sidebar_stock_id)
-        ticker = stock.ticker
         for attribute in attributes:
             result = cache.get(ticker + attribute, 'no data')
             context['stocks' + attribute] = result
+        stock = Stocks.objects.get(ticker=ticker)
         context['side_stock'] = stock.name
         return context
 
@@ -103,7 +101,12 @@ class StocksListView(ListView):
         return context
 
 
-class ChartMixin:
+class FinancialChartMixin:
+    """
+    Class is responsible for adding financial data to context.
+    It is used by JavaScript to make charts. Subclass needs to have
+    kwargs['ticker']
+    """
     earnings_names = [
         'total_revenue', 'gross_profit',
         'operating_income', 'net_income',
@@ -112,21 +115,15 @@ class ChartMixin:
 
     def get_earnings_data(self, earnings_names):
         finance_data = []
+        ticker = self.kwargs['ticker']
+        financial = Financial.objects.filter(stock__ticker=ticker)
         for name in earnings_names:
-            financial = self.object_list.first().stock.financial.all()
-            data = [float(field) for field in financial.values_list(name, flat=True) if field]
+            data = [float(field)/1e+6 for field in financial.values_list(name, flat=True) if field]
             finance_data.append({'name': name, 'data': data})
         return finance_data
 
     def get_balance_data(self, balance_names):
         balance_data = self.get_earnings_data(balance_names)
-        for field in balance_data:
-            if field['name'] == 'assets':
-                a_data = field['data']
-            else:
-                l_data = field['data']
-        equity = [assets-liabilities for (assets, liabilities) in zip(a_data, l_data)]
-        balance_data.append({'name': 'equity', 'data': equity})
         return balance_data
 
     def get_context_data(self, **kwargs):
@@ -155,11 +152,12 @@ class PriceChartMixin:
         return context
 
 
-class StockDetailView(ChartMixin, SideBarMixin, ListView):
+class StockView(FinancialChartMixin, SideBarMixin, ListView):
     template_name = 'stocks/detail.html'
     slug_field = 'ticker'
     slug_url_kwarg = 'ticker'
     paginate_by = 10
+    model = Stocks
 
     def get_queryset(self):
         ticker = self.kwargs['ticker']

@@ -187,16 +187,8 @@ class Financial(models.Model):
         return self.assets - self.liabilities
 
     @property
-    def operating_margin(self):
-        return self.operating_income/self.total_revenue
-
-    @property
     def net_margin(self):
         return self.net_income / self.total_revenue
-
-    @property
-    def roa(self):
-        return self.net_income/self.assets
 
     @property
     def roe(self):
