@@ -1,4 +1,5 @@
 import re
+from config.settings import IEX_API_KEY
 from abc import ABC, abstractmethod
 from json.decoder import JSONDecodeError
 import requests
@@ -25,7 +26,7 @@ class BaseIEX(ABC):
 
 class QuotesIEX(BaseIEX):
     def get_url(self, ticker):
-        return 'https://api.iextrading.com/1.0/stock/{}/book'.format(ticker)
+        return f'https://cloud.iexapis.com/stable/stock/{ticker}/book?token={IEX_API_KEY}'
 
     def get_data(self):
         data = super().get_data()
@@ -34,22 +35,22 @@ class QuotesIEX(BaseIEX):
 
 class CompanyIEX(BaseIEX):
     def get_url(self, ticker):
-        return 'https://api.iextrading.com/1.0/stock/{}/company'.format(ticker)
+        return f'https://cloud.iexapis.com/stable/stock/{ticker}/company?token={IEX_API_KEY}'
 
 
 class PastIEX(BaseIEX):
     def get_url(self, ticker, num=5):
-        return 'https://api.iextrading.com/1.0/stock/{}/chart/{}y'.format(ticker, num)
+        return f'https://cloud.iexapis.com/stable/stock/{ticker}/chart/{num}y?token={IEX_API_KEY}'
 
 
 class DividendsIEX(BaseIEX):
     def get_url(self, ticker, num=5):
-        return 'https://api.iextrading.com/1.0/stock/{}/dividends/{}y'.format(ticker, num)
+        return f'https://cloud.iexapis.com/stable/stock/{ticker}/dividends/{num}y?token={IEX_API_KEY}'
 
 
 class FinancialIEX(BaseIEX):
     def get_url(self, ticker):
-        return 'https://api.iextrading.com/1.0/stock/{}/financials'.format(ticker)
+        return f'https://cloud.iexapis.com/stable/stock/{ticker}/financials/4?token={IEX_API_KEY}'
 
     def get_data(self):
         data = super().get_data()

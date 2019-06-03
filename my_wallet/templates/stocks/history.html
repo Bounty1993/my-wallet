@@ -1,67 +1,114 @@
 {% extends "base.html" %}
+{% load staticfiles %}
 {% block content %}
 {% load render_table from django_tables2 %}
 <div class="container">
-      <ul class="breadcrumb">
-          <li class="breadcrumb-item">
-              <a href="{% url 'core:home' %}">
-                  Home
-              </a>
-          </li>
-          <li class="breadcrumb-item">
-              <a href="{% url 'stocks:list' %}">
-                  Stocks
-              </a>
-          </li>
-          <li class="breadcrumb-item active">
-                  History
-          </li>
-      </ul>
-    <div class="row">
-        <div class="col-md-4">
-            <div class="sticker">
-                {% include "stocks/side_stocks.html" %}
-            </div>
-        </div>
-        <div class="col-md-8">
-            <div class="row">
-                <div class="col-12">
-                    <div id="charLine" class="main-panel shadowing"></div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-12">
-                    <div class="banner d-flex justify-content-between">
-                        {% if filter %}
-                            <form action="" method="get" class="form form-inline">
-                                {{ filter.form.date_price}}
-                                <input type="submit" value="Szukaj" />
-                            </form>
-                        {% endif %}
-                        <div class="download_btn f-left">
-                            <a href="{% url 'stocks:download_csv' ticker=stock_ticker %}">
-                                <button class="btn btn-secondary">Plik csv</button>
-                            </a>
-                            <a href="{% url 'stocks:download_xml' ticker=stock_ticker %}">
-                                <button class="btn btn-secondary">Plik xml</button>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-12">
-                    <div class="table-container shadowing">
-                        {% render_table price_table %}
-                    </div>
-                </div>
-            </div>
-        </div>
+  <ul class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a href="{% url 'core:home' %}">
+        Home
+      </a>
+    </li>
+    <li class="breadcrumb-item">
+      <a href="{% url 'stocks:list' %}">
+        Stocks
+      </a>
+    </li>
+    <li class="breadcrumb-item active">
+      History
+    </li>
+  </ul>
+  <div class="row">
+    <div class="col-md-4">
+      <div class="sticker">
+        {% include "stocks/side_stocks.html" %}
+      </div>
     </div>
+    <div class="col-md-8">
+      <div class="row">
+        <div class="col-12">
+          <div id="charLine" class="main-panel shadowing"></div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-12">
+          <div class="banner d-flex justify-content-between">
+            <form action="" method="get">
+                <input type="text" name="q" placeholder="np. 02/05/2019" />
+                <input type="submit" value="Szukaj"/>
+            </form>
+            <div class="download_btn f-left">
+              <a href="{% url 'stocks:download_csv' ticker=stock_ticker %}">
+                <button class="btn btn-secondary">Plik csv</button>
+              </a>
+              <a href="{% url 'stocks:download_xml' ticker=stock_ticker %}">
+                <button class="btn btn-secondary">Plik xml</button>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-12">
+          <div class="main-panel shadowing">
+            <table class="table">
+              <thead class="thead-dark">
+                <tr>
+                  <th scope="col">Date</th>
+                  <th scope="col">Cena</th>
+                  <th scope="col">Otwarcie</th>
+                  <th scope="col">Zmiana</th>
+                  <th scope="col">Procent</th>
+                  <th scope="col">Wolumen</th>
+                </tr>
+              </thead>
+              <tbody>
+              {% for row in price_table %}
+                <tr>
+                  <td>{{ row.date_price }}</td>
+                  <td>{{ row.price }}</td>
+                  <td>{{ row.open }}</td>
+                  <td>{{ row.change }}</td>
+                  <td>{{ row.percent_change }}</td>
+                  <td>{{ row.volume }}</td>
+                </tr>
+              {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% if is_paginated %}
+            <ul class="pagination justify-content-center mt-3">
+            {% if page_obj.has_previous %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+              </li>
+            {% else %}
+              <li class="page-item disabled"><a class="page-link" href="#">
+                <span>Previous</span></a>
+              </li>
+            {% endif %}
+            <li class="page-item active"><a class="page-link" href="#">
+              {{ page_obj.number }} <span class="sr-only">(current)</span></a>
+            </li>
+            {% if page_obj.has_next %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+              </li>
+            {% else %}
+              <li class="page-item disabled">
+                <a class="page-link" href="#"><span>Next</span></a>
+              </li>
+            {% endif %}
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}
 {% block javascript %}
 {{ price_data|json_script:"price_data"}}
+<script src="{% static 'js/stocks_history.js' %}"></script>
 <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
 <script src="https://code.highcharts.com/stock/highstock.js"></script>
 <script src="https://code.highcharts.com/stock/modules/exporting.js"></script>

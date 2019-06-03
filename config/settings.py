@@ -196,12 +196,11 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 
 CELERY_BEAT_SCHEDULE = {
-    """
     'hello': {
         'task': 'my_wallet.portfolio.tasks.price_update',
-        'schedule': crontab(minute='*/15')  # execute every minute
+        'schedule': crontab(minute='*/30')  # execute every minute
     },
-    """
+
     'update_stock_price': {
         'task': 'my_wallet.stocks.tasks.update_stock_price',
         'schedule': crontab(minute='05', hour='19')
@@ -215,6 +214,9 @@ EMAIL_HOST_USER = config('EMAIL_USER')
 EMAIL_HOST_PASSWORD = config('EMAIL_PASSWORD')
 EMAIL_PORT = 587
 
+IEX_API_KEY = config('IEX_API_KEY')
+
+"""
 # DEBUG settings
 if DEBUG:
     INTERNAL_IPS = ('127.0.0.1', 'localhost',)
@@ -245,3 +247,4 @@ if DEBUG:
         # DELETE THAT
         "SHOW_TOOLBAR_CALLBACK": lambda request: True,
     }
+"""

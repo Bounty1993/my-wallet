@@ -1,35 +1,34 @@
 {% extends "base.html" %}
+{% load staticfiles %}
 {% block content %}
 {% load render_table from django_tables2 %}
-<div class="container">
-  <div>
-      <ul class="breadcrumb">
-          <li class="breadcrumb-item">
-              <a href="{% url 'core:home' %}">
-                  Home
-              </a>
-          </li>
-          <li class="breadcrumb-item">
-              <a href="{% url 'stocks:list' %}">
-                  Stocks
-              </a>
-          </li>
-          <li class="breadcrumb-item active">
-                  Details
-          </li>
-      </ul>
+<nav>
+  <ul class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a href="{% url 'core:home' %}">
+        Home
+      </a>
+    </li>
+    <li class="breadcrumb-item">
+      <a href="{% url 'stocks:list' %}">
+        Akcje
+      </a>
+    </li>
+      <li class="breadcrumb-item active">
+        Szczegóły
+      </li>
+  </ul>
+</nav>
+<div class="row">
+  <div class="col-md-4">
+    <div class="sticker">
+      {% include "stocks/side_stocks.html" %}
+    </div>
   </div>
-  <div class="row">
-        <div class="col-md-4">
-            <div class="sticker">
-                {% include "stocks/side_stocks.html" %}
-            </div>
-
-        </div>
-
-    <div class="col-md-8">
+  <div class="col-md-8">
+    <main>
       <div class="main-panel shadowing">
-        {% with stocks.detail as detail %}
+        {% with stock.detail as detail %}
         <div class="row">
           <div class="col-md-6">
               <p class="data-title">Wskaźniki finansowe:</p>
@@ -51,7 +50,7 @@
           <p><span class="data-title">Sektor:</span> {{detail.sector}}</p>
         </div>
         <p>{{detail.description}}</p>
-        <a href="{{detail.website}}" target="_blank">Check out the {{stocks.name}} website to get more</a>
+        <a href="{{detail.website}}" target="_blank">Check out the {{stock.name}} website to get more</a>
 
         {% endwith %}
       </div>
@@ -62,9 +61,52 @@
       </div>
       <div class="row">
         <div class="col-12">
-            <div class="table-container shadowing">
-                {% render_table table %}
-            </div>
+          <div class="main-panel shadowing">
+            <table class="table">
+              <thead class="thead-dark">
+                <tr>
+                  <th scope="col">Data</th>
+                  <th scope="col">Wielkość</th>
+                  <th scope="col">Dzień ust. praw</th>
+                  <th scope="col">Wpłata</th>
+                </tr>
+              </thead>
+              <tbody>
+              {% for row in object_list %}
+                <tr>
+                  <td>{{ row.stocks }}</td>
+                  <td>{{ row.amount }}</td>
+                  <td>{{ row.record }}</td>
+                  <td>{{ row.payment }}</td>
+                </tr>
+              {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% if is_paginated %}
+            <ul class="pagination justify-content-center mt-3">
+            {% if page_obj.has_previous %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+              </li>
+            {% else %}
+              <li class="page-item disabled"><a class="page-link" href="#">
+                <span>Previous</span></a>
+              </li>
+            {% endif %}
+            <li class="page-item active"><a class="page-link" href="#">
+              {{ page_obj.number }} <span class="sr-only">(current)</span></a>
+            </li>
+            {% if page_obj.has_next %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+              </li>
+            {% else %}
+              <li class="page-item disabled">
+                <a class="page-link" href="#"><span>Next</span></a>
+              </li>
+            {% endif %}
+          {% endif %}
         </div>
       </div>
       <div class="row">
@@ -72,13 +114,14 @@
             <div id="charStacked" class="main-panel shadowing"></div>
         </div>
       </div>
-    </div>
+    </main>
   </div>
 </div>
 {% endblock content %}
 {% block javascript %}
 {{ finance_data|json_script:"finance_data"}}
 {{ balance_data|json_script:"balance_data"}}
+<script src="{% static 'js/stocks_detail.js' %}"></script>
 <script src="https://code.highcharts.com/highcharts.js"></script>
 <script src="https://code.highcharts.com/modules/exporting.js"></script>
 <script src="https://code.highcharts.com/modules/export-data.js"></script>

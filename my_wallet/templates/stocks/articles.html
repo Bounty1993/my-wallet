@@ -1,90 +1,91 @@
 {% extends "base.html" %}
 {% load staticfiles%}
-{% load render_table from django_tables2 %}
 {% block content %}
-<div class="container">
-  <row>
-      <ul class="breadcrumb">
-          <li class="breadcrumb-item">
-              <a href="{% url 'core:home' %}">
-                  Home
-              </a>
-          </li>
-          <li class="breadcrumb-item">
-              <a href="{% url 'stocks:list' %}">
-                  Stocks
-              </a>
-          </li>
-          <li class="breadcrumb-item active">
-                  News
-          </li>
-      </ul>
-  </row>
-  <div class="row">
+<nav>
+  <ul class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a href="{% url 'core:home' %}">
+        Home
+      </a>
+    </li>
+    <li class="breadcrumb-item">
+      <a href="{% url 'stocks:list' %}">
+        Akcje
+      </a>
+    </li>
+    <li class="breadcrumb-item active">
+      Informacje
+    </li>
+  </ul>
+</nav>
+<div class="row">
     <div class="col-sm-4">
       <div class="sticker">
         {% include "stocks/side_stocks.html" %}
       </div>
     </div>
     <div class="col-sm-8">
-        <div class="articles shadowing">
+      <main>
+      <div class="articles shadowing">
         <ul class="nav nav-pills nav-justified mb-3" id="pills-tab" role="tablist">
           <li class="nav-item">
-            <a class="nav-link active" id="pills-google-tab" data-toggle="pill" href="#pills-google" role="tab" aria-controls="pills-google" aria-selected="true">Google</a>
+            <a class="nav-link active" id="pills-google-tab" data-toggle="pill" href="#pills-google" role="tab" aria-controls="pills-google" aria-selected="true">
+              Google
+            </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" id="pills-yahoo-tab" data-toggle="pill" href="#pills-yahoo" role="tab" aria-controls="pills-yahoo" aria-selected="false">Yahoo</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" id="pills-contact-tab" data-toggle="pill" href="#pills-contact" role="tab" aria-controls="pills-contact" aria-selected="false">Bloomberg</a>
+            <a class="nav-link" id="pills-yahoo-tab" data-toggle="pill" href="#pills-yahoo" role="tab" aria-controls="pills-yahoo" aria-selected="false">
+              Yahoo
+            </a>
           </li>
         </ul>
         <div class="tab-content" id="pills-tabContent">
           <div class="tab-pane fade show active" id="pills-google" role="tabpanel" aria-labelledby="pills-google-tab">
-
-              <form class="form-input">
-                  <input type="text" class="form-control" placeholder="Search" name="srch-term" id="searchArticle">
-                  <div class="input-group-btn">
-                      <button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i>
-                      </button>
-                  </div>
-              </form>
-              <ul class="list-group" id="myArticles">
-                  {% for key, article in google_news.items %}
-                  <li class="list-group-item">
-                      <h5 class="title">{{article.title}}</h5>
-                      <p class="text-muted"><span class="glyphicon glyphicon-calendar"></span> July 23, 2014 @ 1:30 PM</p>
-                      <p>{{article.summary}}</p>
-                      <p class="text-muted">Presented by
-                        <a class="btn btn-primary" href="{{article.link}}" target="_blank">
+            <form class="form-input mb-3">
+              <input type="text" class="form-control" placeholder="Search" name="srch-term" id="googleSearch">
+            </form>
+            <ul class="list-group" id="googleArticles">
+              {% for key, article in google_news.items %}
+                <li class="list-group-item">
+                  <article>
+                    <h5 class="title">{{article.title}}</h5>
+                    <p class="text-muted"><span class="glyphicon glyphicon-calendar"></span> July 23, 2014 @ 1:30 PM</p>
+                    <p>{{article.summary}}</p>
+                    <p class="text-muted">Presented by
+                      <a class="btn btn-primary" href="{{article.link}}" target="_blank">
                         Google
-                        </a>
-                      </p>
-                  </li>
-                  {% endfor %}
-              </ul>
+                      </a>
+                    </p>
+                  </article>
+                </li>
+              {% endfor %}
+            </ul>
           </div>
           <div class="tab-pane fade" id="pills-yahoo" role="tabpanel" aria-labelledby="pills-yahoo-tab">
-              <ul class="list-group">
-                  {% for key, article in yahoo_news.items %}
-                  <li class="list-group-item">
-                      <h5 class="title">{{article.title}}</h5>
-                      <p class="text-muted"><span class="glyphicon glyphicon-calendar"></span> July 23, 2014 @ 1:30 PM</p>
-                      <p>{{article.summary}}</p>
-                      <p class="text-muted">Presented by
-                        <a class="btn btn-primary" href="{{article.link}}" target="_blank">
+            <form class="form-input mb-3">
+              <input type="text" class="form-control" placeholder="Search" name="srch-term" id="yahooSearch">
+            </form>
+            <ul class="list-group" id="yahooArticles">
+              {% for key, article in yahoo_news.items %}
+                <li class="list-group-item">
+                  <article>
+                    <h5 class="title">{{article.title}}</h5>
+                    <p class="text-muted"><span class="glyphicon glyphicon-calendar"></span> July 23, 2014 @ 1:30 PM</p>
+                    <p>{{article.summary}}</p>
+                    <p class="text-muted">Presented by
+                      <a class="btn btn-primary" href="{{article.link}}" target="_blank">
                         Yahoo
-                        </a>
-                      </p>
-                  </li>
-                  {% endfor %}
-              </ul>
+                      </a>
+                    </p>
+                  </article>
+                </li>
+              {% endfor %}
+            </ul>
           </div>
-          <div class="tab-pane fade" id="pills-contact" role="tabpanel" aria-labelledby="pills-contact-tab">...</div>
         </div>
         </div>
+       </main>
     </div>
-  </div>
 </div>
 {% endblock %}
 {% block javascript %}

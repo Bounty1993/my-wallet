@@ -1,19 +1,20 @@
 import csv
 import datetime
 
+from django.shortcuts import get_object_or_404
+
 from django.core.cache import cache
 from django.db.models import Q
 from django.http import HttpResponse
 from django.utils import timezone
 from django.views import View
 from django.views.generic import CreateView, DetailView, ListView, TemplateView
-from django.shortcuts import get_object_or_404
 
 from django_tables2 import RequestConfig
 from openpyxl import Workbook
 
 from .crawler import GoogleCrawler, YahooCrawler
-from .models import Dividends, Prices, PricesFilter, Stocks
+from .models import Dividends, Prices, Stocks
 from .tables import (
     DividendTable, PricesTable,
 )
@@ -54,15 +55,17 @@ class ExcelPrices(View):
         return response
 
 
-class CurrentPriceMixin:
-    def sidebar_stock_id(self):
-        # In sub classes define method and give Stocks id
-        pass
-
+class SideBarMixin:
+    """
+    Class is responsible for adding data to sidebar. Subclass needs
+    to have self.kwargs['ticker']. Cache is used to get prices.
+    """
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         attributes = ['_price', '_day_change', '_percent_change']
-        stock = Stocks.objects.get(id=self.sidebar_stock_id())
+        ticker = self.kwargs.get('ticker')
+        sidebar_stock_id = Stocks.objects.get(ticker=ticker).id
+        stock = Stocks.objects.get(id=sidebar_stock_id)
         ticker = stock.ticker
         for attribute in attributes:
             result = cache.get(ticker + attribute, 'no data')
@@ -101,8 +104,6 @@ class StocksListView(ListView):
 
 
 class ChartMixin:
-
-    object = None
     earnings_names = [
         'total_revenue', 'gross_profit',
         'operating_income', 'net_income',
@@ -112,7 +113,7 @@ class ChartMixin:
     def get_earnings_data(self, earnings_names):
         finance_data = []
         for name in earnings_names:
-            financial = self.object.financial.all()
+            financial = self.object_list.first().stock.financial.all()
             data = [float(field) for field in financial.values_list(name, flat=True) if field]
             finance_data.append({'name': name, 'data': data})
         return finance_data
@@ -145,38 +146,38 @@ class PriceChartMixin:
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        stock_name = self.object[0].stock.name
-        instance = self.get_instance()
+        queryset = self.object_list
+        stock_name = queryset.first().stock.name
+        instance = queryset.order_by('date_price')
         prices = [(self.get_num_seconds(field.date_price), float(field.price)) for field in instance]
         price_data = {'name': stock_name, 'prices': prices}
         context['price_data'] = price_data
         return context
 
 
-class StockDetailView(ChartMixin, CurrentPriceMixin, DetailView):
+class StockDetailView(ChartMixin, SideBarMixin, ListView):
     template_name = 'stocks/detail.html'
-    model = Stocks
     slug_field = 'ticker'
     slug_url_kwarg = 'ticker'
+    paginate_by = 10
 
-    def sidebar_stock_id(self):
-        return self.object.id
+    def get_queryset(self):
+        ticker = self.kwargs['ticker']
+        stock = get_object_or_404(Stocks, ticker=ticker)
+        queryset = Dividends.objects.filter(stock=stock)
+        return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        table = DividendTable(self.object.dividends.all())
-        RequestConfig(self.request, paginate={'per_page': 8}).configure(table)
-        context['table'] = table
-        context['last_dividend'] = Dividends.objects.filter(stock=self.object).latest('payment')
+        ticker = self.kwargs.get('ticker')
+        stock = Stocks.objects.get(ticker=ticker)
+        context['stock'] = stock
+        context['last_dividend'] = self.object_list.latest('payment')
         return context
 
 
-class ArticlesView(CurrentPriceMixin, TemplateView):
+class ArticlesView(SideBarMixin, TemplateView):
     template_name = 'stocks/articles.html'
-
-    def sidebar_stock_id(self):
-        ticker = self.kwargs.get('ticker')
-        return Stocks.objects.get(ticker=ticker).id
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -186,33 +187,26 @@ class ArticlesView(CurrentPriceMixin, TemplateView):
         return context
 
 
-class HistoryView(CurrentPriceMixin, PriceChartMixin, DetailView):
+class HistoryView(SideBarMixin, PriceChartMixin, ListView):
     template_name = 'stocks/history.html'
     slug_field = 'ticker'
-    model = Prices
-
-
-    def sidebar_stock_id(self):
-        return self.object.first().stock.id
-
-    def get_instance(self):
-        return Prices.objects.filter(stock__ticker=self.kwargs['ticker']).order_by('date_price')
-
-    def get_object(self):
-        ticker = self.kwargs.get('ticker', '')
-        obj = Prices.objects.filter(stock__ticker=ticker)
-        return obj
-
-    def price_table(self, context):
-        f = PricesFilter(self.request.GET, queryset=self.object)
-        context['filter'] = f
-        price_table = PricesTable(f.qs)
-        RequestConfig(self.request, paginate={'per_page': 20}).configure(price_table)
-        context['price_table'] = price_table
-        return price_table
+    context_object_name = 'price_table'
+    paginate_by = 10
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        self.price_table(context)
         context['stock_ticker'] = self.kwargs.get('ticker')
         return context
+
+    def get_queryset(self):
+        ticker = self.kwargs['ticker']
+        queryset = Prices.objects.filter(stock__ticker=ticker)
+        """
+        q = self.request.GET.get('q', None)
+        if q:
+            date_price = datetime.datetime.strptime(q, '%y/%M/%Y')
+            print(date_price)
+            queryset = queryset.filter(date_price=date_price)
+            return queryset
+        """
+        return queryset

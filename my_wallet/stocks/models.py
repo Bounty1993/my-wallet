@@ -6,10 +6,7 @@ from django.db import models
 from django.db.models import Count, Max, Min, Q, Sum
 from django.utils import timezone
 
-import django_filters
-import requests
-
-from .crawler import CompanyIEX, DividendsIEX, FinancialIEX, PastIEX, QuotesIEX
+from .crawler import QuotesIEX
 
 
 def find_quote_day(date, num_days=0, type='earlier'):
@@ -123,7 +120,7 @@ class Stocks(models.Model):
         Dividends model is used. Reversed sorted dict is returned
         :return: format {'ticker': ..., 'sum_dividends': data in percent}
         """
-        year_ago = datetime.date.today() - datetime.timedelta(days=365 * 2)
+        year_ago = datetime.date.today() - datetime.timedelta(days=365)
         last_year = Sum('dividends__amount', filter=Q(dividends__payment__gte=year_ago))
         data = cls.objects.values('ticker').annotate(sum_dividends=last_year)
         for line in data:
@@ -144,10 +141,10 @@ class Stocks(models.Model):
 
 class StockDetail(models.Model):
     stock = models.OneToOneField(Stocks, on_delete=models.CASCADE, related_name='detail')
-    sector = models.CharField(max_length=50)
-    industry = models.CharField(max_length=50)
+    sector = models.CharField(max_length=200)
+    industry = models.CharField(max_length=200)
     website = models.URLField(null=True, blank=True)
-    description = models.CharField(max_length=500)
+    description = models.CharField(max_length=5000)
 
     class Meta:
         verbose_name = 'stock details'
@@ -251,9 +248,3 @@ class Prices(models.Model):
     class Meta:
         get_latest_by = 'date_price'
         ordering = ('-date_price',)
-
-
-class PricesFilter(django_filters.FilterSet):
-    class Meta:
-        model = Prices
-        fields = ('date_price', )
