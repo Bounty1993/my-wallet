@@ -1,147 +1,154 @@
 {% extends "base.html" %}
 {% load humanize %}
-{% load render_table from django_tables2 %}
+{% load staticfiles %}
 {% load custom_tags %}
+{% block stylesheet %}
+  <link rel="stylesheet" href="{% static 'css/stocks_list.css' %}">
+{% endblock %}
 {% block content %}
-<div class="container">
-    <div class="my_jumbo shadowing">
-        <div>Poniżej znajdziesz informację o instrumentach notowanych na amerykańskiej giełdzie</div>
-        <div>Wszystkie dane finansowe pobierane są z platformy IEX Group.</div>
-        <div>Dane pochodzą z dnia {{today}}</div>
-    </div>
-    <div class="row">
-    <div class="col-md-4">
-        <div class="table-container mb-3">
-            <ul class="nav nav-pills mb-2" role="tablist">
-                <li class="nav-item my_pill">
-                    <a class="nav-link active" data-toggle="pill" href="#growing">Rosnące</a>
-                </li>
-                <li class="nav-item my_pill">
-                    <a class="nav-link" data-toggle="pill" href="#falling">Spadające</a>
-                </li>
-            </ul>
-            <div class="tab-content">
-                <div class="tab-pane container active" id="growing">
-                    <ul class="list-group list-group-flush">
-                      {% for stock in rising %}
-                        <li class="list-group-item">
-                          {{stock.0}} - {{stock.1 | color_percent:3}}
-                        </li>
-                      {% endfor %}
-                    </ul>
-                </div>
-                <div class="tab-pane container fade" id="falling">
-                    <ul class="list-group list-group-flush">
-                      {% for stock in falling %}
-                        <li class="list-group-item">
-                          {{stock.0}} - {{stock.1 | color_percent:3}}
-                        </li>
-                      {% endfor %}
-                    </ul>
-                </div>
-            </div>
+<div class="my_jumbo shadowing">
+  <div>Poniżej znajdziesz informację o instrumentach notowanych na amerykańskiej giełdzie</div>
+  <div>Wszystkie dane finansowe pobierane są z platformy IEX Group.</div>
+  <div>Dane pochodzą z dnia {{today}}</div>
+</div>
+<div class="row">
+  <div class="col-md-4">
+    <div class="table-container mb-3">
+      <ul class="nav nav-pills mb-2" role="tablist">
+        <li class="nav-item my_pill">
+          <a class="nav-link active" data-toggle="pill" href="#growing">Rosnące</a>
+        </li>
+        <li class="nav-item my_pill">
+          <a class="nav-link" data-toggle="pill" href="#falling">Spadające</a>
+        </li>
+      </ul>
+      <div class="tab-content">
+        <div class="tab-pane container active" id="growing">
+          <ul class="list-group list-group-flush">
+            {% for stock in rising %}
+              <li class="list-group-item d-flex justify-content-between">
+                <span>{{stock.0}}</span><span>{{stock.1 | color_percent:3}}</span>
+              </li>
+            {% endfor %}
+          </ul>
         </div>
-        <div class="table-container">
-            <p class="table_title">Najwyższe dywidendy</p>
-
-            <ul class="list-group list-group-flush">
-              {% for stock in dividend_stocks %}
-                <li class="list-group-item">{{stock.ticker}} - {{stock.sum_dividends}}</li>
-              {% endfor %}
-            </ul>
+        <div class="tab-pane container fade" id="falling">
+          <ul class="list-group list-group-flush">
+            {% for stock in falling %}
+              <li class="list-group-item d-flex justify-content-between">
+                <span>{{stock.0}}</span><span>{{stock.1 | color_percent:3}}</span>
+              </li>
+            {% endfor %}
+          </ul>
         </div>
+      </div>
     </div>
-    <div class="col-md-8">
-        <div class="banner shadowing">
+    <div class="table-container">
+      <p class="table_title">Najwyższe dywidendy</p>
+      <ul class="list-group list-group-flush">
+        {% for stock in dividend_stocks %}
+          <li class="list-group-item d-flex justify-content-between">
+            <span>{{stock.ticker}}</span><span>{{stock.sum_dividends}}</span>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  <div class="col-md-8">
+    <div class="banner shadowing">
             <form action="" method="get">
                 <input type="text" name="q" placeholder="Nazwa spółki" />
                 <input type="submit" value="Szukaj"/>
             </form>
         </div>
-        <div id="accordion">
-            {% for stock in stocks %}
-            {% with current=stock.current.latest%}
-            <div class="shadowing card" id="myStocks">
-                <div class="card-header">
-                    <a class="card-link" data-toggle="collapse" href="#collapse{{forloop.counter}}">
-                    <span class="fa-stack fa-sm">
-                        <i class="fas fa-circle fa-stack-2x"></i>
-                        <i class="fas fa-plus fa-stack-1x fa-inverse"></i>
-                    </span>
-                    <span class="stock-name">{{ stock }}</span>
-                    </a>
-                    <div class="price-list">
-                        <p class="stock-price">{{stock.current_price}} USD</p>
-                        <a class="iex-cite" href="https://iextrading.com/developer/">
-                        <small>IEX Real-Time Price</small>
-                        </a>
-                    </div>
+    <div id="accordion">
+      {% for stock in stocks %}
+      {% with current=stock.current.latest%}
+      <div class="shadowing card" id="myStocks">
+        <div class="card-header">
+          <a class="card-link" data-toggle="collapse" href="#collapse{{forloop.counter}}">
+            <span class="fa-stack fa-sm">
+              <i class="fas fa-circle fa-stack-2x"></i>
+              <i class="fas fa-plus fa-stack-1x fa-inverse"></i>
+            </span>
+            <span class="stock-name">{{ stock }}</span>
+          </a>
+          <div class="price-list">
+            <p class="stock-price">{{stock.current_price}} USD</p>
+            <a class="iex-cite" href="https://iextrading.com/developer/">
+              <small>IEX Real-Time Price</small>
+            </a>
+          </div>
+        </div>
+        <div id="collapse{{forloop.counter}}" class="collapse" data-parent="#accordion">
+          <div class="card-body">
+            <div class="d-flex justify-content-between">
+              <div>
+                <div>Zmiana dzienna</div>
+                <div>{{ stock.day_change|color_field }}\{{stock.percent_change|color_percent:3}}</div>
+              </div>
+              <div>
+                <div>Zmiana dzienna</div>
+                <div>
+                  min: <span style="color: red">{{ stock.day_low }} USD</span> \
+                  Max: <span style="color: green">{{stock.day_high}} USD</span>
                 </div>
-              <div id="collapse{{forloop.counter}}" class="collapse" data-parent="#accordion">
-                <div class="card-body">
-                  <div class="d-flex justify-content-between">
-                    <div>
-                         <div>Zmiana dzienna</div>
-                         <div>{{ stock.day_change|color_field }}\{{stock.percent_change|color_percent:3}}</div>
-                    </div>
-                    <div>
-                        <div>Zmiana dzienna</div>
-                        <div>
-                          min: <span style="color: red">{{ stock.day_low }} USD</span> \
-                          Max: <span style="color: green">{{stock.day_high}} USD</span>
-                        </div>
-                    </div>
-                    <div>
-                        <p>Dane są opóźnione do 5 minut</p>
-                    </div>
-                  </div>
-                  <div class="d-flex justify-content-between mt-3">
-                     <div>
-                         <div>Zmiana roczna:</div>
-                         <div>{{ stock.year_change | color_field }} \ In %: {{ stock.perc_year_change | color_percent:3}} </div>
-                     </div>
-                     <div>
-                          <a class="my_custom_Btn" href="{% url 'stocks:detail' stock.ticker %}">
-                              Szczegóły
-                          </a>
-                           <a class="my_custom_Btn" href="{% url 'stocks:articles' ticker=stock.ticker %}">
-                              Informacje
-                          </a>
-                           <a class="my_custom_Btn" href="{% url 'stocks:history' ticker=stock.ticker %}">
-                              Dane historyczne
-                          </a>
-                     </div>
-                  </div>
-                 </div>
+              </div>
+              <div>
+                <p>Dane są opóźnione do 5 minut</p>
               </div>
             </div>
-            {% endwith %}
-            {% endfor %}
-
+            <div class="d-flex justify-content-between mt-3">
+              <div>
+                <div>Zmiana roczna:</div>
+                <div>{{ stock.year_change | color_field }} \ In %: {{ stock.perc_year_change | color_percent:3}} </div>
+              </div>
+              <div>
+                <a href="{% url 'stocks:detail' stock.ticker %}">
+                  <button class="baseBtn">
+                    Szczegóły
+                  </button>
+                </a>
+                <a href="{% url 'stocks:articles' ticker=stock.ticker %}">
+                  <button class="baseBtn">
+                    Informacje
+                  </button>
+                </a>
+                <a href="{% url 'stocks:history' ticker=stock.ticker %}">
+                  <button class="baseBtn">
+                    Dane historyczne
+                  </button>
+                </a>
+              </div>
+            </div>
           </div>
-         {% if is_paginated %}
-            <ul class="pagination justify-content-center mt-3">
-              {% if page_obj.has_previous %}
-              <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
-              {% else %}
-              <li class="page-item disabled"><a class="page-link" href="#"><span>Previous</span></a></li>
-              {% endif %}
-              {% for i in paginator.page_range %}
-              {% if page_obj.number == i %}
-              <li class="page-item active"><a class="page-link" href="#">{{ i }} <span class="sr-only">(current)</span></a></li>
-              {% else %}
-              <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
-              {% endif %}
-              {% endfor %}
-              {% if page_obj.has_next %}
-              <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
-              {% else %}
-              <li class="page-item disabled"><a class="page-link" href="#"><span>Next</span></a></li>
-              {% endif %}
-            </ul>
-         {% endif %}
+        </div>
+      </div>
+      {% endwith %}
+      {% endfor %}
     </div>
-   </div>
+    {% if is_paginated %}
+      <ul class="pagination justify-content-center mt-3">
+        {% if page_obj.has_previous %}
+          <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
+        {% else %}
+          <li class="page-item disabled"><a class="page-link" href="#"><span>Previous</span></a></li>
+        {% endif %}
+        {% for i in paginator.page_range %}
+          {% if page_obj.number == i %}
+            <li class="page-item active"><a class="page-link" href="#">{{ i }} <span class="sr-only">(current)</span></a></li>
+          {% else %}
+            <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+          {% endif %}
+        {% endfor %}
+        {% if page_obj.has_next %}
+          <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+        {% else %}
+          <li class="page-item disabled"><a class="page-link" href="#"><span>Next</span></a></li>
+        {% endif %}
+      </ul>
+    {% endif %}
+  </div>
 </div>
 {% endblock %}
 

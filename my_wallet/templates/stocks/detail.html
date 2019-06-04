@@ -40,8 +40,8 @@
           <div class="col-md-6">
               <p class="data-title">Dividend amount:</p>
               <div class="dividend-data">
-                    <div class="valid-data">{{last_dividend.amount}}<span class="usd-sign">USD</span></div>
-                    <div>{{last_dividend.get_rate}} %</div>
+                    <div class="valid-data">{{dividend_amount}} <span class="usd-sign">USD</span></div>
+                    <div>{{dividend_rate}} %</div>
               </div>
           </div>
         </div>
@@ -65,20 +65,24 @@
             <table class="table">
               <thead class="thead-dark">
                 <tr>
-                  <th scope="col">Data</th>
-                  <th scope="col">Wielkość</th>
+                  <th scope="col">Kwartał</th>
                   <th scope="col">Dzień ust. praw</th>
-                  <th scope="col">Wpłata</th>
+                  <th scope="col">Wypłata</th>
+                  <th scope="col">Wielkość</th>
                 </tr>
               </thead>
               <tbody>
               {% for row in object_list %}
                 <tr>
-                  <td>{{ row.stocks }}</td>
-                  <td>{{ row.amount }}</td>
+                  <td>{{ row.quarter }}</td>
                   <td>{{ row.record }}</td>
                   <td>{{ row.payment }}</td>
+                  <td>{{ row.amount }}</td>
                 </tr>
+              {% empty %}
+              </tbody>
+            </table>
+                <div class="text-align-center">Prawdopodobnie społka je nie wypłaca dywidend<div>
               {% endfor %}
               </tbody>
             </table>

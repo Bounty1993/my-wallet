@@ -1,4 +1,5 @@
 import datetime
+import math
 from decimal import ROUND_HALF_UP, Decimal
 
 from django.core.cache import cache
@@ -9,8 +10,8 @@ from django.utils import timezone
 from .crawler import QuotesIEX
 
 
-def find_quote_day(date, num_days=0, type='earlier'):
-    quote_day = date - timezone.timedelta(days=num_days)
+def find_quote_day(date, days_ago=0, type='earlier'):
+    quote_day = date - timezone.timedelta(days=days_ago)
 
     if type == 'earlier':
         if quote_day.weekday() == 6:
@@ -26,9 +27,37 @@ def find_quote_day(date, num_days=0, type='earlier'):
         return quote_day
 
 
+class StockManager(models.Manager):
+    def highest_dividends(self):
+        """
+        classmethod responsible for collect data about dividends rate.
+        Dividends model is used. Reversed sorted dict is returned
+        :return: format {'ticker': ..., 'sum_dividends': data in percent}
+        """
+        year_ago = datetime.date.today() - datetime.timedelta(days=365)
+        last_year = Sum('dividends__amount', filter=Q(dividends__payment__gte=year_ago))
+        data = self.values('ticker').annotate(sum_dividends=last_year)
+        for line in data:
+            dividend = line['sum_dividends']
+            dividend = dividend if dividend else 0
+            price = cache.get(line['ticker'] + '_price')
+            if price:
+                price = Decimal(price)
+            percents = Decimal('0.0001')
+            dividend = dividend/price if price else None
+            if dividend:
+                line['sum_dividends'] = Decimal(dividend * 100).quantize(percents, ROUND_HALF_UP)
+            else:
+                line['sum_dividends'] = 0
+        data = sorted(data, key=lambda line: line['sum_dividends'], reverse=True)
+        return data
+
+
 class Stocks(models.Model):
     name = models.CharField(max_length=50)
     ticker = models.CharField(max_length=10)
+
+    objects = StockManager()
 
     class Meta:
 
@@ -67,18 +96,16 @@ class Stocks(models.Model):
     def perc_year_change(self):
         return self.get_change(num_days=365)['percent']
 
-    @property
     def dividend_amount(self):
-        year_ago = datetime.date.today() - datetime.timedelta(days=365 * 2)
+        year_ago = datetime.date.today() - datetime.timedelta(days=365)
         four_quarters = self.dividends.filter(payment__gte=year_ago)
         data = four_quarters.aggregate(amount=Sum('amount'))
-        return data['amount']
+        return data['amount'] or 'Brak'
 
-    @property
     def dividend_rate(self):
         price = cache.get(self.ticker + '_price')
         if not price:
-            return 'No data'
+            return 'Brak'
         price = Decimal(price)
         return self.dividend_amount/price
 
@@ -99,6 +126,20 @@ class Stocks(models.Model):
                 break
         return past_price
 
+    def dividends_summarize(self):
+        past_dividends = []
+        if not self.dividends.exists():
+            return []  # None will cause error in pagination
+        for dividend in self.dividends.all().order_by('-payment'):
+            one_quarter = {
+                'payment': dividend.payment,
+                'record': dividend.record,
+                'amount': dividend.amount,
+                'quarter': dividend.which_quarter()
+             }
+            past_dividends.append(one_quarter)
+        return past_dividends
+
     def get_change(self, num_days):
         today = timezone.now().date()
         past_date = today - datetime.timedelta(days=num_days)
@@ -112,31 +153,6 @@ class Stocks(models.Model):
         percent = ((current_price/past_price)-1) * 100
 
         return {'currency': currency, 'percent': percent}
-
-    @classmethod
-    def highest_dividends(cls):
-        """
-        classmethod responsible for collect data about dividends rate.
-        Dividends model is used. Reversed sorted dict is returned
-        :return: format {'ticker': ..., 'sum_dividends': data in percent}
-        """
-        year_ago = datetime.date.today() - datetime.timedelta(days=365)
-        last_year = Sum('dividends__amount', filter=Q(dividends__payment__gte=year_ago))
-        data = cls.objects.values('ticker').annotate(sum_dividends=last_year)
-        for line in data:
-            dividend = line['sum_dividends']
-            dividend = dividend if dividend else 0
-            price = cache.get(line['ticker'] + '_price')
-            if price:
-                price = Decimal(price)
-            percents = Decimal('0.0001')
-            dividend = dividend/price if price else None
-            if dividend:
-                line['sum_dividends'] = Decimal(dividend * 100).quantize(percents, ROUND_HALF_UP)
-            else:
-                line['sum_dividends'] = 0
-        data = sorted(data, key=lambda line: line['sum_dividends'], reverse=True)
-        return data
 
 
 class StockDetail(models.Model):
@@ -165,6 +181,10 @@ class Dividends(models.Model):
             price = price[0].price
             return Decimal(self.amount/price * 100).quantize(percents, ROUND_HALF_UP)
         return 'No data'
+
+    def which_quarter(self):
+        present_quarter = math.ceil(self.record.month / 3)
+        return f'{present_quarter}Q {self.record.year}'
 
     def __str__(self):
         return f'{self.stock} - {self.payment}'
@@ -202,8 +222,8 @@ class Financial(models.Model):
 class PriceManager(models.Manager):
     def year_change(self):
         today = datetime.datetime.now().date()
-        present_date = find_quote_day(today, num_days=50)
-        past_date = find_quote_day(today, num_days=365)
+        present_date = find_quote_day(today, days_ago=50)
+        past_date = find_quote_day(today, days_ago=365)
         data = (
             self.values_list('stock__ticker', 'date_price', 'price')
                 .filter(date_price__in=[present_date, past_date])

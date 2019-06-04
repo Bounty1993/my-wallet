@@ -72,6 +72,8 @@
                   <td>{{ row.percent_change }}</td>
                   <td>{{ row.volume }}</td>
                 </tr>
+              {% empty %}
+                <div>Brak danych dotyczących przeszłych cen</div>
               {% endfor %}
               </tbody>
             </table>

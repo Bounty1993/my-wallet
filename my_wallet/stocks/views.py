@@ -92,7 +92,7 @@ class StocksListView(ListView):
         context = super().get_context_data(**kwargs)
         today = timezone.now().date()
         context['today'] = find_quote_day(today, 0, type='earlier')
-        best_stocks = Stocks.highest_dividends()[:5]
+        best_stocks = Stocks.objects.highest_dividends()[:5]
         context['dividend_stocks'] = best_stocks
         # sorted_stocks = sorted(Stocks.objects.all(), key=lambda stock: stock.perc_year_change)
         sorted_stocks = Prices.objects.year_change()
@@ -162,7 +162,7 @@ class StockView(FinancialChartMixin, SideBarMixin, ListView):
     def get_queryset(self):
         ticker = self.kwargs['ticker']
         stock = get_object_or_404(Stocks, ticker=ticker)
-        queryset = Dividends.objects.filter(stock=stock)
+        queryset = stock.dividends_summarize()
         return queryset
 
     def get_context_data(self, **kwargs):
@@ -170,7 +170,8 @@ class StockView(FinancialChartMixin, SideBarMixin, ListView):
         ticker = self.kwargs.get('ticker')
         stock = Stocks.objects.get(ticker=ticker)
         context['stock'] = stock
-        context['last_dividend'] = self.object_list.latest('payment')
+        context['dividend_amount'] = stock.dividend_amount()
+        context['dividend_rate'] = stock.dividend_rate()
         return context
 
 
