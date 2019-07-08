@@ -96,16 +96,16 @@ class StocksViewMixinsTest(TestCase):
         self.assertTrue('balance_data' in context)
 
         finance_data_expected = [
-            {'name': 'total_revenue', 'data': [1_000_000, ]},
-            {'name': 'gross_profit', 'data': [100_000, ]},
-            {'name': 'operating_income', 'data': [80_000, ]},
-            {'name': 'net_income', 'data': [50_000, ]},
+            {'name': 'total_revenue', 'data': [1, ]},
+            {'name': 'gross_profit', 'data': [0.1, ]},
+            {'name': 'operating_income', 'data': [0.08, ]},
+            {'name': 'net_income', 'data': [0.05, ]},
         ]
         self.assertListEqual(context['finance_data'], finance_data_expected)
 
         balance_data_expected = [
-            {'name': 'assets', 'data': [1_000_000, ]},
-            {'name': 'liabilities', 'data': [500_000, ]},
+            {'name': 'assets', 'data': [1, ]},
+            {'name': 'liabilities', 'data': [0.5, ]},
         ]
         self.assertListEqual(context['balance_data'], balance_data_expected)
 
@@ -164,3 +164,19 @@ class StockDetailViewTest(TestCase):
         url = reverse('stocks:detail', kwargs={'ticker': 'AAPL'})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+
+
+class ArticleViewTest(TestCase):
+
+    @mock.patch('my_wallet.stocks.views.YahooCrawler.get_data')
+    @mock.patch('my_wallet.stocks.views.GoogleCrawler.get_data')
+    def test_status_code(self, mock_google, mock_yahoo):
+        Stocks.objects.create(name='Apple', ticker='AAPL')
+        mock_google.return_value = 'Hi there. I am Google Crawler'
+        mock_yahoo.return_value = 'Hi there. I am YahooCrawler'
+
+        url = reverse('stocks:articles', kwargs={'ticker': 'AAPL'})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['google_news'], 'Hi there. I am Google Crawler')
+        self.assertEqual(response.context['yahoo_news'], 'Hi there. I am YahooCrawler')

@@ -6,7 +6,7 @@ from .crawler import CompanyIEX, DividendsIEX, FinancialIEX, PastIEX, QuotesIEX
 from .models import Dividends, Financial, Prices, StockDetail, Stocks
 
 
-def find_quote_day(date, num_days=0, type='earlier'):
+def find_quote_day(date, num_days=0, type='earlier'):   # pragma: no cover
     quote_day = date - timezone.timedelta(days=num_days)
 
     if type == 'earlier':
@@ -89,10 +89,10 @@ class StockMaker:
                 percent_change=data.get('changePercent') if data.get('changePercent') else None,
             )
 
-    def add_all(self):
+    def add_all(self):  # pragma: no cover
         self.add_stocks()
         self.add_detail()
         self.add_dividends()
         self.add_financial()
         self.add_past_data()
-        print(f'date for {self.ticker} collected')
+        print(f'data for {self.ticker} collected')
