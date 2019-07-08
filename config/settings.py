@@ -195,6 +195,7 @@ CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 
+
 CELERY_BEAT_SCHEDULE = {
     'hello': {
         'task': 'my_wallet.portfolio.tasks.price_update',
@@ -247,3 +248,4 @@ if DEBUG:
         # DELETE THAT
         "SHOW_TOOLBAR_CALLBACK": lambda request: True,
     }
+
