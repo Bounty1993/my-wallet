@@ -1,122 +1,201 @@
-from datetime import date
-
+from datetime import datetime, timedelta
+from decimal import Decimal, ROUND_HALF_UP
 from django.core.cache import cache
-from django.test import Client, TestCase
+
+from django.test import Client, TestCase, override_settings
 
 from my_wallet.stocks.models import (
-    Dividends, Financial, Prices, Stocks, find_quote_day,
+    Dividends, Financial, Prices, Stocks, find_quote_day
 )
-from my_wallet.stocks.utils import StockMaker
+from unittest import mock
 
-"""
-class StocksModels(TestCase):
+percents = Decimal('0.0001')
+
+
+class StocksModelsTest(TestCase):
     def setUp(self):
-        Stocks.objects.create(
-            ticker='AAPL',
-            name='Apple Inc'
-        )
-        self.apple = Stocks.objects.get(ticker='AAPL')
-        cache.set('AAPL_price', 100)
-        cache.set('AAPL_day_change', 5)
-        cache.set('AAPL_percent_change', 0.05)
-        cache.set('AAPL_day_low', 95)
-        cache.set('AAPL_day_high', 105)
+        self.apple = Stocks.objects.create(
+            name='Apple', ticker='AAPL')
+        self.price1 = Prices.objects.create(
+            stock=self.apple, price=101, open=100,
+            volume=100_000, change=1, percent_change=1,
+            date_price=datetime(2019, 1, 1).date())
+        self.price2 = Prices.objects.create(
+            stock=self.apple, price=102, open=101,
+            volume=100_000, change=1, percent_change=1,
+            date_price=datetime(2019, 1, 2).date())
+        self.price3 = Prices.objects.create(
+            stock=self.apple, price=104, open=102,
+            volume=100_000, change=2, percent_change=2,
+            date_price=datetime(2019, 1, 3).date())
 
-    def test_creation_stocks(self):
-        self.assertEquals(self.apple.ticker, 'AAPL')
-        self.assertEquals(self.apple.name, 'Apple Inc')
+        self.price4 = Prices.objects.create(
+            stock=self.apple, price=101, open=100,
+            volume=100_000, change=1, percent_change=1,
+            date_price=datetime(2017, 12, 31).date())
 
-    def test_price_properties(self):
-        self.assertEquals(self.apple.current_price, 100)
-        self.assertEquals(self.apple.day_change, 5)
-        self.assertEquals(self.apple.percent_change, 0.05)
-        self.assertEquals(self.apple.day_low, 95)
-        self.assertEquals(self.apple.day_high, 105)
+        self.financial = Financial.objects.create(
+            stock=self.apple, assets=1_000_000, liabilities=500_000,
+            total_revenue=1_000_000, gross_profit=100_000,
+            operating_income=80_000, net_income=50_000)
 
+        self.dividend = Dividends.objects.create(
+            stock=self.apple, payment=datetime(2019, 2, 1).date(),
+            record=datetime(2019, 1, 1).date(), amount=5)
 
-class DividendsTest(TestCase):
-    def setUp(self):
-        self.stock = Stocks.objects.create(
-            ticker='AAPL',
-            name='Apple'
-        )
-        data = [
-            {'amount': 11, 'payment': date(2016, 3, 1), 'record': date(2016, 3, 2)},
-            {'amount': 12, 'payment': date(2017, 3, 1), 'record': date(2017, 3, 2)},
-            {'amount': 13, 'payment': date(2017, 6, 1), 'record': date(2017, 6, 2)},
-            {'amount': 14, 'payment': date(2018, 6, 1), 'record': date(2018, 6, 2)},
+        self.dividend1 = Dividends.objects.create(
+            stock=self.apple, payment=datetime(2019, 2, 13).date(),
+            record=datetime(2019, 1, 12).date(), amount=10)
+
+        self.dividend3 = Dividends.objects.create(
+            stock=self.apple, payment=datetime(2018, 12, 13).date(),
+            record=datetime(2018, 12, 11).date(), amount=10)
+
+    def test_find_quote_day(self):
+        date = datetime(2019, 7, 7)  # Saturday
+        actual = find_quote_day(date, days_ago=365)
+        expected = datetime(2018, 7, 6)  # Friday
+        self.assertEqual(actual, expected)
+
+        date = datetime(2019, 7, 8)  # Sunday
+        actual = find_quote_day(date, days_ago=365)
+        expected = datetime(2018, 7, 6)  # Friday
+        self.assertEqual(actual, expected)
+
+        date = datetime(2019, 7, 9)  # Monday
+        actual = find_quote_day(date, days_ago=365)
+        expected = datetime(2018, 7, 6)  # Friday
+        self.assertEqual(actual, expected)
+
+        date = datetime(2019, 7, 6)  # Friday
+        actual = find_quote_day(date, days_ago=365, type='later')
+        expected = datetime(2018, 7, 9)  # Monday
+        self.assertEqual(actual, expected)
+
+        date = datetime(2019, 7, 7)  # Saturday
+        actual = find_quote_day(date, days_ago=365, type='later')
+        expected = datetime(2018, 7, 9)  # Monday
+        self.assertEqual(actual, expected)
+
+        date = datetime(2019, 7, 8)  # Sunday
+        actual = find_quote_day(date, days_ago=365, type='later')
+        expected = datetime(2018, 7, 9)  # Monday
+        self.assertEqual(actual, expected)
+
+    @mock.patch('my_wallet.stocks.models.datetime')
+    @mock.patch('my_wallet.stocks.models.cache')
+    def test_stocks_manager_highest_dividends(self, mock_cache, mock_datetime):
+        mock_datetime.date.today.return_value = datetime(2018, 7, 6)
+        mock_datetime.timedelta.return_value = timedelta(days=1)
+
+        current_price = 100
+        mock_cache.get.return_value = current_price
+
+        expected = [{
+            'ticker': self.apple.ticker,
+            'sum_dividends': Decimal(25/current_price * 100)
+        }]
+        actual = Stocks.objects.highest_dividends()
+        self.assertEqual(actual, expected)
+
+    def test_stocks_str(self):
+        self.assertEqual(self.apple.__str__(), 'Apple')
+
+    @mock.patch('my_wallet.stocks.models.cache')
+    def test_stocks_properties(self, mock_cache):
+        options = {
+            'AAPL_price': 100, 'AAPL_day_change': 10,
+            'AAPL_percent_change': -10, 'AAPL_day_low': 90,
+            'AAPL_day_high': 110
+        }
+        mock_cache.get = lambda key: options[key]
+
+        self.assertEqual(self.apple.current_price, options['AAPL_price'])
+        self.assertEqual(self.apple.day_change, options['AAPL_day_change'])
+        self.assertEqual(self.apple.percent_change, options['AAPL_percent_change'])
+        self.assertEqual(self.apple.day_low, options['AAPL_day_low'])
+        self.assertEqual(self.apple.day_high, options['AAPL_day_high'])
+
+    @mock.patch('my_wallet.stocks.models.datetime')
+    def test_stocks_dividend_amount(self, mock_datetime):
+        mock_datetime.date.today.return_value = datetime(2018, 12, 31)
+        mock_datetime.timedelta.return_value = timedelta(days=1)
+        actual = self.apple.dividend_amount()
+        expected = self.dividend.amount + self.dividend1.amount
+        self.assertEqual(actual, expected)
+
+    @mock.patch('my_wallet.stocks.models.timezone')
+    def test_stocks_find_past_price(self, mock_timezone):
+        mock_timezone.now().date.return_value = datetime(2019, 7, 6).date()
+        expected = Prices.objects.create(
+            stock=self.apple, price=101, open=100,
+            volume=100_000, change=1, percent_change=1,
+            date_price=datetime(2018, 5, 6).date())
+        actual = self.apple.find_past_price(365)
+        self.assertEqual(actual, expected.price)
+
+    def test_stocks_dividend_summarize(self):
+        dividend = self.apple.dividends.first()
+        first_element = {
+            'payment': dividend.payment,
+            'record': dividend.record,
+            'amount': dividend.amount,
+            'quarter': dividend.which_quarter()
+        }
+        actual = self.apple.dividends_summarize()
+        self.assertDictEqual(actual[0], first_element)
+
+    def test_stocks_dividend_summarize_empty(self):
+        self.apple = Stocks.objects.create(
+            name='Google', ticker='GOOGL')
+        actual = self.apple.dividends_summarize()
+        expected = []
+        self.assertListEqual(actual, expected)
+
+    def test_prices_order(self):
+        actual = Prices.objects.all()
+        expected = [self.price3, self.price2, self.price1, self.price4]
+        self.assertEqual(list(actual), expected)
+
+    @mock.patch('my_wallet.stocks.models.find_quote_day')
+    def test_prices_year_change(self, find_quote_day):
+        find_quote_day.side_effect = [
+            datetime(2019, 1, 1).date(), datetime(2017, 12, 31).date()
         ]
-        for line in data:
-            Dividends.objects.create(
-                stock=self.stock,
-                amount=line['amount'],
-                payment=line['payment'],
-                record=line['record']
-            )
-        self.dividend = Dividends.objects.get(payment=date(2018, 6, 1))
+        actual = Prices.objects.year_change()
+        perc_change = (self.price1.price / self.price4.price - 1) * 100
+        expected = [[self.apple.ticker, perc_change], ]
+        self.assertEqual(actual, expected)
 
-    def test_init(self):
-        self.assertEquals(Dividends.objects.count(), 4)
+    def test_financial_properties(self):
+        equity_expected = self.financial.assets - self.financial.liabilities
+        equity_actual = self.financial.equity
+        self.assertEqual(equity_actual, equity_expected)
 
-    def test_get_rate(self):
-        price = Prices.objects.create(
-            stock=self.stock,
-            date_price=date(2018, 6, 2),
-            price=100
-        )
-        rate = self.dividend.get_rate
-        actual_rate = round((14/100) * 100)   # to make percent
-        self.assertEquals(float(rate), actual_rate)
+        net_margin_expected = self.financial.net_income / self.financial.total_revenue
+        net_margin_actual = self.financial.net_margin
+        self.assertEqual(net_margin_actual, net_margin_expected)
 
-    def test_highest_rate(self):
-        data = Stocks.highest_dividends()[0]
-        self.assertEquals(data['sum_dividends'], 27)
-        self.assertEquals(data['ticker'], 'AAPL')
+        roe_expected = self.financial.net_income / self.financial.equity
+        roe_actual = self.financial.roe
+        self.assertEqual(roe_actual, roe_expected)
 
-    def test_dividend_amount(self):
-        actual_amount = 27
-        test_amount = self.stock.dividend_amount
-        self.assertEquals(float(test_amount), actual_amount)
+    def test_dividend_which_quarter(self):
+        actual = self.dividend.which_quarter()
+        expected = '1Q 2019'
+        self.assertMultiLineEqual(actual, expected)
 
-    def test_dividend_rate(self):
-        actual_rate = 27 / 100
-        test_rate = self.stock.dividend_rate
-        test_rate = round(float(test_rate), 4)
-        self.assertEquals(test_rate, actual_rate)
+    def test_dividend_get_rate_valid(self):
+        actual = self.dividend.get_rate
+        expected = (
+            Decimal(self.dividend.amount/self.price1.price * 100)
+            .quantize(percents, ROUND_HALF_UP))
+        self.assertEqual(actual, round(expected, 4))
 
-
-class FinancialTest(TestCase):
-
-    def setUp(self):
-        self.stock = Stocks.objects.get(
-            ticker='AAPL',
-            name='Apple Inc'
-        )
-        self.model = Financial.objects.create(
-            stock=self.stock,
-            assets=10_000,
-            liabilities=5_000,
-            total_revenue=10_000,
-            gross_profit=1_000,
-            operating_income=800,
-            net_income=500,
-        )
-
-    def test_init(self):
-        self.assertEquals(self.model.stock, self.stock)
-        self.assertEquals(self.model.assets, 10_000)
-        self.assertEquals(self.model.liabilities, 5_000)
-        self.assertEquals(self.model.total_revenue, 10_000)
-        self.assertEquals(self.model.gross_profit, 1_000)
-        self.assertEquals(self.model.operating_income, 800)
-        self.assertEquals(self.model.net_income, 500)
-
-    def test_equity(self):
-        self.assertEquals(self.model.equity, 5_000)
-
-    def test_operating_margin(self):
-        self.assertEquals(self.model.operating_margin, 0.08)
-
-    def test_net_margin(self):
-        self.assertEquals(self.model.net_margin, 0.05)
-"""
+    def test_dividend_get_rate_invalid(self):
+        new_dividend = Dividends.objects.create(
+            stock=self.apple, payment=datetime(2019, 2, 1).date(),
+            record=datetime(2018, 2, 4).date(), amount=2)
+        actual = new_dividend.get_rate
+        expected = 'No data'
+        self.assertMultiLineEqual(actual, expected)

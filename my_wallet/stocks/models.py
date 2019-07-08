@@ -11,20 +11,40 @@ from .crawler import QuotesIEX
 
 
 def find_quote_day(date, days_ago=0, type='earlier'):
+    """
+    Function is responsible for finding the nearest quote day in the past.
+    First function get the starting date (:date: - :days_ago:). Next function
+    found the nearest working day :earlier: or :later:
+    E.G. (if type = 'earlier')
+        starting date = Sunday -> return = Friday
+        starting date = Friday -> return = Saturday
+    :param date: the beginning date: datetime
+    :param days_ago: how many days from the beginning date: int
+    :param type: can be 'earlier' or 'later': str
+    :return: datetime
+    """
     quote_day = date - timezone.timedelta(days=days_ago)
 
     if type == 'earlier':
         if quote_day.weekday() == 6:
             quote_day -= timezone.timedelta(days=2)
             return quote_day
-        return quote_day
-
-    elif type == 'later':
-        if quote_day.weekday() == 6:
-            quote_day -= datetime.timedelta(days=2)
+        elif quote_day.weekday() == 0:
+            quote_day -= timezone.timedelta(days=3)
             return quote_day
-        quote_day -= datetime.timedelta(days=1)
+        quote_day -= timezone.timedelta(days=1)
         return quote_day
+    elif type == 'later':
+        if quote_day.weekday() == 5:
+            quote_day += timezone.timedelta(days=2)
+            return quote_day
+        elif quote_day.weekday() == 4:
+            quote_day += timezone.timedelta(days=3)
+            return quote_day
+        quote_day += timezone.timedelta(days=1)
+        return quote_day
+    else:   # pragma: no cover
+        raise ValueError('Not correct type')
 
 
 class StockManager(models.Manager):
@@ -130,7 +150,7 @@ class Stocks(models.Model):
         past_dividends = []
         if not self.dividends.exists():
             return []  # None will cause error in pagination
-        for dividend in self.dividends.all().order_by('-payment'):
+        for dividend in self.dividends.all():
             one_quarter = {
                 'payment': dividend.payment,
                 'record': dividend.record,
@@ -156,7 +176,8 @@ class Stocks(models.Model):
 
 
 class StockDetail(models.Model):
-    stock = models.OneToOneField(Stocks, on_delete=models.CASCADE, related_name='detail')
+    stock = models.OneToOneField(
+        Stocks, on_delete=models.CASCADE, related_name='detail')
     sector = models.CharField(max_length=200)
     industry = models.CharField(max_length=200)
     website = models.URLField(null=True, blank=True)
@@ -168,10 +189,12 @@ class StockDetail(models.Model):
 
 
 class Dividends(models.Model):
-    stock = models.ForeignKey(Stocks, on_delete=models.CASCADE, related_name='dividends')
+    stock = models.ForeignKey(
+        Stocks, on_delete=models.CASCADE, related_name='dividends')
     payment = models.DateField(null=True, blank=True)
     record = models.DateField(null=True, blank=True)
-    amount = models.DecimalField(max_digits=11, decimal_places=2, null=True, blank=True)
+    amount = models.DecimalField(
+        max_digits=11, decimal_places=2, null=True, blank=True)
 
     @property
     def get_rate(self):
@@ -194,13 +217,20 @@ class Dividends(models.Model):
 
 
 class Financial(models.Model):
-    stock = models.ForeignKey(Stocks, on_delete=models.CASCADE, related_name='financial')
-    assets = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
-    liabilities = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
-    total_revenue = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True)
-    gross_profit = models.DecimalField(max_digits=14, decimal_places=2, null=True, blank=True)
-    operating_income = models.DecimalField(max_digits=14, decimal_places=2, null=True, blank=True)
-    net_income = models.DecimalField(max_digits=14, decimal_places=2, null=True, blank=True)
+    stock = models.ForeignKey(
+        Stocks, on_delete=models.CASCADE, related_name='financial')
+    assets = models.DecimalField(
+        max_digits=20, decimal_places=2, null=True, blank=True)
+    liabilities = models.DecimalField(
+        max_digits=20, decimal_places=2, null=True, blank=True)
+    total_revenue = models.DecimalField(
+        max_digits=20, decimal_places=2, null=True, blank=True)
+    gross_profit = models.DecimalField(
+        max_digits=14, decimal_places=2, null=True, blank=True)
+    operating_income = models.DecimalField(
+        max_digits=14, decimal_places=2, null=True, blank=True)
+    net_income = models.DecimalField(
+        max_digits=14, decimal_places=2, null=True, blank=True)
 
     @property
     def equity(self):
@@ -249,7 +279,8 @@ class Prices(models.Model):
         related_name='past'
     )
     price = models.DecimalField(max_digits=11, decimal_places=2)
-    open = models.DecimalField(max_digits=11, decimal_places=2, null=True, blank=True)
+    open = models.DecimalField(
+        max_digits=11, decimal_places=2, null=True, blank=True)
     volume = models.PositiveIntegerField(null=True, blank=True)
     change = models.FloatField(null=True, blank=True)
     percent_change = models.FloatField(null=True, blank=True)

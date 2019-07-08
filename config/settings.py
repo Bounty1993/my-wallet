@@ -222,7 +222,7 @@ IEX_API_KEY = config('IEX_API_KEY')
 if DEBUG:
     INTERNAL_IPS = ('127.0.0.1', 'localhost',)
     MIDDLEWARE += (
-       'debug_toolbar.middleware.DebugToolbarMiddleware',
+       # 'debug_toolbar.middleware.DebugToolbarMiddleware',
     )
     INSTALLED_APPS += (
        'debug_toolbar',

@@ -5,32 +5,30 @@ from django.shortcuts import get_object_or_404
 
 from django.core.cache import cache
 from django.db.models import Q
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from django.utils import timezone
 from django.views import View
 from django.views.generic import CreateView, DetailView, ListView, TemplateView
 
-from django_tables2 import RequestConfig
 from openpyxl import Workbook
 
 from .crawler import GoogleCrawler, YahooCrawler
 from .models import Dividends, Prices, Stocks, Financial
-from .tables import (
-    DividendTable, PricesTable,
-)
 from .utils import find_quote_day
 
 
 class CsvPrices(View):
     def get(self, request, ticker):
-        model = Prices
+        prices = Prices.objects.filter(stock__ticker=ticker)
+        if not prices.exists():
+            raise Http404
         headers = ['date_price', 'price', 'open', 'volume', 'change', 'percent_change']
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = f'attachment; filename="{ticker}.csv"'
 
         writer = csv.writer(response)
         writer.writerow(headers)
-        items = model.objects.filter(stock__ticker=ticker).values_list(*headers)
+        items = prices.values_list(*headers)
 
         for item in items:
             writer.writerow(item)
@@ -39,7 +37,9 @@ class CsvPrices(View):
 
 class ExcelPrices(View):
     def get(self, request, ticker):
-        model = Prices
+        prices = Prices.objects.filter(stock__ticker=ticker)
+        if not prices.exists():
+            raise Http404
         headers = ['date_price', 'price', 'open', 'volume', 'change', 'percent_change']
         response = HttpResponse(content_type='application/ms-excel')
         response['Content-Disposition'] = f'attachment; filename="{ticker}.xls"'
@@ -47,7 +47,7 @@ class ExcelPrices(View):
         wb = Workbook()
         ws = wb.active
         ws.append(headers)
-        items = model.objects.filter(stock__ticker=ticker).values_list(*headers)
+        items = prices.values_list(*headers)
         for item in items:
             ws.append(item)
 
