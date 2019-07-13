@@ -196,6 +196,7 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 
 
+
 CELERY_BEAT_SCHEDULE = {
     'hello': {
         'task': 'my_wallet.portfolio.tasks.price_update',
@@ -207,6 +208,7 @@ CELERY_BEAT_SCHEDULE = {
         'schedule': crontab(minute='05', hour='19')
     },
 }
+
 
 # for gmail
 EMAIL_USE_TLS = True
@@ -222,7 +224,7 @@ IEX_API_KEY = config('IEX_API_KEY')
 if DEBUG:
     INTERNAL_IPS = ('127.0.0.1', 'localhost',)
     MIDDLEWARE += (
-       # 'debug_toolbar.middleware.DebugToolbarMiddleware',
+        # 'debug_toolbar.middleware.DebugToolbarMiddleware',
     )
     INSTALLED_APPS += (
        'debug_toolbar',

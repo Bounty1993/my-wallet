@@ -73,7 +73,7 @@ class Portfolio(models.Model):
 
     def sell(self, number, stock, price):
         total_value = number * price
-        asset = self.assets.get(stocks=stock)
+        asset = self.asset.get(stocks=stock)
         self.cash += total_value
         new_cost = asset.total_cost - total_value
         asset.avg_cost = new_cost / (asset.sum_number - number)
@@ -116,6 +116,9 @@ class Asset(models.Model):
         verbose_name = 'Asset'
         verbose_name_plural = 'Assets'
 
+    def __str__(self):
+        return self.stocks.__str__()
+
     @property
     def total_cost(self):
         return self.avg_cost * self.sum_number
@@ -123,8 +126,8 @@ class Asset(models.Model):
 
 class Transaction(models.Model):
     KIND = (
-        ('S', 'SELL'),
-        ('B', 'BUY')
+        ('sell', 'SELL'),
+        ('buy', 'BUY')
     )
     portfolio = models.ForeignKey(Portfolio, related_name='transaction',
                                   on_delete=models.CASCADE)
@@ -144,6 +147,7 @@ class Transaction(models.Model):
 
     def get_price(self):
         self.price = Decimal(Stocks.get_current_price(self.stocks.ticker))
+
 
 class PastPortfolio(models.Model):
     parent = models.ForeignKey(Portfolio, on_delete=models.CASCADE)

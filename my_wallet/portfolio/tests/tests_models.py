@@ -4,8 +4,9 @@ from my_wallet.portfolio.models import Asset, Portfolio, Transaction
 from my_wallet.profiles.models import Profile
 from my_wallet.stocks.models import Stocks
 
-
-class MyModelTests(TestCase):
+"""
+taking requests to iex
+class PortfolioModelTest(TestCase):
 
     def setUp(self):
         profile = Profile.objects.create_user(
@@ -23,8 +24,6 @@ class MyModelTests(TestCase):
 
         self.stocks = Stocks.objects.create(name='Apple', ticker='AAPL')
 
-        self.stock_price = Stocks.get_current_price('AAPL')
-
-
     def test_buy(self):
         pass
+"""

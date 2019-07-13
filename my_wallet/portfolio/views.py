@@ -1,6 +1,7 @@
 from datetime import datetime
 from decimal import Decimal
 
+from django.http import Http404
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
@@ -8,16 +9,16 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
 from django.views.generic import (
-    CreateView, DetailView, ListView, TemplateView, View,
+    CreateView, DetailView, ListView, TemplateView, View, FormView
 )
-
+from django.contrib.auth.mixins import LoginRequiredMixin
 from my_wallet.stocks.models import Stocks
 
 from .forms import NewPortfolioForm, TransactionForm
 from .models import Asset, Portfolio, Transaction
 
 
-class NewPortfolioView(CreateView):
+class NewPortfolioView(LoginRequiredMixin, CreateView):
     template_name = 'portfolio/new.html'
     form_class = NewPortfolioForm
 
@@ -58,9 +59,10 @@ class PortfolioDetails(LoginRequiredMixin, DetailView):
         return context
 
 
-def transactions(request, pk):
+def transactions(request, pk, kind):
     portfolio = get_object_or_404(Portfolio, pk=pk)
-    kind = request.POST.get('kind') or 'B'
+    if kind not in ['buy', 'sell']:
+        raise Http404
     if request.method == "POST":
         stock_id = request.POST.get('stocks')
         stock = Stocks.objects.get(id=stock_id)
@@ -78,18 +80,24 @@ def transactions(request, pk):
                     'stock': obj.stocks,
                     'price': obj.price,
                 }
-                if obj.kind == 'B':
+
+                if obj.kind == 'buy':
                     portfolio.buy(**data_for_transaction)
-                else:
+                elif obj.kind == 'sell':
                     portfolio.sell(**data_for_transaction)
+                else:
+                    raise ValueError('Typ transakcji jest błędny')
 
                 return redirect('portfolio:details', pk=pk)
     else:
         form = TransactionForm()
-        if kind == 'S':
-            print('To Do')
-            # form.fields['stocks'].queryset = possessed_stocks
-    context = {'form': form}
+        if kind == 'sell':
+            possessed_stocks = portfolio.asset.prefetch_related('stocks')
+            form.fields['stocks'].queryset = possessed_stocks
+    context = {
+        'form': form,
+        'portfolio_pk': pk
+    }
     return render(request, 'portfolio/transaction.html', context)
 
 

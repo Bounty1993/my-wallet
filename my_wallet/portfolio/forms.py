@@ -55,13 +55,14 @@ class TransactionForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
-        print(cleaned_data)
+        print("in clean", cleaned_data)
         portfolio = cleaned_data['portfolio']
+
         kind = cleaned_data['kind']
         stocks = cleaned_data['stocks']
         number = cleaned_data['number']
         price = cleaned_data['price']
-        if kind == 'B':
+        if kind == 'buy':
             total_value = price * number
             if portfolio.cash < total_value:
                 raise ValidationError('Środki finansowe są niewystarczające')

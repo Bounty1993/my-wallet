@@ -11,6 +11,6 @@ app_name = 'portfolio'
 urlpatterns = [
     path('new/', NewPortfolioView.as_view(), name='new'),
     path('<pk>/', PortfolioDetails.as_view(), name='details'),
-    path('<pk>/transaction', transactions, name='transaction'),
     path('<pk>/history', PastTransactionsView.as_view(), name='past_transactions'),
+    path('<pk>/<kind>', transactions, name='transaction'),
 ]
