@@ -7,7 +7,7 @@ services:
   - redis-server
   - postgresql
 env:
-  - DATABASE_URL=postgres://postgres@127:0:0:1:5432/testing_db
+  - DATABASE_URL=postgres://postgres@localhost:5432/testing_db
 install:
   - pip install -r requirements.txt
 script:
