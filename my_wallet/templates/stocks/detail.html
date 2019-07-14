@@ -39,8 +39,8 @@
           <div class="col-md-6">
               <p class="data-title">Dividend amount:</p>
               <div class="dividend-data">
-                    <div class="valid-data">{{dividend_amount}} <span class="usd-sign">USD</span></div>
-                    <div>{{dividend_rate}} %</div>
+                    <div class="valid-data">{{dividend_amount | floatformat:2}} <span class="usd-sign">USD</span></div>
+                    <div>{{dividend_rate|floatformat:2}} %</div>
               </div>
           </div>
         </div>
@@ -86,30 +86,7 @@
               </tbody>
             </table>
           </div>
-          {% if is_paginated %}
-            <ul class="pagination justify-content-center mt-3">
-            {% if page_obj.has_previous %}
-              <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
-              </li>
-            {% else %}
-              <li class="page-item disabled"><a class="page-link" href="#">
-                <span>Previous</span></a>
-              </li>
-            {% endif %}
-            <li class="page-item active"><a class="page-link" href="#">
-              {{ page_obj.number }} <span class="sr-only">(current)</span></a>
-            </li>
-            {% if page_obj.has_next %}
-              <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
-              </li>
-            {% else %}
-              <li class="page-item disabled">
-                <a class="page-link" href="#"><span>Next</span></a>
-              </li>
-            {% endif %}
-          {% endif %}
+          {% include 'pagination.html' %}
         </div>
       </div>
       <div class="row">

@@ -121,7 +121,7 @@ class YahooCrawler(BaseCrawler):
     url = 'https://finance.yahoo.com/quote/{}'
 
     def get_news(self, soup):
-        return soup.find('ul', 'Mb(0) Ov(h) P(0) Wow(bw)')
+        return soup.find('ul', 'My(0) Ov(h) P(0) Wow(bw)')
 
     def article_text(self, article):
         title = article.h3.text
