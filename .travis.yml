@@ -7,7 +7,8 @@ services:
   - docker
 install:
   - docker-compose build
-# before_script:
+before_script:
+  - docker-compose up -d
 #  - docker-compose web python manage.py migrate --noinput
 script:
   - docker-compose run --no-deps --rm web python manage.py test
