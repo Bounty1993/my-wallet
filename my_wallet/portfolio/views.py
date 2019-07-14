@@ -111,10 +111,10 @@ def transactions(request, pk, kind):
 
 
 class PastTransactionsView(ListView):
-
     template_name = 'portfolio/past_transactions.html'
     model = Transaction
     context_object_name = 'transactions'
+    paginate_by = 20
 
     def get_queryset(self):
         portfolio_id = self.kwargs['pk']

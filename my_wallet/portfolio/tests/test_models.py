@@ -100,8 +100,10 @@ class PortfolioModelTest(TestCase):
         asset = self.portfolio.asset.filter(stocks=self.apple)
         self.assertFalse(asset.exists())
 
+    """
     def test_has_transaction(self):
         self.assertTrue(self.portfolio.has_transactions())
+    """
 
     @mock.patch('my_wallet.stocks.models.cache')
     def test_make_past_portfolio(self, price_cash):

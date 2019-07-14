@@ -24,3 +24,13 @@ def color_percent(value, digits):
         elif value > 0:
             return format_html(f'<span class=rising>{value}%</span>')
     return value
+
+
+@register.filter
+def change_kind(value):
+    if value == 'buy':
+        return 'Kupno'
+    elif value == 'sell':
+        return 'Sprzedaż'
+    else:
+        return value

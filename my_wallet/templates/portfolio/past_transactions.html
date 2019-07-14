@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load custom_tags %}
 {% block content %}
 <div class="container">
 <ul class="breadcrumb">
@@ -21,7 +22,32 @@
     {% include "profiles/sidebar.html" %}
   </div>
   <div class="col-sm-9">
-      Hello
+    <div class="main-panel shadowing">
+      <table class="table">
+        <thead class="thead-dark">
+        <tr>
+          <th scope="col">Data</th>
+          <th scope="col">Akcje</th>
+          <th scope="col">Cena</th>
+          <th scope="col">Ilość</th>
+          <th scope="col">Kupno/Sprzedaż</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for transaction in transactions %}
+        <tr>
+          <td>{{transaction.date}}</td>
+          <td>{{transaction.stocks}}</td>
+          <td>{{transaction.price}}</td>
+          <td>{{transaction.number}}</td>
+          <td>{{transaction.kind | change_kind}}</td>
+        </tr>
+        {% empty %}
+        <p>Nie zawarłeś żadnej transakcji</p>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
 </div>

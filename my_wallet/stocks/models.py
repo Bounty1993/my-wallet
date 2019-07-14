@@ -120,14 +120,14 @@ class Stocks(models.Model):
         year_ago = datetime.date.today() - datetime.timedelta(days=365)
         four_quarters = self.dividends.filter(payment__gte=year_ago)
         data = four_quarters.aggregate(amount=Sum('amount'))
-        return data['amount'] or 'Brak'
+        return data['amount'] or 0
 
     def dividend_rate(self):
         price = cache.get(self.ticker + '_price')
         if not price:
             return 'Brak'
         price = Decimal(price)
-        return self.dividend_amount/price
+        return (self.dividend_amount()/price) * 100
 
     @staticmethod
     def get_current_price(ticker):
