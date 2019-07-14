@@ -6,7 +6,6 @@ from rest_framework.generics import (
 from rest_framework.permissions import (
     IsAdminUser, IsAuthenticated, IsAuthenticatedOrReadOnly,
 )
-from rest_framework.views import APIView
 
 from my_wallet.portfolio.models import Portfolio
 from my_wallet.stocks.models import Stocks

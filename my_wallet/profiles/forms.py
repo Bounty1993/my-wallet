@@ -76,5 +76,6 @@ class MyPasswordChangeForm(PasswordChangeForm):
 
 
 class ContactForm(forms.Form):
-    subject = forms.CharField(max_length=50)
-    content = forms.CharField(widget=forms.Textarea(attrs={'rows': 5, 'col': 15}))
+    subject = forms.CharField(max_length=50, required=True)
+    content = forms.CharField(widget=forms.Textarea(attrs={'rows': 5, 'col': 15}), required=True)
+    email = forms.EmailField(label='Twój email na który chcesz uzyskać odpowiedź', required=True)

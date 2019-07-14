@@ -1,6 +1,5 @@
 import logging
 
-from django.shortcuts import render
 from django.views.generic import TemplateView
 
 logger = logging.getLogger(__name__)

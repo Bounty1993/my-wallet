@@ -165,8 +165,8 @@ class Stocks(models.Model):
         past_date = today - datetime.timedelta(days=num_days)
         try:
             data = self.past.filter(date_price__gte=past_date)
-            current_price = list(data)[0].price
-            past_price = list(data)[-1].price
+            current_price = list(data)[-1].price
+            past_price = list(data)[0].price
         except (AttributeError, IndexError):
             return {'currency': 'No data', 'percent': 'no data'}
         currency = current_price - past_price
@@ -278,13 +278,14 @@ class Prices(models.Model):
         Stocks, on_delete=models.CASCADE,
         related_name='past'
     )
-    price = models.DecimalField(max_digits=11, decimal_places=2)
+    price = models.DecimalField(
+        max_digits=11, decimal_places=2, null=True, blank=True)
     open = models.DecimalField(
         max_digits=11, decimal_places=2, null=True, blank=True)
     volume = models.PositiveIntegerField(null=True, blank=True)
     change = models.FloatField(null=True, blank=True)
     percent_change = models.FloatField(null=True, blank=True)
-    date_price = models.DateField(null=True, blank=True)
+    date_price = models.DateField()
 
     objects = PriceManager()
 

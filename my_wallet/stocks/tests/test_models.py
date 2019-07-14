@@ -152,6 +152,22 @@ class StocksModelsTest(TestCase):
         expected = []
         self.assertListEqual(actual, expected)
 
+    @mock.patch('my_wallet.stocks.models.datetime')
+    @mock.patch('my_wallet.stocks.models.timezone')
+    def test_stocks_get_change(self, mock_timezone, mock_datetime):
+        mock_timezone.now.return_value.date.return_value = datetime(2019, 6, 6)
+        mock_datetime.timedelta.return_value = timedelta(days=365)
+        actual = self.apple.get_change(num_days=356)
+        expected_currency = 101 - 104
+        self.assertEqual(actual['currency'], expected_currency)
+        expected_percent = (101 / 104 - 1) * 100
+        self.assertAlmostEqual(actual['percent'], Decimal(expected_percent))
+
+    def test_stocks_get_change_no_data(self):
+        amazon = Stocks.objects.create(name='Amazon', ticker='AMZN')
+        expected = {'currency': 'No data', 'percent': 'no data'}
+        self.assertEqual(amazon.get_change(365), expected)
+
     def test_prices_order(self):
         actual = Prices.objects.all()
         expected = [self.price3, self.price2, self.price1, self.price4]

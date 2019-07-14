@@ -38,7 +38,7 @@
       </div>
       <div class="card-body">
         <p>Masz jakieś pytania? - Napisz do mnie</p>
-        <form method="post">
+        <form method="post" novalidate>
           {% csrf_token %}
           {{ form | crispy }}
           <button type="submit" class="btn btn-success">

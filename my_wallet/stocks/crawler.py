@@ -57,7 +57,7 @@ class FinancialIEX(BaseIEX):
         return data.get('financials', '')
 
 
-class BaseCrawler(ABC):
+class BaseCrawler(ABC): # pragma: no cover
 
     def get_soup(self):
         url = self.url.format(self.formats)
@@ -95,7 +95,7 @@ class BaseCrawler(ABC):
         return articles
 
 
-class GoogleCrawler(BaseCrawler):
+class GoogleCrawler(BaseCrawler):   # pragma: no cover
 
     def __init__(self, ticker):
         self.ticker = ticker
@@ -113,7 +113,7 @@ class GoogleCrawler(BaseCrawler):
         return title, link, summary
 
 
-class YahooCrawler(BaseCrawler):
+class YahooCrawler(BaseCrawler):    # pragma: no cover
 
     def __init__(self, ticker):
         self.formats = ticker
