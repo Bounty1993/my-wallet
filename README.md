@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/Bounty1993/my-wallet.svg?branch=master)](https://travis-ci.org/Bounty1993/my-wallet)
+[![Coverage Status](https://coveralls.io/repos/github/Bounty1993/my-wallet/badge.svg?branch=master)](https://coveralls.io/github/Bounty1993/my-wallet?branch=master)
 
 # my-wallet website
 

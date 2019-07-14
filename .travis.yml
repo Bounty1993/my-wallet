@@ -12,3 +12,6 @@ before_script:
 #  - docker-compose web python manage.py migrate --noinput
 script:
   - docker-compose run --no-deps --rm web python manage.py test
+  - docker-compose run web coverage run --source='.' manage.py test
+after_success:
+  - docker-compose run web coveralls
