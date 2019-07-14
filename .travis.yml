@@ -6,10 +6,12 @@ python:
 services:
   - redis-server
   - postgresql
+env:
+  - DATABASE_URL=postgres://postgres@127:0:0:1:5432/testing_db
 install:
   - pip install -r requirements.txt
 script:
-  - psql -c 'create database travis_ci_test;' -U postgres
+  - psql -c 'create database testing_db;' -U postgres
   - python manage.py test
   - coverage run --source='.' manage.py test
 after_success:
