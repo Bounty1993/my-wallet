@@ -1,12 +1,13 @@
 dist: xenial   # required for Python >= 3.7
+sudo: required
 language: python
 python:
   - "3.7"
 services:
   - docker
-
-before_script:
+install:
   - docker-compose build
-
+# before_script:
+#  - docker-compose web python manage.py migrate --noinput
 script:
-  - docker-compose run web test
+  - docker-compose run --no-deps --rm web python manage.py test
