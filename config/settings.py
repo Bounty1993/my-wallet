@@ -19,7 +19,7 @@ SECRET_KEY = config('SECRET_KEY', default=string.ascii_letters)
 DEBUG = config('DEBUG', default=True, cast=bool)
 
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv(), default='*')
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv(), default=['*'])
 
 
 # Application definition
@@ -94,25 +94,16 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
-"""
 DATABASES = {
     'default': dj_database_url.config(
         default=config('DATABASE_URL')
     )
 }
-"""
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
-}
-
 
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://localhost:6379/1",
+        "LOCATION": config('REDIS_URL', default='redis://localhost:6379/1'),
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient"
         },
@@ -205,7 +196,6 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 
 
-"""
 CELERY_BEAT_SCHEDULE = {
     'hello': {
         'task': 'my_wallet.portfolio.tasks.price_update',
@@ -217,13 +207,13 @@ CELERY_BEAT_SCHEDULE = {
         'schedule': crontab(minute='05', hour='19')
     },
 }
-"""
+
 
 # for gmail
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = config('EMAIL_USER', default='localhost')
-EMAIL_HOST_PASSWORD = config('EMAIL_PASSWORD', default=1025)
+EMAIL_HOST_PASSWORD = config('EMAIL_PASSWORD', default='secret_password')
 EMAIL_PORT = 587
 
 IEX_API_KEY = config('IEX_API_KEY', default=string.ascii_letters)
