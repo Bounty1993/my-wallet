@@ -40,6 +40,14 @@ class PortfolioDetails(LoginRequiredMixin, DetailView):
     model = Portfolio
     context_object_name = 'portfolio'
 
+    def get(self, request, *args, **kwargs):
+        portfolio_id = self.kwargs['pk']
+        portfolio = request.user.portfolio.filter(pk=portfolio_id)
+        if portfolio.exists():
+            return super().get(request, *args, **kwargs)
+        else:
+            raise Http404
+
     def chart_data(self, assets):
         data = []
         total_value = self.object.total_value
@@ -55,6 +63,7 @@ class PortfolioDetails(LoginRequiredMixin, DetailView):
         context = super().get_context_data(**kwargs)
         assets = self.object.asset.all().prefetch_related('stocks')
         context['assets'] = assets
+        context['portfolio'] = self.object.get_summary()
         context['data'] = self.chart_data(assets)
         return context
 

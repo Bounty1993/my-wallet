@@ -53,7 +53,7 @@
                                 Szczegóły portfela
                             </button>
                         </a>
-                        <a href="{% url 'portfolio:transaction' portfolio.pk %}">
+                        <a href="{% url 'portfolio:transaction' pk=portfolio.pk kind='buy' %}">
                             <button class="btn btn-success">
                                 Nowa transakcja
                             </button>

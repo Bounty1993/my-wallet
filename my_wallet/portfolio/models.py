@@ -42,13 +42,17 @@ class Portfolio(models.Model):
     def total_value(self):
         return Decimal(self.stocks_value) + self.cash
 
-    @property
-    def total_return(self):
-        return self.total_value - self.beginning_cash
-
-    @property
-    def percent_return(self):
-        return self.total_return/self.beginning_cash * 100
+    def get_summary(self):
+        data = {}
+        stock_value = self.stocks_value
+        data['stocks_value'] = stock_value
+        data['total_value'] = Decimal(stock_value) + self.cash
+        data['total_return'] = data['total_value'] - self.beginning_cash
+        data['percent_return'] = data['total_return'] / self.beginning_cash * 100
+        data['pk'] = self.pk
+        data['beginning_cash'] = self.beginning_cash
+        data['cash'] = self.cash
+        return data
 
     def buy(self, number, stock, price):
         total_value = number * price
@@ -66,7 +70,7 @@ class Portfolio(models.Model):
             Asset.objects.create(
                 portfolio=self,
                 stocks=stock,
-                avg_cost=total_value,
+                avg_cost=price,
                 sum_number=number
             )
             self.save()
@@ -75,13 +79,16 @@ class Portfolio(models.Model):
         total_value = number * price
         asset = self.asset.get(stocks=stock)
         self.cash += total_value
+        # is it the best way to show? Maybe i should not change avg_cost...
+        if (asset.sum_number - number) == 0:
+            asset.delete()
+            self.save()
+            return
         new_cost = asset.total_cost - total_value
         asset.avg_cost = new_cost / (asset.sum_number - number)
         asset.sum_number -= number
         asset.save()
         self.save()
-        if asset.sum_number == 0:
-            asset.delete()
 
     def is_new(self):
         if self.created_at == datetime.now().date:
@@ -89,13 +96,13 @@ class Portfolio(models.Model):
         return False
 
     def has_transactions(self):
-        older = self.transaction.filter(date__lte=datetime.now().date)
+        older = self.transaction.filter(date__lte=timezone.now().date())
         if older.exists():
             return True
 
     def make_past_portfolio(self):
         PastPortfolio.objects.create(
-            parent=self,
+            portfolio=self,
             beginning_cash=self.beginning_cash,
             cash=self.cash,
             stock_value=self.stocks_value
@@ -150,7 +157,9 @@ class Transaction(models.Model):
 
 
 class PastPortfolio(models.Model):
-    parent = models.ForeignKey(Portfolio, on_delete=models.CASCADE)
+    portfolio = models.ForeignKey(
+        Portfolio, on_delete=models.CASCADE,
+        related_name='past_portfolio')
     beginning_cash = models.DecimalField(max_digits=11, decimal_places=2)
     cash = models.DecimalField(max_digits=11, decimal_places=2)
     stock_value = models.DecimalField(max_digits=11, decimal_places=2)

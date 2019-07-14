@@ -36,7 +36,6 @@ INSTALLED_APPS = [
     'coverage',
     'django_extensions',
     'crispy_forms',
-    'django_tables2',
     'social_django',
     'rest_framework',
     'django_redis',

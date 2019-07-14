@@ -55,7 +55,6 @@ class TransactionForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
-        print("in clean", cleaned_data)
         portfolio = cleaned_data['portfolio']
 
         kind = cleaned_data['kind']
@@ -67,7 +66,7 @@ class TransactionForm(forms.ModelForm):
             if portfolio.cash < total_value:
                 raise ValidationError('Środki finansowe są niewystarczające')
         else:
-            stocks_in_portfolio = portfolio.assets.filter(stocks=stocks)
+            stocks_in_portfolio = portfolio.asset.filter(stocks=stocks)
             if stocks_in_portfolio.count() == 0:
                 raise ValidationError('Nie masz tych akcji w portfelu')
             num_of_stocks = stocks_in_portfolio.first().sum_number
