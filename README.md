@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/Bounty1993/my-wallet.svg?branch=master)](https://travis-ci.org/Bounty1993/my-wallet)
+
 # my-wallet website
 
 My Wallet jest stroną na której użytkownik może zapoznać się z bieżącymi kursami giełdowymi spółek amerykańskich oraz ETF-ów. Ponadto widoczne są dane finasowy, przeszłe kursy oraz najnowsze informacje prasowe. Możliwe jest także stworzenie własnej kompozycji spółek i śledzenia ich wyników.

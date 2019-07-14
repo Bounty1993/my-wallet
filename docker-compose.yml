@@ -4,13 +4,13 @@ volumes:
 services:
   web:
     build: .
-    command: python manage.py runserver 0.0.0.0:8000
     volumes:
-      - .:/code
+      - .:/my_wallet
     ports:
-      - "8000:8000"
+      - 8000:8000
     environment:
       DATABASE_URL: postgres://postgres13:example123@db:5432/postgres12
+    command: python manage.py runserver 0.0.0.0:8000
     depends_on:
       - db
       - redis
