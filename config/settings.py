@@ -213,11 +213,11 @@ CELERY_BEAT_SCHEDULE = {
 # for gmail
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = config('EMAIL_USER')
-EMAIL_HOST_PASSWORD = config('EMAIL_PASSWORD')
+EMAIL_HOST_USER = config('EMAIL_USER', default='localhost')
+EMAIL_HOST_PASSWORD = config('EMAIL_PASSWORD', default=1025)
 EMAIL_PORT = 587
 
-IEX_API_KEY = config('IEX_API_KEY')
+IEX_API_KEY = config('IEX_API_KEY', default=string.ascii_letters)
 
 
 # DEBUG settings
