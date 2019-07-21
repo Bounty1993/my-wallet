@@ -8,8 +8,8 @@ services:
       - .:/my_wallet
     ports:
       - 8000:8000
-    environment:
-      DATABASE_URL: postgres://postgres13:example123@db:5432/postgres12
+    env_file:
+      - example.env
     command: python manage.py runserver 0.0.0.0:8000
     depends_on:
       - db
@@ -33,6 +33,8 @@ services:
     command: celery -A my_wallet worker -l info
     volumes:
       - .:/my_wallet
+    env_file:
+      - example.env
     depends_on:
       - db
       - redis
@@ -41,6 +43,8 @@ services:
     command: celery -A my_wallet beat -l info
     volumes:
       - .:/my_wallet
+    env_file:
+      - example.env
     depends_on:
       - db
       - redis
